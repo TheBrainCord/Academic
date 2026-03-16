@@ -1,6 +1,25 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Public paths that don't require authentication
+const PUBLIC_PATHS = ['/auth/login', '/auth/callback', '/research/published']
+
+// Map each role to its home dashboard
+const ROLE_DASHBOARD: Record<string, string> = {
+  teacher:     '/teacher/dashboard',
+  student:     '/student/dashboard',
+  supervisor:  '/supervisor/dashboard',
+  coordinator: '/coordinator/dashboard',
+}
+
+// Paths each role is allowed to access (prefix match)
+const ROLE_PREFIXES: Record<string, string[]> = {
+  teacher:     ['/teacher'],
+  student:     ['/student'],
+  supervisor:  ['/supervisor'],
+  coordinator: ['/coordinator', '/supervisor'],  // coordinators can view supervisor pages too
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -26,26 +45,62 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
-  // Redirect unauthenticated users away from protected routes
-  if (!user && (path.startsWith('/teacher') || path.startsWith('/student'))) {
-    return NextResponse.redirect(new URL('/auth/login', request.url))
+  // Allow public paths through without auth
+  if (PUBLIC_PATHS.some(p => path === p || path.startsWith(p + '/'))) {
+    return supabaseResponse
   }
 
-  if (user && (path.startsWith('/teacher') || path.startsWith('/student'))) {
-    // Verify role matches route — fetched via RLS-bound query
+  // Root redirect
+  if (path === '/') {
+    if (!user) return NextResponse.redirect(new URL('/auth/login', request.url))
+    // Role-based home redirect handled below
+  }
+
+  // Protect all role-prefixed routes
+  const isProtected = Object.values(ROLE_PREFIXES)
+    .flat()
+    .some(prefix => path.startsWith(prefix))
+
+  if (isProtected || path === '/dashboard') {
+    if (!user) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    const role = profile?.role
+    const role = profile?.role as string | undefined
 
-    if (path.startsWith('/teacher') && role !== 'teacher') {
-      return NextResponse.redirect(new URL('/student/dashboard', request.url))
+    if (!role) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
     }
-    if (path.startsWith('/student') && role !== 'student') {
-      return NextResponse.redirect(new URL('/teacher/dashboard', request.url))
+
+    // /dashboard → redirect to role-specific home
+    if (path === '/dashboard') {
+      return NextResponse.redirect(new URL(ROLE_DASHBOARD[role] ?? '/auth/login', request.url))
+    }
+
+    // Check that the role is allowed to access this path prefix
+    const allowedPrefixes = ROLE_PREFIXES[role] ?? []
+    const isAllowed = allowedPrefixes.some(prefix => path.startsWith(prefix))
+
+    if (!isAllowed) {
+      return NextResponse.redirect(new URL(ROLE_DASHBOARD[role] ?? '/auth/login', request.url))
+    }
+
+    // New supervisor with no onboarding → redirect to onboarding
+    if (role === 'supervisor' && !path.startsWith('/supervisor/onboarding')) {
+      const { data: fullProfile } = await supabase
+        .from('profiles')
+        .select('bio_short')
+        .eq('id', user.id)
+        .single()
+      if (!fullProfile?.bio_short) {
+        return NextResponse.redirect(new URL('/supervisor/onboarding', request.url))
+      }
     }
   }
 
@@ -53,5 +108,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/teacher/:path*', '/student/:path*', '/dashboard'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
