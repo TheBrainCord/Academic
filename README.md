@@ -25,6 +25,5 @@ Drop a `.yaml` file in `/content/subjects/` and run `npm run seed`.
 No code changes required.
 
 ## License
-Developer: Ravesh Ashok Naik
-Github Profile: @ranaik09
+
 MIT — free to use, fork, and deploy at any university.
