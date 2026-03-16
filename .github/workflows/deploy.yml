@@ -1,0 +1,173 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main          # → Vercel Production
+      - "claude/**"   # → Vercel Preview (feature/AI branches)
+    paths:
+      - "iot-at-christ/**"
+      - ".github/workflows/deploy.yml"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "iot-at-christ/**"
+
+# Cancel in-progress deployments for the same ref
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Step 1: Quality gate — must pass before any deploy ───────────────────
+  quality:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: iot-at-christ
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: iot-at-christ/package.json
+
+      - run: npm install --legacy-peer-deps
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run test:run
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+          ANTHROPIC_API_KEY: placeholder-anthropic-key
+          RESEND_API_KEY: placeholder-resend-key
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+  # ── Step 2: Deploy Preview (PRs + feature branches) ───────────────────────
+  deploy-preview:
+    name: Deploy → Preview
+    needs: quality
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: iot-at-christ/package.json
+
+      - name: Install app dependencies
+        run: npm install --legacy-peer-deps
+        working-directory: iot-at-christ
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: iot-at-christ
+        env:
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build project
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: iot-at-christ
+        env:
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy to Vercel Preview
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "✅ Preview URL: $url"
+        working-directory: iot-at-christ
+        env:
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Comment preview URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = '${{ steps.deploy.outputs.url }}'
+            const body = [
+              '## 🚀 Preview Deployment',
+              '',
+              `**URL:** ${url}`,
+              '',
+              '| Status | Branch | Commit |',
+              '|--------|--------|--------|',
+              `| ✅ Ready | \`${{ github.head_ref }}\` | \`${{ github.sha }}\` |`,
+            ].join('\n')
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            })
+
+  # ── Step 3: Deploy Production (main only) ────────────────────────────────
+  deploy-production:
+    name: Deploy → Production
+    needs: quality
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: iot-at-christ/package.json
+
+      - name: Install app dependencies
+        run: npm install --legacy-peer-deps
+        working-directory: iot-at-christ
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: iot-at-christ
+        env:
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build project
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: iot-at-christ
+        env:
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy to Vercel Production
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "✅ Production URL: $url"
+        working-directory: iot-at-christ
+        env:
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

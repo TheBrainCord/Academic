@@ -66,7 +66,7 @@ export function IdeaExplorer() {
       <div>
         <h2 className="text-base font-display font-semibold text-christ-navy mb-2">Start Your Research</h2>
         <p className="text-sm font-body text-christ-navy/60 mb-4">
-          Describe a problem you want to solve with IoT. Don't worry about making it perfect.
+          Describe a problem you want to solve with IoT. Don&apos;t worry about making it perfect.
         </p>
         <textarea
           value={idea}

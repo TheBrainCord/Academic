@@ -116,6 +116,21 @@ Called **only** from server-side API routes (`/app/api/research/*`). Never from 
 - `lib/anthropic/research-suggest.ts` — phase-level next-step suggestions
 - `lib/anthropic/paper-draft.ts` — IEEE paper section drafts from student observations
 
+### Multi-Supervisor Model (Migration 002)
+
+Extends the research module with a full supervision layer:
+
+- **Roles**: `coordinator` (admin), `supervisor` (primary|advisor), `student`
+- **`project_supervisors`** — assigns supervisors to projects. Advisors get `tagged_phases int[]` and `tagged_sections text[]` restricting their access.
+- **`phase_signoffs`** — one row per phase (UNIQUE). Upsert pattern handles coordinator override.
+- **`supervision_comments`** — threaded via `parent_id`. `is_private=true` hides from students.
+- **`notifications`** — in-platform + Resend email via `lib/notifications/send.ts`
+
+Permission checks: `lib/roles/permissions.ts` — always call these in Server Actions before mutations.
+
+New routes: `/supervisor/*`, `/coordinator/*` with own layouts.
+Components: `components/supervision/` — SignOffModal, SupervisorCard, CommentThread, MeetingNoteForm, QuestionForm.
+
 ### Research Lab
 
 Dark-themed module (`--research-bg: #0D0B08`). All other pages use light theme — this contrast is intentional.
@@ -143,6 +158,76 @@ Fonts (all via Google Fonts, imported in `app/layout.tsx`):
 - `Playfair Display` — display headings
 - `Source Serif 4` — body text
 - `Courier Prime` — monospace / code / research notes
+
+---
+
+## Deployment
+
+### Vercel
+
+The app deploys to Vercel from the `iot-at-christ/` subdirectory.
+
+**Required GitHub Secrets** (Settings → Secrets → Actions):
+```
+VERCEL_TOKEN        # from vercel.com → Account Settings → Tokens
+VERCEL_ORG_ID       # from .vercel/project.json after `vercel link`
+VERCEL_PROJECT_ID   # from .vercel/project.json after `vercel link`
+```
+
+**One-time Vercel project setup:**
+```bash
+cd iot-at-christ
+npx vercel link          # links repo, creates .vercel/project.json
+npx vercel env pull      # pulls env vars into .env.local
+```
+
+**Required Vercel Environment Variables** (set in Vercel dashboard):
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+RESEND_API_KEY
+ANTHROPIC_API_KEY
+NEXT_PUBLIC_APP_URL        # set to your Vercel domain
+```
+
+### CI/CD (GitHub Actions)
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `.github/workflows/ci.yml` | Every push/PR | lint → type-check → test |
+| `.github/workflows/deploy.yml` | Push to `main` | Quality gate → Vercel **production** |
+| `.github/workflows/deploy.yml` | Push to `claude/**` or PR | Quality gate → Vercel **preview** |
+
+Preview deployments automatically comment the URL on the PR.
+
+---
+
+## Memory Management (Token Efficiency)
+
+### Session Start Hook
+`.claude/hooks/session-start.sh` runs at the start of every Claude Code session:
+1. **Installs dependencies** — `npm install --prefer-offline` (async, cached after first run)
+2. **Prints compact context snapshot** — architecture summary, key file paths, role model, deploy info — replaces the need to re-read files
+3. **Lists recently modified files** — helps Claude resume in-progress work
+
+Registered in `.claude/settings.json`.
+
+### CLAUDE.md as Memory
+This file IS the project memory. When the codebase grows, keep this file updated:
+- Add new major features to the Architecture section
+- Keep the supervision model table current
+- Add new design tokens when added to tailwind.config.ts
+- Add new environment variables to the deployment section
+
+### Token-saving rules for Claude
+- **Read CLAUDE.md first** before exploring files — it has 90% of what you need
+- **Use Grep/Glob** over reading whole directories
+- **Read only the specific function you need to modify**, not whole files
+- **Never re-read files already in the conversation context**
+- The session hook snapshot replaces needing to call `ls` and read layout files at session start
 
 ---
 
