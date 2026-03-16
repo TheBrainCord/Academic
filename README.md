@@ -1,7 +1,7 @@
 # IoT at CHRIST
 
 Open-source academic platform for IoT education.
-Built for Christ University M.Tech CSE programme.
+Built for Christ University MSc CSA programme.
 
 ## What it does
 
