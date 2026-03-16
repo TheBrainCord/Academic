@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --christ-navy:    #1B2E4B;
+    --christ-saffron: #E8720C;
+    --christ-gold:    #B7791F;
+    --christ-green:   #1A7A4A;
+    --christ-red:     #C0392B;
+    --christ-bg:      #F7F8FA;
+    --research-bg:    #0D0B08;
+    --research-amber: #F5A623;
+    --radius: 0.5rem;
+  }
+
+  body {
+    @apply bg-christ-bg font-body text-christ-navy;
+  }
+
+  h1, h2, h3 {
+    @apply font-display;
+  }
+
+  code, pre, kbd {
+    @apply font-mono;
+  }
+}
