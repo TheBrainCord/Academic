@@ -1,43 +1,21 @@
-Copyright (c) 2026 Ravesh Ashok Naik (GitHub: ranaik09)
-Contact: ravesh.ashok.naik@gmail.com
+MIT License
 
-All Rights Reserved.
+Copyright (c) 2026 Ravesh Ashok Naik
 
-PROPRIETARY AND CONFIDENTIAL
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-This software, its source code, documentation, designs, concepts, and all associated
-intellectual property ("the Work") are the exclusive property of Ravesh Ashok Naik.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-No part of the Work may be:
-
-  - Copied, reproduced, or duplicated in any form or by any means
-  - Modified, adapted, translated, or created into derivative works
-  - Distributed, published, or sublicensed to any third party
-  - Used for commercial purposes, either directly or indirectly
-  - Reverse-engineered, decompiled, or disassembled
-
-without the prior explicit written permission of the owner, Ravesh Ashok Naik.
-
-OWNERSHIP OF IDEAS AND CONCEPTS
-
-The original ideas, concepts, and intellectual property embodied in this project
-are solely owned by Ravesh Ashok Naik. No use, adaptation, or implementation of
-these ideas — in whole or in part — is permitted without written authorization
-from the owner.
-
-PERMITTED USE
-
-Viewing of this repository for personal, non-commercial, educational reference
-is permitted, provided that no part of the Work is copied, reproduced, or used
-in any other project or product without explicit written permission.
-
-DISCLAIMER
-
-THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
-IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY
-ARISING FROM THE USE OR INABILITY TO USE THE WORK.
-
-For permissions, licensing inquiries, or collaboration requests, contact:
-  Ravesh Ashok Naik
-  ravesh.ashok.naik@gmail.com
-  https://github.com/ranaik09
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
