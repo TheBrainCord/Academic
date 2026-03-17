@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { NewPostButton } from '@/components/student/NewPostButton'
 
 export default async function StudentForumPage() {
   const supabase = createClient()
@@ -13,7 +14,7 @@ export default async function StudentForumPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-display font-bold text-christ-navy">Forum</h1>
-        {/* TODO: NewPostButton client component */}
+        <NewPostButton />
       </div>
 
       <div className="space-y-3">

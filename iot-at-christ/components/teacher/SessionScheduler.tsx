@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toIST } from '@/lib/utils'
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
+
+const IST = 'Asia/Kolkata'
 
 interface Props {
   sessionId:         string
@@ -13,18 +16,18 @@ export function SessionScheduler({ sessionId, currentScheduledAt }: Props) {
   const supabase = createClient()
   const [saving, setSaving]   = useState(false)
   const [saved, setSaved]     = useState(false)
-  // Store as local datetime string for the input; save as UTC to DB
+  // Keep the datetime-local input in IST so the teacher always sees and sets IST times
   const [value, setValue] = useState(
     currentScheduledAt
-      ? new Date(currentScheduledAt).toISOString().slice(0, 16) // 'YYYY-MM-DDTHH:mm'
+      ? formatInTimeZone(new Date(currentScheduledAt), IST, "yyyy-MM-dd'T'HH:mm")
       : ''
   )
 
   async function handleSave() {
     if (!value) return
     setSaving(true)
-    // Input is local time — store as UTC in DB
-    const utc = new Date(value).toISOString()
+    // value is an IST datetime string — convert to UTC before storing
+    const utc = fromZonedTime(value, IST).toISOString()
     await supabase.from('sessions').update({ scheduled_at: utc }).eq('id', sessionId)
     setSaving(false)
     setSaved(true)
