@@ -1,7 +1,6 @@
 # AI assistant workspace files — not part of the project source
 .CLAUDE/
 .claude/
-.ai-workspace/
 CLAUDE.md
 *.claude.md
 
