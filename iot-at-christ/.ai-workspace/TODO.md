@@ -6,15 +6,13 @@ Steps 1–11 are complete and working. Do not rebuild them.
 
 ## THIS SESSION — complete these in order
 
-### Task 1: Mobile responsiveness audit
+### ~~Task 1: Mobile responsiveness audit~~ DONE
 
-Check and fix these pages on small screens (≤ 375px):
-- /teacher/curriculum — session list and session detail should stack vertically
-- /teacher/students — ClassroomSyncStatus bar should wrap gracefully
-- /student/research/[id] — PhaseCard and PaperEditor sections should scroll without overflow
-- /teacher/research/[id] — feedback form should not overflow horizontally
-
-Rule: no horizontal scroll on any page at 375px viewport width.
+Fixed 5 overflow issues at 375px:
+- teacher/students: header stacks (flex-col → sm:flex-row), table Email col hidden on mobile, px reduced
+- ClassroomSyncStatus: flex-wrap so long last-sync text + button wraps
+- teacher/curriculum, student/research/[id], teacher/research/[id]: text-3xl → text-2xl sm:text-3xl
+- teacher/research/[id]: p-8 → p-4 sm:p-8
 
 ### Task 2: Supabase Storage bucket for PDF exports
 
@@ -36,11 +34,7 @@ create policy "pdf_owner" on storage.objects
 
 File: /supabase/migrations/004_storage_buckets.sql
 
-### Task 3: Leaderboard — wire real XP
-
-/app/student/leaderboard/page.tsx currently exists. Verify it reads from
-student_progress.xp (sum per student) grouped by student_id, ordered DESC.
-If it is using a stub or hardcoded data, replace with a real Supabase query.
+### ~~Task 3: Leaderboard — wire real XP~~ DONE (verified — no changes needed)
 
 ### Task 4: README.md
 

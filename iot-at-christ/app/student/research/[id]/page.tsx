@@ -26,7 +26,7 @@ export default async function StudentResearchWorkspacePage({ params }: { params:
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-10">
         <div>
           <p className="text-xs font-mono text-research-amber">{project.domain}</p>
-          <h1 className="text-3xl font-display font-bold mt-1">{project.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-display font-bold mt-1">{project.title}</h1>
           <p className="text-xs font-mono text-white/40 mt-1">{project.approval_status}</p>
         </div>
 

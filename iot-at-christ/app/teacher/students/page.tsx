@@ -20,30 +20,30 @@ export default async function TeacherStudentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-display font-bold text-christ-navy">Students</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl sm:text-3xl font-display font-bold text-christ-navy">Students</h1>
         <ClassroomSyncStatus lastSync={lastSync} />
       </div>
 
-      <div className="rounded-lg border border-christ-navy/10 bg-white overflow-hidden">
+      <div className="rounded-lg border border-christ-navy/10 bg-white overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-christ-bg border-b border-christ-navy/10">
             <tr>
-              <th className="px-6 py-3 text-left font-mono text-xs text-christ-navy/50">Name</th>
-              <th className="px-6 py-3 text-left font-mono text-xs text-christ-navy/50">Email</th>
-              <th className="px-6 py-3 text-left font-mono text-xs text-christ-navy/50">Joined</th>
+              <th className="px-4 sm:px-6 py-3 text-left font-mono text-xs text-christ-navy/50">Name</th>
+              <th className="hidden sm:table-cell px-6 py-3 text-left font-mono text-xs text-christ-navy/50">Email</th>
+              <th className="px-4 sm:px-6 py-3 text-left font-mono text-xs text-christ-navy/50">Joined</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-christ-navy/5">
             {students?.map(s => (
               <tr key={s.id} className="hover:bg-christ-bg transition-colors">
-                <td className="px-6 py-3">
+                <td className="px-4 sm:px-6 py-3">
                   <Link href={`/teacher/students/${s.id}`} className="font-body text-christ-navy hover:text-christ-saffron">
                     {s.full_name}
                   </Link>
                 </td>
-                <td className="px-6 py-3 font-mono text-xs text-christ-navy/60">{s.email}</td>
-                <td className="px-6 py-3 font-mono text-xs text-christ-navy/40">
+                <td className="hidden sm:table-cell px-6 py-3 font-mono text-xs text-christ-navy/60">{s.email}</td>
+                <td className="px-4 sm:px-6 py-3 font-mono text-xs text-christ-navy/40">
                   {new Date(s.created_at).toLocaleDateString('en-IN')}
                 </td>
               </tr>

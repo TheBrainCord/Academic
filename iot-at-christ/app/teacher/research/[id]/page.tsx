@@ -16,12 +16,12 @@ export default async function TeacherResearchDetailPage({ params }: { params: { 
   const isOwner = project.owner_id === user?.id
 
   return (
-    <div className={`min-h-screen ${isOwner ? 'bg-research-bg text-white' : 'bg-christ-bg text-christ-navy'} p-8 space-y-8`}>
+    <div className={`min-h-screen ${isOwner ? 'bg-research-bg text-white' : 'bg-christ-bg text-christ-navy'} p-4 sm:p-8 space-y-8`}>
       <div>
         <p className={`text-xs font-mono ${isOwner ? 'text-research-amber' : 'text-christ-navy/50'}`}>
           {isOwner ? 'My Project' : `Student: ${(project.profiles as any)?.full_name}`}
         </p>
-        <h1 className="text-3xl font-display font-bold mt-1">{project.title}</h1>
+        <h1 className="text-2xl sm:text-3xl font-display font-bold mt-1">{project.title}</h1>
         <p className={`font-mono text-sm mt-1 ${isOwner ? 'text-research-amber' : 'text-christ-navy/50'}`}>
           {project.domain} · {project.approval_status}
         </p>

@@ -51,9 +51,9 @@
 
 ## In progress (current session: Step 12)
 
-- [ ] Mobile responsiveness audit — NOT STARTED
+- [x] Mobile responsiveness audit — DONE (5 fixes: students table hidden email col, header stacks, ClassroomSyncStatus flex-wrap, curriculum/research/student-research headings responsive)
 - [ ] Migration 004: Supabase Storage bucket for research-pdfs — NOT STARTED
-- [ ] Leaderboard: verify real XP query — NOT VERIFIED
+- [x] Leaderboard: verify real XP query — VERIFIED (reads student_progress.xp, sums per student, sorted DESC)
 - [ ] README.md — NOT STARTED
 - [ ] .env.example — NOT STARTED
 

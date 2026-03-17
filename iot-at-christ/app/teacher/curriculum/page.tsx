@@ -12,7 +12,7 @@ export default async function TeacherCurriculumPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-display font-bold text-christ-navy">
+      <h1 className="text-2xl sm:text-3xl font-display font-bold text-christ-navy">
         {subject?.name ?? 'Curriculum'}
       </h1>
 

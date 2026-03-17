@@ -29,7 +29,7 @@ export function ClassroomSyncStatus({ lastSync }: Props) {
     : 'Never synced'
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       <span className="text-xs font-mono text-christ-navy/40">{lastSyncText}</span>
       <button
         onClick={handleSync}
