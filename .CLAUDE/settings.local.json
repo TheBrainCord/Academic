@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm install:*)",
+      "Bash(ls -la /c/TheBrainCord/Academic/iot-at-christ/*.*)",
+      "Bash(npm run:*)",
+      "Bash(grep -rn private-next-app-dir /c/TheBrainCord/Academic/iot-at-christ/node_modules/next/dist/build/ --include=*.js)",
+      "Bash(grep -v \"^$\")",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npm run build)",
+      "Bash(ls /c/TheBrainCord/Academic/iot-at-christ/node_modules/@next/swc*)",
+      "Bash(node:*)",
+      "Bash(ls /c/TheBrainCord/Academic/iot-at-christ/node_modules/next/headers*)",
+      "Bash(grep -v \"//\")",
+      "Bash(NEXT_WEBPACK_LOGGING=profile-server npm run build)",
+      "Bash(grep '\"\"version\"\"' /c/TheBrainCord/Academic/iot-at-christ/node_modules/zod/package.json)",
+      "Bash(grep '\"\"zod\"\"' /c/TheBrainCord/Academic/iot-at-christ/package.json)",
+      "Bash(npm show:*)",
+      "Bash(grep '\"\"version\"\"' /c/TheBrainCord/Academic/iot-at-christ/node_modules/@supabase/ssr/package.json)",
+      "Bash(grep '\"\"ramda\"\"' /c/TheBrainCord/Academic/iot-at-christ/node_modules/@supabase/ssr/package.json)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
+}
