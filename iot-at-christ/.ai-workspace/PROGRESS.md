@@ -1,5 +1,22 @@
 # Build progress
 
+## Virtual Lab — Phase 1 (current)
+
+- [x] Shared contract: types/simulator.ts (boards, components, circuit, validation, simulation)
+- [x] Engine: lib/simulator/{boards,components,validation,simulation}.ts + vitest suite
+      — Arduino Uno / ESP32 DevKit / Raspberry Pi 4, 10 components,
+      connection-testing rules (power, ground, ADC-on-Pi, LED resistor, shorts,
+      voltage compatibility), deterministic fake telemetry + serial monitor
+- [x] UI: /student/simulator — tap-to-connect wiring on an SVG workbench,
+      live validation panel, serial monitor, readings panel, localStorage persistence
+- [x] Research Idea Bank: /student/research-ideas — curated academic IoT project
+      ideas (types/research-ideas.ts + content/research-ideas/ideas.ts), domain &
+      difficulty filters, links into Virtual Lab and Research Lab
+- [x] Student nav: added Virtual Lab + Idea Bank
+- [ ] Phase 2 ideas (not started): guided wiring challenges per session, saving
+      benches to Supabase, code-block simulation (student writes pseudo-sketch),
+      MCP3008 ADC module for the Pi
+
 ## Completed (do not rebuild)
 
 - [x] Step 1: Project scaffold, Tailwind config, fonts imported
