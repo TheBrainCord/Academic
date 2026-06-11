@@ -1,0 +1,105 @@
+# CI/CD for the IoT at CHRIST platform (iot-at-christ/) → Vercel project "christ-iot".
+#
+# Pull requests  → quality gate + Vercel preview deployment
+# Push to main   → quality gate + Vercel production deployment
+#
+# One-time setup required in GitHub repo settings → Secrets and variables → Actions:
+#   VERCEL_TOKEN — create at https://vercel.com/account/tokens (scope: team TheBrainCord)
+# Org and project IDs are identifiers, not secrets, so they live in plain env below.
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deploy target'
+        type: choice
+        options: [preview, production]
+        default: preview
+
+env:
+  VERCEL_ORG_ID: team_URqZRmRvZO7Ygq36M79rat8b
+  VERCEL_PROJECT_ID: prj_XQ6qADRzJHz6ci64HBaBl3OSkIc1
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: iot-at-christ
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: iot-at-christ/.nvmrc
+          cache: npm
+          cache-dependency-path: iot-at-christ/package-lock.json
+
+      # --legacy-peer-deps: @react-email/components pins React 18 peer while
+      # the app is on React 19 — same flag Vercel uses (see vercel.json).
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Unit tests (vitest)
+        run: npm run test:run
+
+      # Known debt: types/database.ts is stale against supabase-js v2.101,
+      # producing ~300 pre-existing errors. Non-blocking until regenerated with
+      # `npx supabase gen types typescript`.
+      - name: Type-check (non-blocking)
+        run: npm run type-check
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy (${{ (github.ref == 'refs/heads/main' || inputs.environment == 'production') && 'production' || 'preview' }})
+    needs: quality
+    runs-on: ubuntu-latest
+    # Forked PRs can't read VERCEL_TOKEN — skip deploys for them.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: iot-at-christ/.nvmrc
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Resolve target environment
+        id: target
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ inputs.environment }}" = "production" ]; then
+            echo "env=production" >> "$GITHUB_OUTPUT"
+            echo "prod_flag=--prod" >> "$GITHUB_OUTPUT"
+          else
+            echo "env=preview" >> "$GITHUB_OUTPUT"
+            echo "prod_flag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=${{ steps.target.outputs.env }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build (vercel build)
+        run: vercel build ${{ steps.target.outputs.prod_flag }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy prebuilt output
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt ${{ steps.target.outputs.prod_flag }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "### Deployed to ${{ steps.target.outputs.env }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
