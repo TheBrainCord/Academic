@@ -1,0 +1,16 @@
+{
+  "_schema": {
+    "_comment": "One record per dispatched sub-task (telemetry granularity). Cycle-level grouping is derived by joining on task_id prefix, not stored separately.",
+    "fields": {
+      "timestamp": "string — ISO-8601 UTC, when the task was dispatched",
+      "task_id": "string — task graph node id, e.g. '2026-06-11T14:30:00Z-init-ranaik#node-2'",
+      "assigned_agent": "architect | code_synthesizer | security_warden | quality_assurance | direct",
+      "compute_tier": "economy | standard | reasoning | frontier",
+      "execution_time_ms": "integer",
+      "input_tokens": "integer",
+      "output_tokens": "integer",
+      "status": "DONE | BLOCKED | FAILED | REWORK"
+    }
+  },
+  "entries": []
+}

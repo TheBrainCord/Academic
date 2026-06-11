@@ -1,0 +1,52 @@
+{
+  "_comment": "Token optimization & pricing tier matrix. Tiers are abstract; bind them to concrete model IDs per deployment so the engine stays portable across providers.",
+  "tiers": {
+    "economy": {
+      "description": "Mechanical edits, renames, doc tweaks, config bumps, formatting, log summarization.",
+      "default_model": "claude-haiku-4-5-20251001",
+      "max_input_tokens_per_task": 8000,
+      "max_output_tokens_per_task": 2000,
+      "relative_cost": 1
+    },
+    "standard": {
+      "description": "Code synthesis, refactors, test authoring, static security analysis, routine reviews.",
+      "default_model": "claude-sonnet-4-6",
+      "max_input_tokens_per_task": 50000,
+      "max_output_tokens_per_task": 12000,
+      "relative_cost": 5
+    },
+    "reasoning": {
+      "description": "Architecture decomposition, cross-cutting design, ambiguous or novel problems, final CRITIQUE on high-risk merges.",
+      "default_model": "claude-opus-4-8",
+      "max_input_tokens_per_task": 150000,
+      "max_output_tokens_per_task": 24000,
+      "relative_cost": 25
+    },
+    "frontier": {
+      "description": "Orchestrator brain and last-resort escalation after two failed attempts at the reasoning tier.",
+      "default_model": "claude-fable-5",
+      "max_input_tokens_per_task": 200000,
+      "max_output_tokens_per_task": 32000,
+      "relative_cost": 40
+    }
+  },
+  "agent_tier_bindings": {
+    "orchestrator": "frontier",
+    "architect": "reasoning",
+    "code_synthesizer": "standard",
+    "security_warden": "standard",
+    "quality_assurance": "standard",
+    "mechanical_tasks": "economy"
+  },
+  "escalation_policy": {
+    "max_retries_per_task": 2,
+    "escalate_one_tier_on_retry": 2,
+    "demote_after_consecutive_successes": 5
+  },
+  "budget": {
+    "soft_session_token_limit": 500000,
+    "on_soft_limit": "summarize context, drop completed task payloads, continue",
+    "hard_session_token_limit": 1000000,
+    "on_hard_limit": "halt dispatch, report partial results and remaining task graph to user"
+  }
+}
