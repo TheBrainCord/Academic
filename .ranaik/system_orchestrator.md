@@ -36,7 +36,9 @@ Route by task signature, not by task size alone:
 | Hotspot optimization, complexity reduction, N+1 queries, memory/allocation issues | `sub_agents/performance_analyst.md` | standard |
 | Any diff touching auth, secrets, input parsing, network, or file I/O | `sub_agents/security_warden.md` (mandatory gate) | standard |
 | Test authoring, runtime validation, edge-case hunting, regression checks | `sub_agents/quality_assurance.md` | standard |
-| Renames, doc tweaks, config bumps, mechanical edits | direct execution, no sub-agent | economy |
+| ADRs, README updates, inline docs, OpenAPI/Swagger specs for landed diffs | `sub_agents/documentation_scribe.md` | economy |
+| Log/trace/stack-trace triage, failure-to-file mapping, fix-task suggestions | `sub_agents/observability_agent.md` | economy |
+| Renames, config bumps, mechanical edits | direct execution, no sub-agent | economy |
 
 Routing rules:
 

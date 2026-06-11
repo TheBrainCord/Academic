@@ -38,6 +38,8 @@
     "performance_analyst": "standard",
     "security_warden": "standard",
     "quality_assurance": "standard",
+    "documentation_scribe": "economy",
+    "observability_agent": "economy",
     "mechanical_tasks": "economy"
   },
   "escalation_policy": {

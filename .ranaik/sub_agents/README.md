@@ -21,6 +21,12 @@ ORCHESTRATOR ── PLAN ──► architect ──► task graph
    │                       │ PASS/FAIL
    ├── gate ──────► quality_assurance          (tests + runtime validation)
    │                       │ PASS/FAIL
+   │                       │ FAIL + noisy logs
+   │                       ▼
+   ├── triage ────► observability_agent ──► suggested_tasks ──► architect (reschedule)
+   │
+   ├── post-merge ► documentation_scribe        (ADRs/README/inline docs for landed diffs)
+   │
    └── CRITIQUE + REFINE ──► merge to workspace
 ```
 
@@ -59,3 +65,5 @@ A result missing any field, or whose `evidence` does not address the
 | Refactoring Guru | `refactoring_guru.md` | Migration & refactoring specialist (modernization, decoupling, behavior-preserving rewrites) |
 | Performance Analyst | `performance_analyst.md` | Performance & profiling optimizer (CPU/memory/space complexity, query efficiency) |
 | Quality Assurance | `quality_assurance.md` | Unit tester, runtime validator & edge-case checker |
+| Documentation Scribe | `documentation_scribe.md` | Technical writer & systems historian (ADRs, README, inline docs, API specs) — economy tier |
+| Observability Agent | `observability_agent.md` | Log & telemetry interpreter (trace isolation, failure mapping, task suggestions) — economy tier |
