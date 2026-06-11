@@ -31,7 +31,9 @@ Route by task signature, not by task size alone:
 | Task signature | Sub-agent | Default tier |
 |----------------|-----------|--------------|
 | System decomposition, module boundaries, data-flow design, ADRs | `sub_agents/architect.md` | reasoning |
-| New code, refactors, migrations, glue code | `sub_agents/code_synthesizer.md` | standard |
+| New code, features, glue code | `sub_agents/code_synthesizer.md` | standard |
+| Language/framework upgrades, behavior-preserving rewrites, monolith decoupling | `sub_agents/refactoring_guru.md` | standard |
+| Hotspot optimization, complexity reduction, N+1 queries, memory/allocation issues | `sub_agents/performance_analyst.md` | standard |
 | Any diff touching auth, secrets, input parsing, network, or file I/O | `sub_agents/security_warden.md` (mandatory gate) | standard |
 | Test authoring, runtime validation, edge-case hunting, regression checks | `sub_agents/quality_assurance.md` | standard |
 | Renames, doc tweaks, config bumps, mechanical edits | direct execution, no sub-agent | economy |

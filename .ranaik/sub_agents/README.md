@@ -13,7 +13,9 @@ user prompt
    ▼
 ORCHESTRATOR ── PLAN ──► architect ──► task graph
    │                                       │
-   ├── ACT ───────► code_synthesizer ◄─────┘   (per node, parallel where possible)
+   ├── ACT ───────► code_synthesizer ◄─────┤   (per node, parallel where possible)
+   │                refactoring_guru   ◄───┤   (migration/modernization nodes)
+   │                performance_analyst◄───┘   (hotspot/optimization nodes)
    │                       │ diff
    ├── gate ──────► security_warden            (mandatory for security-signature diffs)
    │                       │ PASS/FAIL
@@ -54,4 +56,6 @@ A result missing any field, or whose `evidence` does not address the
 | Architect | `architect.md` | System layout & decomposition specialist |
 | Security Warden | `security_warden.md` | Zero-Trust static analyzer & policy checker |
 | Code Synthesizer | `code_synthesizer.md` | Modular, clean-code constructor |
+| Refactoring Guru | `refactoring_guru.md` | Migration & refactoring specialist (modernization, decoupling, behavior-preserving rewrites) |
+| Performance Analyst | `performance_analyst.md` | Performance & profiling optimizer (CPU/memory/space complexity, query efficiency) |
 | Quality Assurance | `quality_assurance.md` | Unit tester, runtime validator & edge-case checker |

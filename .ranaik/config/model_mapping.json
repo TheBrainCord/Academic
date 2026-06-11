@@ -34,6 +34,8 @@
     "orchestrator": "frontier",
     "architect": "reasoning",
     "code_synthesizer": "standard",
+    "refactoring_guru": "standard",
+    "performance_analyst": "standard",
     "security_warden": "standard",
     "quality_assurance": "standard",
     "mechanical_tasks": "economy"
