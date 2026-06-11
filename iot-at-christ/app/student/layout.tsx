@@ -6,9 +6,11 @@ const navItems = [
   { href: '/student/dashboard',   label: 'Home' },
   { href: '/student/missions',    label: 'Missions' },
   { href: '/student/lessons',     label: 'Lessons' },
+  { href: '/student/simulator',   label: 'Virtual Lab' },
   { href: '/student/assignments', label: 'Assignments' },
   { href: '/student/forum',       label: 'Forum' },
   { href: '/student/research',    label: 'Research' },
+  { href: '/student/research-ideas', label: 'Idea Bank' },
   { href: '/student/leaderboard', label: 'Leaderboard' },
 ]
 
