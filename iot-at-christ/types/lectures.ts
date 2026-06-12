@@ -51,6 +51,8 @@ export interface LectureModule {
 
   wiring: {
     intro: string
+    /** A small ASCII circuit map of the whole bench, shown above the steps */
+    diagram?: AsciiDiagram
     steps: WiringStep[]
     /** Challenge id in the Virtual Lab that mirrors this circuit, if any */
     labChallengeId?: string

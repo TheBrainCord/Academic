@@ -219,6 +219,9 @@ export function LectureViewer({ module: mod }: { module: LectureModule }) {
         {slide.kind === 'wiring' && (
           <div className="space-y-4">
             <Paragraphs text={mod.wiring.intro} />
+            {mod.wiring.diagram && (
+              <AsciiBlock art={mod.wiring.diagram.art} caption={mod.wiring.diagram.caption} />
+            )}
             <ol className="space-y-2">
               {mod.wiring.steps.map((s, i) => (
                 <li key={i} className="rounded-lg border border-christ-navy/10 px-3 py-2.5">
