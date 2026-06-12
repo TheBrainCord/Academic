@@ -1,12 +1,18 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Info, Play, RotateCcw, Square } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Flame, Info, Play, RotateCcw, Square } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BOARDS, getBoard } from '@/lib/simulator/boards'
-import { COMPONENTS } from '@/lib/simulator/components'
+import { COMPONENTS, getComponent } from '@/lib/simulator/components'
 import { validateCircuit } from '@/lib/simulator/validation'
 import { simulateStep } from '@/lib/simulator/simulation'
+import {
+  failureEffectMap,
+  triggeredFailures,
+  type FailureEffect,
+  type TriggeredFailure,
+} from '@/lib/simulator/failure-lessons'
 import type {
   BoardId,
   Circuit,
@@ -19,21 +25,40 @@ import type {
 import { BoardCanvas } from '@/components/simulator/BoardCanvas'
 import { ChallengePanel } from '@/components/simulator/ChallengePanel'
 import { ComponentGuide } from '@/components/simulator/ComponentGuide'
+import { ComponentThumb } from '@/components/simulator/ComponentArt'
+import { MistakeExplainer } from '@/components/simulator/MistakeExplainer'
 import { ValidationPanel } from '@/components/simulator/ValidationPanel'
 import { SerialMonitor } from '@/components/simulator/SerialMonitor'
-import { ReadingsPanel } from '@/components/simulator/ReadingsPanel'
+import { ReadingsPanel, type GaugedReading } from '@/components/simulator/ReadingsPanel'
 
 const STORAGE_KEY = 'iot-at-christ:simulator:v1'
 const DEFAULT_BOARD: BoardId = 'arduino-uno'
 const MAX_SERIAL_LINES = 200
 const TICK_MS = 800
+const DRAMA_MS = 650 // pacing of the serial lines during a failure run
 
-// Palette chip accents per component category (Christ brand tokens)
-const CATEGORY_CHIP: Record<ComponentCategory, string> = {
-  sensor: 'border-christ-green/40 text-christ-green bg-christ-green/5',
-  actuator: 'border-christ-saffron/40 text-christ-saffron bg-christ-saffron/5',
-  passive: 'border-christ-navy/30 text-christ-navy bg-christ-navy/5',
-  input: 'border-christ-gold/40 text-christ-gold bg-christ-gold/5',
+const CATEGORY_DOT: Record<ComponentCategory, string> = {
+  sensor: 'bg-christ-green',
+  actuator: 'bg-christ-saffron',
+  passive: 'bg-christ-navy',
+  input: 'bg-christ-gold',
+}
+
+const CATEGORY_LABEL: Record<ComponentCategory, string> = {
+  sensor: 'Sensor',
+  actuator: 'Actuator',
+  passive: 'Passive',
+  input: 'Input',
+}
+
+const EMPTY_EFFECTS: { byInstance: Record<string, FailureEffect>; byWire: Record<string, FailureEffect> } = {
+  byInstance: {},
+  byWire: {},
+}
+
+interface FailureRun {
+  effects: typeof EMPTY_EFFECTS
+  failures: TriggeredFailure[]
 }
 
 function newId(): string {
@@ -59,16 +84,20 @@ export function Workbench() {
   })
   const [hydrated, setHydrated] = useState(false)
   const [pending, setPending] = useState<WireEnd | null>(null)
-  const [running, setRunning] = useState(false)
+  const [runState, setRunState] = useState<'idle' | 'running' | 'failing'>('idle')
   const [serial, setSerial] = useState<SerialLine[]>([])
   const [frame, setFrame] = useState<SimulationFrame | null>(null)
   const [guideFor, setGuideFor] = useState<ComponentId | null>(null)
+  const [failure, setFailure] = useState<FailureRun | null>(null)
+  const [explainerOpen, setExplainerOpen] = useState(false)
   const tickRef = useRef(0)
   const circuitRef = useRef(circuit)
   circuitRef.current = circuit
 
   const board = getBoard(circuit.boardId)
   const validation = useMemo(() => validateCircuit(circuit), [circuit])
+  const errorCount = validation.issues.filter((i) => i.severity === 'error').length
+  const hasWiring = circuit.wires.length > 0
 
   // --- Persistence (guarded for SSR) -------------------------------------
   useEffect(() => {
@@ -96,9 +125,16 @@ export function Workbench() {
     }
   }, [circuit, hydrated])
 
-  // --- Simulation loop -----------------------------------------------------
+  // Any edit to the circuit clears the aftermath of the last failure run —
+  // the student is fixing things, so the smoke clears.
   useEffect(() => {
-    if (!running) return
+    setFailure(null)
+    setExplainerOpen(false)
+  }, [circuit])
+
+  // --- Healthy simulation loop --------------------------------------------
+  useEffect(() => {
+    if (runState !== 'running') return
     const id = window.setInterval(() => {
       tickRef.current += 1
       const next = simulateStep(circuitRef.current, tickRef.current)
@@ -108,12 +144,62 @@ export function Workbench() {
       }
     }, TICK_MS)
     return () => window.clearInterval(id)
-  }, [running])
+  }, [runState])
 
-  // --- Actions ---------------------------------------------------------------
+  // --- Failure run: play out the drama, then explain ----------------------
+  useEffect(() => {
+    if (runState !== 'failing' || !failure) return
+    const queue: string[] = [
+      `Booting ${getBoard(circuitRef.current.boardId).name}...`,
+      'Powering circuit...',
+      ...failure.failures.flatMap((f) => f.lesson.serialDrama),
+      '--- simulation halted ---',
+    ]
+    let i = 0
+    const id = window.setInterval(() => {
+      if (i >= queue.length) {
+        window.clearInterval(id)
+        setRunState('idle')
+        setExplainerOpen(true)
+        return
+      }
+      const text = queue[i]
+      tickRef.current += 1
+      const tick = tickRef.current
+      setSerial(prev => [...prev, { tick, text }].slice(-MAX_SERIAL_LINES))
+      i += 1
+    }, DRAMA_MS)
+    return () => window.clearInterval(id)
+  }, [runState, failure])
+
+  const startRun = () => {
+    setPending(null)
+    if (validation.ok) {
+      setRunState('running')
+      if (tickRef.current === 0) {
+        setSerial(prev => [
+          ...prev,
+          { tick: 0, text: `Booting ${board.name}...` },
+          { tick: 0, text: 'Setup complete. Reading sensors...' },
+        ])
+      }
+      return
+    }
+    // The student runs a broken circuit on purpose (or hasn't noticed) —
+    // let it fail visibly, then explain. That IS the lesson.
+    setFailure({
+      effects: failureEffectMap(validation.issues),
+      failures: triggeredFailures(validation.issues),
+    })
+    setRunState('failing')
+  }
+
+  const stopRun = () => setRunState('idle')
+
+  // --- Bench actions --------------------------------------------------------
   const switchBoard = (boardId: BoardId) => {
     if (boardId === circuit.boardId) return
-    setRunning(false)
+    setRunState('idle')
     setPending(null)
     setFrame(null)
     // Pin layouts differ between boards, so old wires would point at pins
@@ -128,8 +214,8 @@ export function Workbench() {
       const placed = {
         instanceId: newId(),
         componentId,
-        x: 300 + (n % 3) * 155,
-        y: 60 + (Math.floor(n / 3) % 4) * 112,
+        x: 320 + (n % 3) * 165,
+        y: 40 + (Math.floor(n / 3) % 4) * 122,
       }
       return { ...c, components: [...c.components, placed] }
     })
@@ -189,7 +275,7 @@ export function Workbench() {
 
   const resetBench = () => {
     if (!window.confirm('Clear your whole bench? Every component and wire will be removed.')) return
-    setRunning(false)
+    setRunState('idle')
     setPending(null)
     setFrame(null)
     setSerial([])
@@ -201,6 +287,21 @@ export function Workbench() {
       // ignore — nothing to clean up if storage is unavailable
     }
   }
+
+  // Enrich readings with their min/max range so the panel can draw gauges.
+  const gaugedReadings: GaugedReading[] = useMemo(() => {
+    const out: GaugedReading[] = []
+    for (const r of frame?.readings ?? []) {
+      const placed = circuit.components.find((c) => c.instanceId === r.instanceId)
+      const def = placed ? getComponent(placed.componentId) : undefined
+      const range = def?.readings?.find((d) => d.label === r.label)
+      out.push({ ...r, min: range?.min ?? 0, max: range?.max ?? Math.max(1, r.value) })
+    }
+    return out
+  }, [frame, circuit.components])
+
+  const running = runState !== 'idle'
+  const shorted = failure?.failures.some((f) => f.lesson.code === 'short-circuit') ?? false
 
   // --- Render ---------------------------------------------------------------
   return (
@@ -220,7 +321,10 @@ export function Workbench() {
               )}
             >
               <span className="flex items-center justify-between gap-2">
-                <span className="font-display font-semibold text-sm text-christ-navy">{b.name}</span>
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: b.accentColor }} />
+                  <span className="font-display font-semibold text-sm text-christ-navy">{b.name}</span>
+                </span>
                 <span className="font-mono text-[10px] text-christ-gold border border-christ-gold/30 rounded-full px-1.5 py-0.5 whitespace-nowrap">
                   {b.logicVoltage}V logic
                 </span>
@@ -234,32 +338,33 @@ export function Workbench() {
         </p>
       </section>
 
-      {/* Component palette */}
+      {/* Parts bin */}
       <section>
         <h2 className="text-sm font-display font-semibold text-christ-navy mb-2">
-          Parts bin — tap to add, tap <Info className="inline h-3 w-3" /> to learn how it works
+          Parts bin — tap a part to add it, tap <Info className="inline h-3 w-3" /> to learn how it works
         </h2>
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
           {Object.values(COMPONENTS).map(def => (
             <div
               key={def.id}
-              className={cn(
-                'flex items-center whitespace-nowrap rounded-full border text-xs font-body',
-                CATEGORY_CHIP[def.category],
-              )}
+              className="relative rounded-lg border border-christ-navy/10 bg-white hover:border-christ-saffron/60 hover:shadow-sm transition-all"
             >
               <button
                 onClick={() => addComponent(def.id)}
                 title={def.description}
-                className="flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 transition-transform active:scale-95"
+                className="w-full flex flex-col items-center gap-1 px-1.5 pt-2 pb-1.5 active:scale-95 transition-transform"
               >
-                <span aria-hidden>{def.glyph}</span>
-                <span>{def.name}</span>
+                <ComponentThumb componentId={def.id} size={52} />
+                <span className="text-[11px] font-body text-christ-navy leading-tight text-center">{def.name}</span>
+                <span className="flex items-center gap-1 text-[9px] font-mono text-christ-navy/40 uppercase tracking-wide">
+                  <span className={cn('h-1.5 w-1.5 rounded-full', CATEGORY_DOT[def.category])} />
+                  {CATEGORY_LABEL[def.category]}
+                </span>
               </button>
               <button
                 onClick={() => setGuideFor(def.id)}
                 aria-label={`How the ${def.name} works`}
-                className="pr-2.5 pl-1 py-1.5 opacity-60 hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 rounded-full p-1 text-christ-navy/40 hover:text-christ-saffron hover:bg-christ-saffron/10 transition-colors"
               >
                 <Info className="h-3.5 w-3.5" />
               </button>
@@ -273,7 +378,8 @@ export function Workbench() {
         <section className="md:col-span-2 space-y-3">
           {pending && (
             <div className="rounded-md border border-christ-saffron/40 bg-christ-saffron/10 px-3 py-2 text-xs font-body text-christ-saffron">
-              Now tap where this wire should go… (tap again to cancel)
+              Now tap where this wire should go — the <span className="text-christ-green font-semibold">green pulsing rings</span> mark
+              electrically sensible targets. (Tap the same point again to cancel.)
             </div>
           )}
 
@@ -282,7 +388,10 @@ export function Workbench() {
             circuit={circuit}
             pending={pending}
             issues={validation.issues}
-            actuatorStates={running ? (frame?.actuatorStates ?? {}) : {}}
+            actuatorStates={runState === 'running' ? (frame?.actuatorStates ?? {}) : {}}
+            running={running}
+            failureEffects={failure?.effects ?? EMPTY_EFFECTS}
+            shorted={shorted}
             onTapEndpoint={tapEndpoint}
             onMoveComponent={moveComponent}
             onRemoveComponent={removeComponent}
@@ -290,27 +399,37 @@ export function Workbench() {
             onShowGuide={setGuideFor}
           />
 
-          {/* Run controls */}
+          {/* Run controls + bench status */}
           <div className="flex flex-wrap items-center gap-2">
             {running ? (
               <button
-                onClick={() => setRunning(false)}
+                onClick={stopRun}
                 className="inline-flex items-center gap-1.5 rounded-md bg-christ-red px-4 py-2 text-sm font-body text-white hover:bg-christ-red/90 transition-colors"
               >
                 <Square className="h-4 w-4" /> Stop
               </button>
             ) : (
               <button
-                onClick={() => setRunning(true)}
-                disabled={!validation.ok}
+                onClick={startRun}
+                disabled={!hasWiring}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-body text-white transition-colors',
-                  validation.ok
-                    ? 'bg-christ-green hover:bg-christ-green/90'
-                    : 'bg-christ-navy/30 cursor-not-allowed',
+                  !hasWiring
+                    ? 'bg-christ-navy/30 cursor-not-allowed'
+                    : validation.ok
+                      ? 'bg-christ-green hover:bg-christ-green/90'
+                      : 'bg-christ-saffron hover:bg-christ-saffron/90',
                 )}
               >
-                <Play className="h-4 w-4" /> Run Simulation
+                {validation.ok ? (
+                  <>
+                    <Play className="h-4 w-4" /> Run Simulation
+                  </>
+                ) : (
+                  <>
+                    <Flame className="h-4 w-4" /> Run Anyway — watch it fail
+                  </>
+                )}
               </button>
             )}
             <button
@@ -319,10 +438,27 @@ export function Workbench() {
             >
               <RotateCcw className="h-4 w-4" /> Reset Bench
             </button>
-            {!validation.ok && !running && (
-              <span className="text-[11px] font-body text-christ-navy/50">
-                Fix the red issues in “Test Connections” first, then you can run.
-              </span>
+
+            {/* Status chip */}
+            {hasWiring && (
+              validation.ok ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-christ-green/10 px-2.5 py-1 text-[11px] font-body text-christ-green">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Bench OK
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full bg-christ-red/10 px-2.5 py-1 text-[11px] font-body text-christ-red">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  {errorCount} problem{errorCount === 1 ? '' : 's'} — run it and see what breaks
+                </span>
+              )
+            )}
+            {failure && !explainerOpen && failure.failures.length > 0 && (
+              <button
+                onClick={() => setExplainerOpen(true)}
+                className="inline-flex items-center gap-1 rounded-full border border-christ-red/30 bg-white px-2.5 py-1 text-[11px] font-body text-christ-red hover:bg-christ-red/5 transition-colors"
+              >
+                <Flame className="h-3.5 w-3.5" /> What just went wrong?
+              </button>
             )}
           </div>
 
@@ -345,12 +481,17 @@ export function Workbench() {
         <section className="space-y-4">
           <ChallengePanel circuit={circuit} validation={validation} />
           <ValidationPanel result={validation} wireCount={circuit.wires.length} />
-          <ReadingsPanel readings={frame?.readings ?? []} running={running} />
-          <SerialMonitor lines={serial} boardName={board.name} />
+          <ReadingsPanel readings={gaugedReadings} running={runState === 'running'} />
+          <SerialMonitor lines={serial} boardName={board.name} onClear={() => setSerial([])} />
         </section>
       </div>
 
       <ComponentGuide componentId={guideFor} onClose={() => setGuideFor(null)} />
+      <MistakeExplainer
+        failures={failure?.failures ?? []}
+        open={explainerOpen}
+        onClose={() => setExplainerOpen(false)}
+      />
     </div>
   )
 }

@@ -107,7 +107,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
   if (circuit.components.length === 0 && circuit.wires.length === 0) {
     return {
       ok: true,
-      issues: [{ severity: 'info', message: 'Drag a component onto the bench to get started' }],
+      issues: [{ severity: 'info', code: 'not-wired', message: 'Drag a component onto the bench to get started' }],
     }
   }
 
@@ -135,6 +135,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
     if ((isPowerPin(a) && isGroundPin(b)) || (isGroundPin(a) && isPowerPin(b))) {
       issues.push({
         severity: 'error',
+        code: 'short-circuit',
         wireId: wire.id,
         message: `Short circuit! ${a.label} is wired straight to ${b.label} — never connect power directly to ground.`,
       })
@@ -149,6 +150,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
     if (!hasAnyWire) {
       issues.push({
         severity: 'info',
+        code: 'not-wired',
         instanceId: placed.instanceId,
         message: `${def.name} is on the bench but not wired yet`,
       })
@@ -165,6 +167,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
           if (powerPins.length === 0) {
             issues.push({
               severity: 'error',
+              code: 'no-power',
               instanceId: placed.instanceId,
               message: `${def.name} has no power connection — wire its ${terminal.label} terminal to a power pin (5V or 3.3V).`,
             })
@@ -175,6 +178,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
             if (rail > def.maxVoltage) {
               issues.push({
                 severity: 'error',
+                code: 'overvoltage',
                 instanceId: placed.instanceId,
                 pinId: pin.id,
                 message: `${pin.label} supplies ${rail}V but ${def.name} tolerates at most ${def.maxVoltage}V — that would damage it. Use a lower-voltage rail.`,
@@ -182,6 +186,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
             } else if (def.minVoltage > rail) {
               issues.push({
                 severity: 'warning',
+                code: 'undervoltage',
                 instanceId: placed.instanceId,
                 pinId: pin.id,
                 message: `${def.name} needs at least ${def.minVoltage}V but ${pin.label} only supplies ${rail}V — it may be unreliable at ${rail}V.`,
@@ -194,6 +199,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
           if (groundPins.length === 0) {
             issues.push({
               severity: 'error',
+              code: 'no-ground',
               instanceId: placed.instanceId,
               message: `${def.name}'s ${terminal.label} terminal isn't connected to ground — every circuit needs a path back to a GND pin.`,
             })
@@ -205,6 +211,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
           if (netPins.length === 0) {
             issues.push({
               severity: 'error',
+              code: 'floating-signal',
               instanceId: placed.instanceId,
               message: `${def.name}'s ${terminal.label} terminal isn't connected to any board pin — its signal has nowhere to go.`,
             })
@@ -212,6 +219,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
             const kind = powerPins.length > 0 ? 'power' : 'ground'
             issues.push({
               severity: 'error',
+              code: 'signal-short',
               instanceId: placed.instanceId,
               message: `${def.name}'s ${terminal.label} terminal is wired straight to a ${kind} pin — that's a short circuit in the making. Signal terminals belong on GPIO pins.`,
             })
@@ -222,6 +230,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
           if (netPins.length === 0) {
             issues.push({
               severity: 'error',
+              code: 'floating-signal',
               instanceId: placed.instanceId,
               message: `${def.name}'s ${terminal.label} terminal isn't connected to any board pin — its signal has nowhere to go.`,
             })
@@ -232,6 +241,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
             if (circuit.boardId === 'raspberry-pi-4' && !board.hasAnalogIn) {
               issues.push({
                 severity: 'error',
+                code: 'no-adc-on-board',
                 instanceId: placed.instanceId,
                 pinId: pin.id,
                 message: `The Raspberry Pi has no analog inputs (no ADC), so it can't read ${def.name}'s ${terminal.label} directly. Add an external ADC chip like the MCP3008, or pick a board with analog pins.`,
@@ -239,6 +249,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
             } else {
               issues.push({
                 severity: 'error',
+                code: 'analog-on-digital',
                 instanceId: placed.instanceId,
                 pinId: pin.id,
                 message: `${def.name}'s ${terminal.label} outputs an analog signal, but ${pin.label} can't read analog. Move the wire to an analog-in pin.`,
@@ -260,6 +271,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
         if (pinsIn(strict.netOf(keyOf(terminal.id))).length > 0) {
           issues.push({
             severity: 'error',
+            code: 'missing-resistor',
             instanceId: placed.instanceId,
             message: 'LED needs a series resistor (try the 220Ω) or it will burn out',
           })
@@ -288,6 +300,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
         reportedPins.add(pin.id)
         issues.push({
           severity: 'warning',
+          code: 'pin-conflict',
           pinId: pin.id,
           message: `Pin ${pin.label} has ${dataTerminals.length} data signals wired to it — a pin can only serve one signal at a time.`,
         })

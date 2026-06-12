@@ -10,7 +10,9 @@ export default function SimulatorPage() {
         </h1>
         <p className="text-sm font-body text-christ-navy/60 mt-1">
           Practice wiring Arduino, ESP32 and Raspberry Pi circuits right in the
-          browser — no hardware needed.
+          browser — no hardware needed. Mistakes are welcome here: run a broken
+          circuit and the lab shows you the failure first, then explains the
+          engineering behind it.
         </p>
       </div>
       <Workbench />

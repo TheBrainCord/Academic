@@ -3,11 +3,32 @@
 import { useEffect, useRef } from 'react'
 import type { SerialLine } from '@/types/simulator'
 
-export function SerialMonitor({ lines, boardName }: { lines: SerialLine[]; boardName: string }) {
-  const bottomRef = useRef<HTMLDivElement>(null)
+/** Failure-drama lines get highlighted so mistakes jump out of the log. */
+function lineClass(text: string): string {
+  if (text.includes('***') || /ERROR|BROWNOUT|failure|disabled|halted/i.test(text)) {
+    return 'text-christ-red'
+  }
+  if (/WARNING|timeout|unstable|noise|corrupted|retrying/i.test(text)) {
+    return 'text-christ-saffron'
+  }
+  return 'text-research-amber'
+}
 
+export function SerialMonitor({
+  lines,
+  boardName,
+  onClear,
+}: {
+  lines: SerialLine[]
+  boardName: string
+  onClear?: () => void
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Scroll the log container itself — scrollIntoView would yank the page.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ block: 'end' })
+    const el = scrollRef.current
+    if (el) el.scrollTop = el.scrollHeight
   }, [lines])
 
   return (
@@ -17,19 +38,27 @@ export function SerialMonitor({ lines, boardName }: { lines: SerialLine[]; board
         <span className="h-2 w-2 rounded-full bg-christ-gold/70" />
         <span className="h-2 w-2 rounded-full bg-christ-green/70" />
         <span className="ml-2 text-[11px] font-mono text-white/70">Serial Monitor — {boardName}</span>
+        {onClear && lines.length > 0 && (
+          <button
+            onClick={onClear}
+            className="ml-auto text-[10px] font-mono text-white/50 hover:text-white transition-colors"
+          >
+            clear
+          </button>
+        )}
       </div>
-      <div className="bg-research-bg h-40 overflow-y-auto px-3 py-2 font-mono text-[11px] leading-relaxed text-research-amber">
+      <div ref={scrollRef} className="bg-research-bg h-44 overflow-y-auto px-3 py-2 font-mono text-[11px] leading-relaxed">
         {lines.length === 0 ? (
-          <p className="text-research-amber/40">— serial monitor idle —</p>
+          <p className="text-research-amber/40">— serial monitor idle · 9600 baud —</p>
         ) : (
           lines.map((line, i) => (
-            <div key={i}>
+            <div key={i} className={lineClass(line.text)}>
               <span className="text-research-amber/40">[{line.tick}] </span>
               {line.text}
             </div>
           ))
         )}
-        <div ref={bottomRef} />
+        <span className="inline-block w-2 h-3 bg-research-amber/70 align-middle animate-pulse" aria-hidden />
       </div>
     </div>
   )
