@@ -72,14 +72,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The Vercel project is also connected to this repo via Vercel's Git
+      # integration, which auto-deploys every push. The CLI deploy below only
+      # runs when VERCEL_TOKEN is configured — without it the job skips
+      # cleanly instead of failing, and the Git integration does the deploy.
+      - name: Check for VERCEL_TOKEN
+        id: token
+        run: |
+          if [ -n "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "### Vercel CLI deploy skipped" >> "$GITHUB_STEP_SUMMARY"
+            echo "VERCEL_TOKEN secret is not configured — Vercel's Git integration handles the deployment instead. See iot-at-christ/DEPLOYMENT.md." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.token.outputs.present == 'true'
         with:
           node-version-file: iot-at-christ/.nvmrc
 
       - name: Install Vercel CLI
+        if: steps.token.outputs.present == 'true'
         run: npm install -g vercel@latest
 
       - name: Resolve target environment
+        if: steps.token.outputs.present == 'true'
         id: target
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ inputs.environment }}" = "production" ]; then
@@ -91,12 +109,15 @@ jobs:
           fi
 
       - name: Pull Vercel project settings
+        if: steps.token.outputs.present == 'true'
         run: vercel pull --yes --environment=${{ steps.target.outputs.env }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build (vercel build)
+        if: steps.token.outputs.present == 'true'
         run: vercel build ${{ steps.target.outputs.prod_flag }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy prebuilt output
+        if: steps.token.outputs.present == 'true'
         id: deploy
         run: |
           URL=$(vercel deploy --prebuilt ${{ steps.target.outputs.prod_flag }} --token=${{ secrets.VERCEL_TOKEN }})
