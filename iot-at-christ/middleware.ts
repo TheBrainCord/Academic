@@ -1,8 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Public paths that don't require authentication
-const PUBLIC_PATHS = ['/auth/login', '/auth/callback', '/research/published']
+// Public paths that don't require authentication — the Virtual Lab and Idea
+// Bank are open to everyone so teaching sessions don't depend on login.
+const PUBLIC_PATHS = ['/auth/login', '/auth/callback', '/research/published', '/lab', '/ideas']
 
 // Map each role to its home dashboard
 const ROLE_DASHBOARD: Record<string, string> = {
@@ -26,9 +27,11 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // A deploy without Supabase env vars must not 500 on every request
-  // (MIDDLEWARE_INVOCATION_FAILED) — route to the static setup notice instead.
+  // (MIDDLEWARE_INVOCATION_FAILED). The homepage, Virtual Lab and Idea Bank
+  // need no database, so they stay open; everything else gets the setup notice.
   if (!supabaseUrl || !supabaseAnonKey) {
-    if (path === '/setup') return NextResponse.next()
+    const openWithoutDb = path === '/' || path === '/setup' || path.startsWith('/lab') || path.startsWith('/ideas')
+    if (openWithoutDb) return NextResponse.next()
     return NextResponse.redirect(new URL('/setup', request.url))
   }
   if (path === '/setup') {
@@ -70,10 +73,10 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Root redirect
+  // Root: public homepage for visitors, dashboard for signed-in users
   if (path === '/') {
-    if (!user) return NextResponse.redirect(new URL('/auth/login', request.url))
-    // Role-based home redirect handled below
+    if (!user) return supabaseResponse
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Protect all role-prefixed routes
