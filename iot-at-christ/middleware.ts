@@ -21,11 +21,25 @@ const ROLE_PREFIXES: Record<string, string[]> = {
 }
 
 export async function middleware(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const path = request.nextUrl.pathname
+
+  // A deploy without Supabase env vars must not 500 on every request
+  // (MIDDLEWARE_INVOCATION_FAILED) — route to the static setup notice instead.
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (path === '/setup') return NextResponse.next()
+    return NextResponse.redirect(new URL('/setup', request.url))
+  }
+  if (path === '/setup') {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() { return request.cookies.getAll() },
@@ -40,10 +54,16 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session — required for Server Components to read auth state
-  const { data: { user } } = await supabase.auth.getUser()
-
-  const path = request.nextUrl.pathname
+  // Refresh session — required for Server Components to read auth state.
+  // Never let an unreachable/misconfigured Supabase take the whole site down:
+  // on failure, treat the request as unauthenticated instead of throwing.
+  let user: Awaited<ReturnType<typeof supabase.auth.getUser>>['data']['user'] = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch {
+    user = null
+  }
 
   // Allow public paths through without auth
   if (PUBLIC_PATHS.some(p => path === p || path.startsWith(p + '/'))) {
