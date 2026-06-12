@@ -12,15 +12,25 @@
 - **Push to `main`** → tests + build, then a **production deployment**.
 - **Manual** → Actions tab → "Deploy to Vercel" → Run workflow (choose preview/production).
 
-The deploy uses the Vercel CLI `pull → build → deploy --prebuilt` flow, so the
-build runs in GitHub Actions and Vercel only receives the finished output.
+There are **two deployment modes** — pick one:
+
+1. **Vercel Git integration (current)** — the `christ-iot` project is connected
+   to this repo in Vercel, so Vercel auto-builds and deploys every push on its
+   own. In this mode the GitHub Actions workflow acts as the quality gate
+   (tests + build) and its CLI deploy job skips itself (no `VERCEL_TOKEN`).
+2. **CLI deploy from Actions** — add the `VERCEL_TOKEN` secret (below) and the
+   workflow deploys via `vercel pull → build → deploy --prebuilt`. If you do
+   this, disable Vercel's auto-deploy (project → Settings → Git, or add
+   `"git": { "deploymentEnabled": false }` to `vercel.json`) so each push
+   doesn't deploy twice.
 
 ## One-time setup checklist
 
-1. **GitHub secret** — repo Settings → Secrets and variables → Actions → New secret:
+1. **GitHub secret** (only for mode 2) — repo Settings → Secrets and variables → Actions:
    - `VERCEL_TOKEN`: create at <https://vercel.com/account/tokens> with access
-     to the TheBrainCord team. This is the only secret the workflow needs —
-     the org and project IDs are plain identifiers committed in the workflow.
+     to the TheBrainCord team. Without it the workflow still runs tests + build
+     and simply skips the CLI deploy. The org and project IDs are plain
+     identifiers committed in the workflow.
 
 2. **Vercel project settings** (<https://vercel.com> → christ-iot → Settings):
    - **Root Directory**: `iot-at-christ` (the app lives in a subfolder of the repo).
