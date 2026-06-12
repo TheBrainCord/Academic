@@ -6,6 +6,7 @@ import Link from 'next/link'
 const navItems = [
   { href: '/',      label: 'Home' },
   { href: '/lab',   label: 'Virtual Lab' },
+  { href: '/learn', label: 'Lectures' },
   { href: '/ideas', label: 'Idea Bank' },
 ]
 
