@@ -1,12 +1,12 @@
-# Supabase setup — project `esykujvkyssgqmetvdyj`
+# Supabase setup — project `buenkrsopqnhpysgsvog`
 
 The Supabase project behind IoT at CHRIST is
-**`esykujvkyssgqmetvdyj`** → base URL `https://esykujvkyssgqmetvdyj.supabase.co`.
+**`buenkrsopqnhpysgsvog`** → base URL `https://buenkrsopqnhpysgsvog.supabase.co`.
 Follow the steps in order; step 4 is the block you paste into Vercel.
 
 ## 1. Apply the database schema
 
-Open <https://supabase.com/dashboard/project/esykujvkyssgqmetvdyj/sql/new>
+Open <https://supabase.com/dashboard/project/buenkrsopqnhpysgsvog/sql/new>
 and run the two migration files **in this order** (paste the full file
 contents, run, then the next):
 
@@ -16,7 +16,7 @@ contents, run, then the next):
 Or with the CLI from `iot-at-christ/`:
 
 ```bash
-npx supabase link --project-ref esykujvkyssgqmetvdyj
+npx supabase link --project-ref buenkrsopqnhpysgsvog
 npx supabase db push
 ```
 
@@ -26,7 +26,7 @@ npx supabase db push
 ## 2. Get your API keys
 
 Dashboard → Project Settings → **API**
-(<https://supabase.com/dashboard/project/esykujvkyssgqmetvdyj/settings/api>):
+(<https://supabase.com/dashboard/project/buenkrsopqnhpysgsvog/settings/api>):
 
 - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
 - **anon / public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -44,7 +44,7 @@ Dashboard → Authentication → **URL Configuration**:
 
 Then Authentication → Providers → **Google**: enable it and paste the Google
 OAuth client ID/secret (the same ones used below). In Google Cloud Console,
-add `https://esykujvkyssgqmetvdyj.supabase.co/auth/v1/callback` as an
+add `https://buenkrsopqnhpysgsvog.supabase.co/auth/v1/callback` as an
 authorized redirect URI.
 
 ## 4. Paste into Vercel → christ-iot → Settings → Environment Variables
@@ -54,7 +54,7 @@ Variables → paste), then fill in each `<...>` from steps 2–3. Apply to
 **Production** (and Preview if you want previews functional):
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://esykujvkyssgqmetvdyj.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://buenkrsopqnhpysgsvog.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key from step 2>
 SUPABASE_SERVICE_ROLE_KEY=<service_role key from step 2>
 
@@ -93,7 +93,7 @@ npm run seed                        # pushes content/subjects/iot.yaml into Supa
 ## 7. Regenerate DB types (clears ~300 known type errors)
 
 ```bash
-npx supabase gen types typescript --project-id esykujvkyssgqmetvdyj > types/database.ts
+npx supabase gen types typescript --project-id buenkrsopqnhpysgsvog > types/database.ts
 ```
 
 Commit the result, then remove `continue-on-error` from the type-check step in
