@@ -80,6 +80,25 @@ const buildNets = (circuit: Circuit, throughPassives: boolean): Nets => {
   }
 }
 
+/**
+ * Board pins electrically reachable from one component terminal, with
+ * resistors passing nets through — shared with the challenge checker so it
+ * sees circuits exactly the way validation does.
+ */
+export function boardPinsReachableFrom(
+  circuit: Circuit,
+  instanceId: string,
+  terminalId: string,
+): PinDef[] {
+  const board = getBoard(circuit.boardId)
+  const pinById = new Map(board.pins.map((p) => [p.id, p]))
+  return buildNets(circuit, true)
+    .netOf(`comp:${instanceId}:${terminalId}`)
+    .filter((key) => key.startsWith('board:'))
+    .map((key) => pinById.get(key.slice('board:'.length)))
+    .filter((p): p is PinDef => p !== undefined)
+}
+
 export function validateCircuit(circuit: Circuit): ValidationResult {
   const issues: ValidationIssue[] = []
   const board = getBoard(circuit.boardId)
