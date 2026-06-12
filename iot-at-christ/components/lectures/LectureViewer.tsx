@@ -31,11 +31,11 @@ interface Slide {
 }
 
 const PART_BADGE: Record<SlideKind, { label: string; icon: typeof Atom; tone: string }> = {
-  overview: { label: 'Module overview', icon: ListChecks, tone: 'text-christ-navy bg-christ-navy/10' },
-  physics: { label: 'Part 1 · Hardware physics from scratch', icon: Atom, tone: 'text-christ-saffron bg-christ-saffron/10' },
-  wiring: { label: 'Part 2 · Simulator wiring & setup', icon: Cable, tone: 'text-christ-green bg-christ-green/10' },
-  code: { label: 'Part 3 · Code execution breakdown', icon: TerminalSquare, tone: 'text-christ-navy bg-christ-navy/10' },
-  research: { label: 'Part 4 · M.Sc. research spark', icon: Rocket, tone: 'text-christ-gold bg-christ-gold/10' },
+  overview: { label: 'Overview', icon: ListChecks, tone: 'text-christ-navy bg-christ-navy/10' },
+  physics: { label: 'Hardware & Physics', icon: Atom, tone: 'text-christ-saffron bg-christ-saffron/10' },
+  wiring: { label: 'Wiring & Setup', icon: Cable, tone: 'text-christ-green bg-christ-green/10' },
+  code: { label: 'Code Walkthrough', icon: TerminalSquare, tone: 'text-christ-navy bg-christ-navy/10' },
+  research: { label: 'Research Direction', icon: Rocket, tone: 'text-christ-gold bg-christ-gold/10' },
 }
 
 function AsciiBlock({ art, caption }: { art: string; caption: string }) {
@@ -196,9 +196,6 @@ export function LectureViewer({ module: mod }: { module: LectureModule }) {
                 )
               })}
             </div>
-            <p className="text-[11px] font-body text-christ-navy/40">
-              Tip for the classroom: use ← and → arrow keys to drive the deck. Your position is saved per module.
-            </p>
           </div>
         )}
 
