@@ -1,9 +1,8 @@
 import Link from 'next/link'
-import { ArrowRight, Atom, Cable, Clock, Cpu, Rocket, TerminalSquare } from 'lucide-react'
+import { ArrowRight, Clock, Cpu } from 'lucide-react'
 import { UNIT2_MODULES } from '@/content/lectures/unit2'
 
-// Unit 2 interactive lecture gallery — the PPT replacement. Public like the
-// Virtual Lab: no login, no database, teachable from any browser.
+// Unit 2 lecture gallery — pick a module to open its slide deck.
 export default function LearnPage() {
   return (
     <div className="space-y-6">
@@ -12,29 +11,12 @@ export default function LearnPage() {
           Unit 2 · Hardware Layer
         </p>
         <h1 className="text-3xl font-display font-bold text-christ-navy mt-1">
-          Interactive Lecture Modules
+          Lecture Modules
         </h1>
         <p className="text-sm font-body text-christ-navy/60 mt-1 max-w-2xl">
-          Four step-by-step teaching decks — from silicon physics to a manufactured PCB. Each module
-          follows the same arc: <span className="text-christ-navy">hardware physics from scratch → simulator
-          wiring → code execution breakdown → an M.Sc. research spark</span>, and links straight into the
-          Virtual Lab so the class can wire what was just taught.
+          From silicon physics to a manufactured PCB — wiring, code and research ideas for each topic,
+          linked straight into the Virtual Lab.
         </p>
-      </div>
-
-      {/* The 4-part method, stated once */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {[
-          { icon: Atom, label: '1 · Physics from scratch', tone: 'text-christ-saffron' },
-          { icon: Cable, label: '2 · Simulator wiring', tone: 'text-christ-green' },
-          { icon: TerminalSquare, label: '3 · Code breakdown', tone: 'text-christ-navy' },
-          { icon: Rocket, label: '4 · Research spark', tone: 'text-christ-gold' },
-        ].map(({ icon: Icon, label, tone }) => (
-          <div key={label} className="rounded-lg border border-christ-navy/10 bg-white px-3 py-2 flex items-center gap-2">
-            <Icon className={`h-4 w-4 shrink-0 ${tone}`} />
-            <span className="text-[11px] font-body text-christ-navy/70">{label}</span>
-          </div>
-        ))}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -58,16 +40,12 @@ export default function LearnPage() {
               <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> ~{mod.minutes} min</span>
               <span className="inline-flex items-center gap-1"><Cpu className="h-3 w-3" /> {mod.board}</span>
               <span className="ml-auto inline-flex items-center gap-1 text-christ-saffron">
-                Teach it <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                Open <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
               </span>
             </div>
           </Link>
         ))}
       </div>
-
-      <p className="text-[11px] font-body text-christ-navy/40">
-        Units 1 and 3–7 get their decks next — the structure you see here is the template for the whole syllabus.
-      </p>
     </div>
   )
 }

@@ -21,12 +21,12 @@ export const UNIT2_MODULES: LectureModule[] = [
 
     physics: {
       intro:
-        'Before writing a single line of code, you must be able to picture what the silicon is doing. This module opens the chip: what separates a ₹250 microcontroller from a ₹5,000 microprocessor, what physically sits behind every GPIO pin, how an ADC turns a voltage into a number, and how three wires can carry a conversation between chips.',
+        'What separates a ₹250 microcontroller from a ₹5,000 microprocessor, what sits behind every GPIO pin, how an ADC turns a voltage into a number, and how three wires carry a conversation between chips.',
       concepts: [
         {
           heading: 'MCU vs MPU — one die versus a computer on a board',
           body:
-            'A microcontroller (MCU) like the ESP32 or the ATmega328P on the Arduino Uno is a complete computer on one die: CPU core, flash (program memory), SRAM (data memory), and every peripheral — timers, ADC, UART — share that single piece of silicon. There is no operating system between your code and the hardware; when you write to a register, the voltage on a pin changes in nanoseconds. Power consumption is microamps to milliamps, and the chip boots in milliseconds.\n\nA microprocessor (MPU) like the BCM2711 in the Raspberry Pi 4 is only a CPU (plus caches and an MMU). RAM is a separate chip, storage is an SD card, and you need a full OS — Linux — to make it useful. You gain gigahertz, gigabytes and a filesystem; you lose determinism (Linux may pre-empt your pin-toggling code for 10ms whenever it likes), instant boot, and the microamp power budget.\n\nThe selection rule for IoT: if the job is "read sensors, decide, transmit, sleep", an MCU wins. If the job needs vision, a database, or heavy maths — a Jetson Nano running a neural network, a Pi serving dashboards — you need an MPU. Most serious products use both: MCU at the sensing edge, MPU as the gateway.',
+            'An MCU (ESP32, ATmega328P) is a complete computer on one die — CPU, flash, SRAM, timers, ADC and UART share the same silicon, no OS in between. A register write changes a pin in nanoseconds; power draw is µA–mA and boot time is milliseconds.\n\nAn MPU (BCM2711 in a Raspberry Pi 4) is only a CPU + caches — RAM is a separate chip, storage is an SD card, and Linux sits between your code and the pins. You gain GHz, GB and a filesystem; you lose determinism, instant boot and the µA budget.\n\nRule of thumb: "read, decide, transmit, sleep" → MCU. Vision, databases, heavy maths → MPU. Most products use both.',
           diagram: {
             art: `        MCU (ESP32)                    MPU (Raspberry Pi 4)
   +---------------------+        +----------+   +---------+
@@ -42,7 +42,7 @@ export const UNIT2_MODULES: LectureModule[] = [
         {
           heading: 'Anatomy of a GPIO pin — what "pinMode" physically configures',
           body:
-            'Every GPIO pin hides a small circuit. The output stage is a CMOS push-pull pair: a PMOS transistor to the supply rail and an NMOS transistor to ground. Drive the pair one way and the PMOS conducts — the pin is "HIGH", sourcing current from VCC. Drive it the other way and the NMOS conducts — "LOW", sinking current to ground. Each transistor has finite on-resistance, which is why a pin can only source/sink ~12–40mA before it overheats — and why shorting an output pin to a rail kills it.\n\nThe input stage is a Schmitt trigger — a comparator with two thresholds. On 3.3V logic, the input must rise above ~2.0V to register HIGH and fall below ~0.8V to register LOW; the gap (hysteresis) stops a slowly drifting or noisy voltage from rattling the input between states. An unconnected input floats between the thresholds and reads random values — this is the "floating pin" you met in the Virtual Lab, and it is why internal pull-up resistors (a ~45kΩ resistor to VCC, enabled by a register bit) exist.\n\nThree registers control all of it (AVR names; every MCU has equivalents): DDR decides direction (output driver enabled or not), PORT sets the output level — or, in input mode, enables the pull-up — and PIN reads the Schmitt trigger output. pinMode() and digitalWrite() are nothing more than single-bit writes into these registers.',
+            'The output stage is a CMOS push-pull pair: a PMOS transistor to VCC and an NMOS to ground. One conducts → pin is HIGH (sources current); the other conducts → LOW (sinks current). Finite on-resistance means a pin can only source/sink ~12–40mA — short it to a rail and it dies.\n\nThe input stage is a Schmitt trigger: on 3.3V logic it reads HIGH above ~2.0V and LOW below ~0.8V, with hysteresis so noise can\'t rattle it. An unconnected input floats between the thresholds and reads garbage — the "floating pin" failure from the Virtual Lab — which is why internal pull-up resistors (~45kΩ to VCC) exist.\n\nThree registers run all of it (AVR names, every MCU has equivalents): DDR sets direction, PORT sets output level (or enables the pull-up in input mode), PIN reads the input. pinMode() and digitalWrite() are single-bit writes into these registers.',
           diagram: {
             art: `             VCC
               |
@@ -61,7 +61,7 @@ export const UNIT2_MODULES: LectureModule[] = [
         {
           heading: 'ADC and PWM — crossing between analog and digital',
           body:
-            'An ADC (analog-to-digital converter) measures a voltage by binary search. The dominant design in MCUs is the SAR — successive approximation register. A sample-and-hold capacitor freezes the input voltage; the SAR then asks one question per bit: "is the input above half the reference?" — sets that bit accordingly, then compares against quarter steps, eighth steps, and so on. A 10-bit conversion (Uno: 0–1023) takes 10 comparisons; a 12-bit one (ESP32: 0–4095) takes 12. Resolution in volts = Vref / 2^bits: the Uno resolves 5V/1024 ≈ 4.9mV per count.\n\nDACs do the reverse, but most MCUs fake analog output with PWM — pulse width modulation. A hardware timer counts up repeatedly; a compare register flips the pin HIGH for the first N counts of every cycle. The ratio N/total is the duty cycle. Switch fast enough (490Hz on the Uno, up to 40MHz on the ESP32) and anything slow — an LED into your eye, a motor\'s inertia, an RC filter — averages the pulses into an effective voltage of duty × VCC.\n\nThe Raspberry Pi\'s famous catch belongs here: the BCM2711 has no on-chip ADC at all. Analog sensors need an external SAR chip (the MCP3008) connected over SPI — a 10-bit ADC the Pi interrogates digitally.',
+            'An ADC measures voltage by binary search. The dominant design — SAR (successive approximation register) — freezes the input on a capacitor, then asks "above half the reference?" one bit at a time. A 10-bit conversion (Uno: 0–1023) takes 10 comparisons; 12-bit (ESP32: 0–4095) takes 12. Resolution = Vref / 2^bits — the Uno resolves ≈4.9mV per count.\n\nMost MCUs fake analog output with PWM instead of a DAC: a timer counts up, a compare register holds the pin HIGH for the first N counts of each cycle — duty = N/total. Switch fast (490Hz Uno, up to 40MHz ESP32) and anything slow — an LED, a motor, an RC filter — averages the pulses into duty × VCC.\n\nThe Raspberry Pi has no on-chip ADC at all — analog sensors need an external SAR chip (MCP3008) over SPI.',
           diagram: {
             art: `SAR ADC: binary search for Vin = 2.1 V (Vref 3.3 V, 4 bits)
   step 1: Vin > 1.65 ?  yes -> bit3 = 1   (range 1.65-3.3)
@@ -77,7 +77,7 @@ PWM duty 25%:   _      _      _
         {
           heading: 'UART, I2C, SPI — three ways chips talk',
           body:
-            'UART is the oldest: two wires (TX→RX each way), no clock. Both sides agree on a baud rate in advance; each byte travels framed by a start bit and stop bit, and the receiver samples mid-bit using its own clock. Simple, but only ever point-to-point, and a 2% clock mismatch corrupts data.\n\nI2C runs a whole network on two wires: SDA (data) and SCL (clock), both open-drain — devices can only pull the line LOW; a shared pull-up resistor restores HIGH. This is why nothing burns when two devices "talk at once" (wired-AND), and it enables addressing: the master broadcasts a 7-bit address, and only the matching slave ACKs by pulling SDA low during the 9th clock. Typical speed 100–400kHz; dozens of sensors share one bus. On the Uno, A4/A5 are the I2C pins; on the Pi, GPIO2/GPIO3.\n\nSPI trades wires for speed: dedicated MOSI, MISO and SCK lines plus one chip-select wire per device. The master clocks bits out on MOSI and simultaneously clocks bits in on MISO — full duplex, no addressing overhead, tens of MHz. Displays, SD cards and the MCP3008 ADC all speak SPI. Rule of thumb: UART for one neighbour, I2C for many slow sensors, SPI for few fast ones.',
+            'UART: two wires (TX→RX each way), no clock — both sides agree a baud rate, each byte framed by start/stop bits. Simple, point-to-point only.\n\nI2C: two wires, SDA (data) + SCL (clock), both open-drain with a shared pull-up — devices can only pull LOW, so nothing burns when two talk at once. The master addresses a 7-bit slave; that slave ACKs. 100–400kHz, dozens of sensors per bus. Uno: A4/A5. Pi: GPIO2/GPIO3.\n\nSPI: dedicated MOSI, MISO, SCK + one chip-select per device — full duplex, tens of MHz, no addressing. Displays, SD cards, the MCP3008 ADC.\n\nRule of thumb: UART for one neighbour, I2C for many slow sensors, SPI for few fast ones.',
           diagram: {
             art: `UART  MCU A  TX ----------> RX  MCU B   (no clock,
             RX <---------- TX          agreed baud)
@@ -94,14 +94,44 @@ SPI   master MOSI -> slave   SCK ->   MISO <-   CS ->`,
         {
           heading: 'The power budget — why 50µA matters more than 240MHz',
           body:
-            'A battery-powered IoT node lives or dies by its energy budget, not its clock speed. An ESP32 with Wi-Fi transmitting draws ~160–260mA; CPU running quietly, ~40mA; light sleep ~0.8mA; deep sleep — RAM mostly off, a real-time clock ticking — ~10µA. A 2,000mAh battery lasts 8 hours transmitting continuously, but years if the node sleeps and wakes for two seconds every ten minutes.\n\nThe arithmetic every designer does: average current = (t_active × I_active + t_sleep × I_sleep) / (t_active + t_sleep). For 2s at 100mA every 600s, plus deep sleep at 10µA: average ≈ (2×100,000 + 598×10) / 600 ≈ 343µA → roughly 8 months on 2,000mAh. Every extra awake-second is the enemy; this is why protocol choice, sensor warm-up time and even how fast your code runs are power decisions.\n\nIndia context worth quoting in class: Bolt IoT (Bengaluru) builds Wi-Fi MCU platforms for exactly this duty-cycle pattern, and C-DAC\'s SHAKTI program is producing indigenous RISC-V processors — the long-term answer to importing every microcontroller this country deploys.',
+            'A battery-powered node lives or dies by its energy budget, not its clock speed. An ESP32 transmitting over Wi-Fi draws ~160–260mA; idling ~40mA; light sleep ~0.8mA; deep sleep (RTC only) ~10µA. Continuous transmission empties a 2,000mAh battery in ~8 hours — a 2s-every-10-minutes duty cycle stretches the same battery to months.\n\naverage current = (t_active·I_active + t_sleep·I_sleep) / (t_active+t_sleep). Every extra awake-second is the enemy — protocol choice, sensor warm-up and even how fast your code runs are power decisions.\n\nBolt IoT (Bengaluru) builds Wi-Fi MCU platforms for exactly this pattern; C-DAC\'s SHAKTI program is building indigenous RISC-V processors for it.',
+          diagram: {
+            art: `Current draw, ESP32 (log scale)
+  Wi-Fi TX     ~200 mA  ############################
+  active CPU    ~40 mA  ######
+  light sleep  ~0.8 mA  .
+  deep sleep    ~10 µA  ' (RTC tick only)
+
+2 s awake @100mA, every 600 s, else deep sleep:
+  avg = (2x100000 + 598x10) / 600  =~  343 uA
+  2000 mAh / 343 uA  =~  8 months`,
+            caption: 'Duty-cycling turns an 8-hour battery into an 8-month one.',
+          },
         },
       ],
     },
 
     wiring: {
       intro:
-        'We rebuild Session 4\'s assignment circuit: an ESP32 reading a DHT11 (temperature + humidity, digital one-wire) and an LDR (light, analog) — the exact pattern of the Nashik vineyard nodes. Wire it in the Virtual Lab first; the same connections work on Wokwi with a DHT22.',
+        'An ESP32 reading a DHT11 (temperature + humidity, digital one-wire) and an LDR (light, analog) — the pattern behind the Nashik vineyard nodes.',
+      diagram: {
+        art: `        ESP32 DevKit
+       +--------------+
+  3V3 -|3V3        GND|- GND
+       |              |
+GPIO4 -|GPIO4   GPIO34|- ADC1_CH6
+       +--------------+
+         |    |          |
+       DATA  3V3---+    signal
+         |    |     \\     |
+      +--DHT11--+   [ LDR divider ]
+      | VCC GND |    VCC      out
+      +---------+
+
+DHT11:  VCC->3V3   GND->GND   DATA->GPIO4
+LDR:    VCC->3V3   signal->GPIO34 (ADC, input-only)`,
+        caption: 'One digital one-wire sensor (DHT11) + one analog divider (LDR) on the ESP32.',
+      },
       steps: [
         { from: 'ESP32 3V3', to: 'DHT11 VCC', purpose: 'Supply rail. The DHT11 tolerates 3–5.5V; on the ESP32 we use 3.3V so its DATA line idles at a level the 3.3V GPIO can safely read.' },
         { from: 'ESP32 GND', to: 'DHT11 GND', purpose: 'Return path — completes the current loop. No GND, no circuit (the open-circuit failure you saw in the lab).' },
@@ -212,12 +242,12 @@ void loop() {
 
     physics: {
       intro:
-        'A sensor is a transducer: it converts a physical quantity into an electrical one. Everything downstream — your ADC counts, your dashboards, your ML models — inherits the physics of that conversion. This module builds the vocabulary to read a datasheet critically and the math to turn raw counts into numbers you can defend in a paper.',
+        'A sensor is a transducer: it converts a physical quantity into an electrical one. Everything downstream — ADC counts, dashboards, ML models — inherits the physics of that conversion.',
       concepts: [
         {
           heading: 'Transduction — how physics becomes voltage',
           body:
-            'Resistive sensors change resistance with the measured quantity: an LDR\'s cadmium-sulphide film frees more charge carriers under photons (resistance falls with light); a thermistor\'s semiconductor frees carriers with heat; a soil probe conducts better through wet soil\'s dissolved ions. Resistance is not voltage, so we wrap the element in a voltage divider: Vout = VCC × R2/(R1+R2). The MCU\'s ADC reads Vout — which is why your LDR module has three pins, not two.\n\nCapacitive sensors change capacitance: the DHT11\'s humidity element is a polymer dielectric between electrodes that absorbs water vapour, shifting its permittivity. The chip measures the capacitor\'s charge time against an internal oscillator. Capacitive soil probes work identically and outlive resistive ones because no metal touches the electrolyte — no corrosion.\n\nPiezoelectric sensors generate charge under mechanical stress (the HC-SR04\'s transducers are piezo discs: drive them with 40kHz to emit ultrasound, and the returning echo strains the receiving disc into producing a measurable voltage). Photodiodes in PIR sensors, Hall elements for current, thermopiles for IR — every sensor family is one of a handful of physical effects wearing different packaging.',
+            'Resistive sensors change resistance: an LDR\'s resistance falls with light, a thermistor\'s with heat, a soil probe\'s with moisture. Wrap the element in a voltage divider — Vout = VCC × R2/(R1+R2) — and the ADC reads Vout. That\'s why an LDR module has three pins, not two.\n\nCapacitive sensors (DHT11 humidity, capacitive soil probes) change capacitance — the chip times how fast the capacitor charges. No metal touches the electrolyte, so they outlive resistive probes.\n\nPiezoelectric sensors generate charge under mechanical stress — the HC-SR04\'s discs emit 40kHz ultrasound and the echo strains the receiver into a measurable voltage. Photodiodes, Hall elements, thermopiles: every sensor family is one of a handful of physical effects in different packaging.',
           diagram: {
             art: `Voltage divider — the universal resistive-sensor circuit
         VCC (5 V)
@@ -237,7 +267,7 @@ void loop() {
         {
           heading: 'Accuracy vs precision vs resolution vs range — four different promises',
           body:
-            'Accuracy is closeness to the truth: a DHT11 promises ±2°C — your 25.0°C reading means "somewhere between 23 and 27". Precision (repeatability) is the spread between repeated measurements of the same value: a sensor can be beautifully precise and consistently wrong (a 1.5°C offset, say) — that combination is fixable by calibration; imprecision is not.\n\nResolution is the smallest step the system can represent. It is set by the weakest link: the DHT11 reports whole degrees (sensor-limited); a 10-bit ADC on a 5V reference cannot see changes below ~4.9mV (converter-limited). More ADC bits never add accuracy — a 16-bit reading of a ±2°C sensor is four extra bits of confidently stated noise.\n\nRange is where the promises hold: the DHT11 measures 0–50°C; at 55°C it doesn\'t fail loudly, it just lies. Datasheet exercise from this session: the DHT22 (±0.5°C, 0.1° resolution, −40 to 80°C, one read per 2s) against the BME280 (±1°C but ±3% RH, 0.01° resolution, I2C, ~µA sleep current) — for a Bengaluru weather station the BME280\'s speed, bus interface and power win; the decision is an engineering argument, not a spec-sheet beauty contest.',
+            'Accuracy is closeness to the truth — a DHT11\'s ±2°C means 25.0°C could be anywhere from 23 to 27. Precision is repeatability: a sensor can be precise and consistently wrong (calibration fixes that; imprecision is not fixable).\n\nResolution is the smallest step the system can represent, set by the weakest link — the DHT11 reports whole degrees; a 10-bit ADC on 5V can\'t see below ~4.9mV. More ADC bits never add accuracy.\n\nRange is where the promises hold — a DHT11 at 55°C (range 0–50°C) doesn\'t fail loudly, it just lies. Choosing the DHT22 vs the BME280 for a weather station is this trade-off made concrete: accuracy, resolution, bus, power — not a spec-sheet beauty contest.',
           diagram: {
             art: `        accurate+precise   precise, not accurate
              .  x x            x x
@@ -253,19 +283,59 @@ void loop() {
         {
           heading: 'Noise, drift, and two-point calibration',
           body:
-            'Noise is random variation between consecutive samples — thermal agitation in resistors, supply ripple, electromagnetic pickup on your wires. Because it is random with mean zero, averaging N samples shrinks its standard deviation by √N: average 16 readings and noise drops fourfold. That is the cheapest signal-processing win in embedded systems and costs only time.\n\nDrift is slow, systematic change in the sensor itself: electrolytic corrosion on soil-probe electrodes, dust on an LDR, polymer ageing in humidity elements. Averaging cannot remove a bias that moves with time — only recalibration can, which is why the syllabus says your soil sensor needs annual recalibration.\n\nTwo-point calibration is the workhorse: measure the raw reading in two known conditions — soil probe in air (raw_dry, true 0%) and in water (raw_wet, true 100%) — then map linearly: value = (raw − raw_dry) × 100 / (raw_wet − raw_dry). You are solving y = mx + c from two anchor points; it corrects both offset and scale error in one shot. Three or more points reveal non-linearity, which you fit with a curve or a lookup table.',
+            'Noise is random sample-to-sample variation — thermal agitation, supply ripple, EM pickup. Random with mean zero, so averaging N samples shrinks its spread by √N: 16 readings → noise halved twice over, for free.\n\nDrift is slow systematic change in the sensor itself — corrosion, dust, ageing. Averaging can\'t remove it; only recalibration can.\n\nTwo-point calibration: measure raw in two known conditions (probe in air = 0%, in water = 100%), then map linearly — solving y = mx + c from two anchors corrects both offset and scale at once.',
+          diagram: {
+            art: `Noise (random):  averaging N samples -> sigma / sqrt(N)
+Drift (slow, systematic): only recalibration fixes it
+
+Two-point calibration — y = mx + c from two anchors:
+  raw_dry  (in air)   --> 0 %
+  raw_wet  (in water) --> 100 %
+
+  value = (raw - raw_dry) * 100 / (raw_wet - raw_dry)`,
+            caption: 'Averaging kills noise; only re-anchoring the two endpoints kills drift.',
+          },
         },
         {
           heading: 'Sensor fusion — why Apollo\'s wards alarm 60% less',
           body:
-            'Every sensor lies differently. A GPS gives absolute position but wanders metre-scale and dies indoors; an accelerometer integrates beautifully over 100ms but its tiny bias, double-integrated, drifts metres within a minute; a barometer nails relative altitude but wanders with the weather. Fusion exploits complementary error structures: trust the accelerometer at high frequency, the GPS/barometer at low frequency.\n\nThe simplest fusion is the complementary filter: estimate = α × (fast sensor) + (1−α) × (slow sensor), with α ≈ 0.98 for gyro+accelerometer attitude estimation. The Kalman filter generalises this, weighting each source by its variance every time step — statistically optimal when errors are Gaussian.\n\nThe Apollo Hospitals case is fusion as logic: an SpO2 dip alone might be a loose finger clip; an SpO2 dip while the ECG shows tachycardia and the accelerometer shows the patient is motionless is an emergency. Demanding agreement between independent sensors before alarming cut false alarms ~60% — directly transferable to any IoT alerting system you will ever build.',
+            'Every sensor lies differently. GPS gives absolute position but wanders metre-scale and dies indoors; an accelerometer integrates beautifully short-term but drifts over a minute; a barometer nails relative altitude but wanders with weather. Fusion trusts the fast sensor briefly and the slow sensor for the long run.\n\nThe complementary filter: estimate = α·(fast) + (1−α)·(slow), α ≈ 0.98 for gyro+accelerometer. A Kalman filter generalises this, weighting each source by its variance.\n\nApollo Hospitals: an SpO2 dip alone might be a loose clip; SpO2 dip + tachycardia + the patient motionless is an emergency. Requiring agreement across independent sensors cut false alarms ~60%.',
+          diagram: {
+            art: `fast sensor (accel) --\\
+                       >--  estimate = a*fast + (1-a)*slow
+slow sensor (GPS/baro)-/        (a =~ 0.98)
+
+Apollo logic:
+  SpO2 dip alone            -> maybe just a loose clip
+  SpO2 dip + ECG tachycardia
+            + accel: still   -> agreement => real alarm`,
+            caption: 'Fusion = trusting different sensors at different timescales, or requiring agreement.',
+          },
         },
       ],
     },
 
     wiring: {
       intro:
-        'The bench experiment: one clean analog source (potentiometer — you control the truth by turning the knob) and one messy real sensor (LDR) on the Uno\'s 10-bit ADC. The pot teaches the ADC transfer function; the LDR gets the calibration treatment.',
+        'One clean analog source (potentiometer) and one messy real sensor (LDR) on the Uno\'s 10-bit ADC. The pot teaches the transfer function; the LDR gets the calibration treatment.',
+      diagram: {
+        art: `        Arduino Uno
+       +------------+
+  5V --|5V       GND|-- GND
+       |            |
+  A0 --|A0        A1|-- (LDR signal)
+       +------------+
+   |        |          |
+  wiper    5V----+    out
+   |        |     \\     |
++--POT------+   [ LDR divider ]
+| VCC GND |      VCC      GND
++---------+
+
+POT:  VCC->5V  GND->GND  wiper->A0
+LDR:  VCC->5V  signal->A1 (10-bit ADC, 0-1023)`,
+        caption: 'A clean reference channel (pot) next to a noisy real one (LDR), read together.',
+      },
       steps: [
         { from: 'Uno 5V', to: 'Potentiometer VCC', purpose: 'Top of the pot\'s internal divider — the wiper will sweep between this rail and GND.' },
         { from: 'Uno GND', to: 'Potentiometer GND', purpose: 'Bottom of the divider and the ADC\'s reference ground — both must share this node or counts are meaningless.' },
@@ -380,17 +450,28 @@ void loop() {
 
     physics: {
       intro:
-        'Sensing is half of IoT; the value is in acting — switching a pump, dimming a streetlight, dispensing a drug. But actuators are power components and your GPIO pin can deliver ~20mA at 5V. This module is about the physics of switching real loads without destroying the controller doing the switching.',
+        'Sensing is half of IoT — the value is in acting. But a GPIO pin delivers ~20mA at 5V, and actuators are power components. This is the physics of switching real loads without destroying the controller.',
       concepts: [
         {
           heading: 'The current chasm — why a pin cannot drive a motor',
           body:
-            'A GPIO output is that small CMOS pair from Module 1: its transistors have on-resistance of tens of ohms and a thermal limit near 20–40mA. A relay coil wants 70mA, a small DC motor 200–1,000mA (and several amps at stall), a pump more. Connect any of these directly and the pin\'s transistor becomes the fuse.\n\nThe universal pattern is staged amplification: the pin switches a transistor, the transistor switches the load, and a separate power rail carries the load current. The pin\'s job shrinks to charging a transistor\'s input — microamps to milliamps — while the load draws its amps from a supply built for it.\n\nThis also isolates voltage domains: a 3.3V ESP32 pin can switch a 12V motor or, through a relay, 230V mains — provided the stages are designed for it. Every driver circuit you will ever meet (motor driver ICs, relay boards, LED strip drivers) is this one idea in packaging.',
+            'A GPIO\'s CMOS transistors have on-resistance of tens of ohms and a thermal limit near 20–40mA. A relay coil wants 70mA, a small DC motor 200mA–1A (amps at stall). Connect either directly and the pin becomes the fuse.\n\nThe universal pattern is staged amplification: the pin switches a transistor, the transistor switches the load, and a separate rail carries the load current. The pin charges a transistor input — µA to mA — while the load draws amps from a supply built for it.\n\nThis also isolates voltage domains: a 3.3V pin can switch a 12V motor or, through a relay, 230V mains. Every motor driver IC, relay board and LED-strip driver is this one idea in packaging.',
+          diagram: {
+            art: `GPIO pin limit: ~20-40 mA
+  relay coil   needs ~70 mA    |==> too much
+  DC motor     needs 0.2-1 A   |==> way too much
+
+Staged amplification:
+ GPIO --(uA-mA, charges gate)--> [transistor] --(amps)--> LOAD
+                                       ^
+                              separate power rail`,
+            caption: 'The pin never carries the load current — it only switches a transistor that does.',
+          },
         },
         {
           heading: 'The MOSFET as a switch — gate charge, Rds(on) and "logic-level"',
           body:
-            'A MOSFET is a voltage-controlled switch: the gate is an insulated capacitor; charging it above the threshold voltage forms a conductive channel between drain and source. No steady gate current flows — the pin only supplies a pulse of charge at each switching edge — which is why MOSFETs, not bipolar transistors, dominate modern drivers.\n\nThe key datasheet number is Rds(on), the channel resistance when fully on: a logic-level FET like the IRLZ44N reaches ~0.025Ω with just 5V on the gate. At 2A load that dissipates I²R = 0.1W — barely warm, no heatsink. The classic student trap is the IRF540 (not logic-level): at 5V gate drive it is only half-on, Rds(on) is tens of times higher, and it cooks. "Logic-level" is the phrase that means "fully enhances at 3.3–5V".\n\nIn the standard low-side configuration the FET sits between load and ground, with a 10kΩ resistor from gate to ground so the load stays off while the MCU boots (a floating gate — Module 1\'s floating pin, with amps behind it). PWM into the gate gives proportional control: motor speed, LED-strip brightness, heater power.',
+            'A MOSFET is a voltage-controlled switch: the gate is an insulated capacitor — charge it above the threshold voltage and a conductive channel opens between drain and source. No steady gate current flows, just a pulse of charge per edge.\n\nThe key number is Rds(on), the on-resistance: a logic-level FET (IRLZ44N) reaches ~0.025Ω at 5V gate drive — at 2A that\'s only 0.1W. The classic trap is the IRF540 (not logic-level): at 5V it\'s only half-on, Rds(on) is tens of times higher, and it cooks. "Logic-level" = fully on at 3.3–5V.\n\nLow-side: the FET sits between load and ground, with a 10kΩ gate-to-ground resistor so the load stays off while the MCU boots. PWM into the gate gives proportional control.',
           diagram: {
             art: `Low-side MOSFET switch with flyback diode
                  +12 V
@@ -412,19 +493,64 @@ GPIO --[220Ω]-- G [MOSFET]  IRLZ44N (logic-level)
         {
           heading: 'Inductive kickback — the flyback diode is not optional',
           body:
-            'Coils — relay coils, motor windings, solenoids — store energy in a magnetic field: E = ½LI². An inductor\'s defining law, V = L·di/dt, has a vicious corollary: interrupt the current instantly and di/dt → huge, so the coil generates whatever voltage it takes to keep its current flowing. Switch off a relay coil with a bare transistor and the coil end swings to hundreds of volts negative spike — through your switching device.\n\nThe flyback diode is the escape route: placed across the coil, reverse-biased in normal operation (invisible), it becomes forward-biased the instant the switch opens, letting the coil\'s current recirculate harmlessly through the loop and decay in the winding resistance. One ₹2 component versus one dead MOSFET — or a dead microcontroller, since the spike happily couples back through the gate.\n\nRelays themselves add a second isolation trick: the coil and the contacts are mechanically linked but electrically separate, so an MCU-side 5V coil can switch 230V mains with no shared wire. For mains work, professional designs add an optocoupler before the transistor too — an LED shining at a phototransistor across a plastic gap — so even a catastrophic failure on the load side cannot reach the logic. (E-ink displays sit at the opposite extreme of "real output": charged pigment particles electrophoretically parked by a field — zero power to hold an image, which is why shelf labels last years on a coin cell.)',
+            'Coils store energy in a magnetic field: E = ½LI². V = L·di/dt means interrupting the current instantly forces di/dt → huge — the coil generates whatever voltage it takes to keep current flowing. Switch off a relay coil with a bare transistor and the coil swings to hundreds of volts, through your switching device.\n\nThe flyback diode is the escape route: across the coil, invisible in normal operation, it becomes forward-biased the instant the switch opens — the current recirculates and decays harmlessly. One ₹2 diode versus one dead MOSFET.\n\nRelays add isolation too: coil and contacts are mechanically linked but electrically separate, so a 5V coil can switch 230V mains. Mains designs add an optocoupler before the transistor for the same reason.',
+          diagram: {
+            art: `Switch OFF, no flyback diode:
+  V = L di/dt,  di/dt -> huge  =>  spike: hundreds of volts
+
+With flyback diode across the coil:
+   +12V ---[ COIL ]---+
+                |      |
+              [<-|]----+  <- diode recirculates the current
+                |
+   switch ------+------ GND
+   (spike clamped to ~1V, current decays in the winding)`,
+            caption: 'The diode is invisible until the switch opens — then it saves the transistor.',
+          },
         },
         {
           heading: 'Closing the loop — hysteresis or the system chatters',
           body:
-            'A complete IoT loop is sense → decide → act → (the action changes what you sense). The naive decision rule "pump ON if moisture < 40%" fails in practice: at the threshold, noise of ±1% switches the pump on and off several times a minute — chattering — which mechanically destroys relays (rated ~100k cycles) and pumps.\n\nThe fix is the same hysteresis you met inside the Schmitt trigger, now applied in software: turn ON below 35%, OFF above 45%. Inside the 10-point dead band the actuator holds its previous state, so one decision requires the signal to travel the full gap. Width is an engineering choice: wider = fewer cycles but sloppier regulation.\n\nAdd time-based guards in real deployments — minimum on-time, minimum off-time, a daily cycle budget — because sensors fail, and an actuator wired to a failed sensor must fail safe. The parking-sensor circuit you will wire next is the smallest honest version of this loop: distance in, sound out, hysteresis in the middle.',
+            'A complete IoT loop is sense → decide → act → (the action changes what you sense). "Pump ON if moisture < 40%" fails: noise of ±1% near the threshold switches the pump on/off several times a minute — chattering — which destroys relays (~100k cycle rating) and pumps.\n\nThe fix is the Schmitt trigger\'s hysteresis, in software: ON below 35%, OFF above 45%. Inside that dead band the actuator holds its previous state.\n\nReal deployments add time guards too — minimum on/off time, daily cycle budgets — because sensors fail, and a failed sensor must fail safe.',
+          diagram: {
+            art: `Naive: pump ON if moisture < 40%  -> chatters at 40%
+
+Hysteresis (dead band 35-45%):
+  moisture < 35%  -> pump ON
+  moisture > 45%  -> pump OFF
+  35-45%          -> hold previous state
+
+ 45% ----.________          ________
+ 35% ----'        \\________/
+         ON  (hold)   OFF    (hold)  ON`,
+            caption: 'A dead band means one decision needs the signal to cross the whole gap.',
+          },
         },
       ],
     },
 
     wiring: {
       intro:
-        'The Smart-City parking assistant: an HC-SR04 measures distance, the Uno decides, a buzzer and LED act. Sensor → decision → actuator on one bench. (The buzzer stands in for the MOSFET-driven loads of the lecture — its current is pin-safe; the decision logic is identical.)',
+        'The parking assistant: an HC-SR04 measures distance, the Uno decides, a buzzer and LED act — sensor → decision → actuator on one bench. (The buzzer\'s current is pin-safe; the decision logic is identical to a MOSFET-driven load.)',
+      diagram: {
+        art: `        Arduino Uno
+       +----------------+
+  5V --|5V            GND|-- GND
+       |                 |
+  D9 --|D9~  D8  D5~  D3~|
+       +--|----|----|----|--+
+          |    |    |    |
+       TRIG  ECHO  BUZZ  220R--LED--+
+          |    |    |    |          |
+       +--HC-SR04---+   GND        GND
+       | VCC=5V GND |
+       +------------+
+
+HC-SR04: VCC->5V, GND->GND, TRIG->D9, ECHO->D8
+Buzzer:  +->D5(~)  -->GND
+LED:     D3(~) -> 220R -> anode, cathode -> GND`,
+        caption: 'One ranging sensor in, two actuators out — distance becomes sound and light.',
+      },
       steps: [
         { from: 'Uno 5V', to: 'HC-SR04 VCC', purpose: 'The HC-SR04\'s piezo driver genuinely needs 5V — on 3.3V its ultrasonic burst is too weak for reliable echoes (the undervoltage failure in the lab).' },
         { from: 'Uno GND', to: 'HC-SR04 GND', purpose: 'Common reference for the TRIG/ECHO timing signals.' },
@@ -546,12 +672,12 @@ void loop() {
 
     physics: {
       intro:
-        'Your Virtual Lab bench and a breadboard share a secret: they are held together by hope and spring contacts. Products ship on printed circuit boards. This module covers the physics that breadboards hide — where currents actually return, how copper width sets temperature, why decoupling capacitors exist — and the workflow that turns a schematic into a ₹150 manufactured board from a fab.',
+        'A breadboard and a manufactured PCB share a circuit but not its physics. This module covers what breadboards hide — where currents return, how copper width sets temperature, why decoupling caps exist — and the workflow from schematic to a ₹150 manufactured board.',
       concepts: [
         {
           heading: 'Why breadboards lie — parasitics and contact resistance',
           body:
-            'Every breadboard joint is a phosphor-bronze spring gripping a wire: 10–100mΩ of contact resistance that changes when you nudge the board. Adjacent 5-hole rails form ~2pF capacitors with each other, and a 20cm jumper wire is ~150nH of inductance plus an antenna. At Arduino speeds you get away with it; raise frequencies (SPI at 8MHz, a MOSFET switching amps in 100ns) and circuits that "worked on the breadboard" oscillate, glitch and brown-out.\n\nA PCB replaces all of it with photolithographically etched copper foil laminated onto FR4 fibreglass: joints become soldered (sub-mΩ, gas-tight), wire lengths collapse to millimetres, and — the real prize — geometry becomes repeatable. Board #1 and board #1,000 are electrically identical, which is what "productising" physically means.\n\nThe prototyping ladder: breadboard to prove the concept, perfboard (soldered, hand-wired) when it must survive a field trial, custom PCB when you need repeatability, compactness, EMC compliance or more than a handful of units. The jump to PCB happens earlier than students expect — at 5+ units, hand-wiring time already costs more than fab + assembly.',
+            'Every breadboard joint is a spring gripping a wire: 10–100mΩ of contact resistance that shifts when you nudge the board. A 20cm jumper adds ~150nH of inductance plus an antenna. At Arduino speeds you get away with it; raise frequencies (SPI at 8MHz, a MOSFET switching in 100ns) and circuits that "worked on the breadboard" oscillate and brown-out.\n\nA PCB replaces all of it with etched copper on FR4: joints become soldered (sub-mΩ), wire lengths collapse to millimetres, and geometry becomes repeatable — board #1 and board #1,000 are electrically identical.\n\nThe prototyping ladder: breadboard to prove the concept → perfboard for a field trial → custom PCB for repeatability, compactness or volume. The jump happens earlier than students expect — at 5+ units, hand-wiring already costs more than fab + assembly.',
           diagram: {
             art: `2-layer PCB cross-section (1.6 mm standard)
   ~~~~~~~~~~~ solder mask (green insulation)
@@ -568,7 +694,7 @@ void loop() {
         {
           heading: 'Trace width is thermal engineering, and current returns under the trace',
           body:
-            'A copper trace is a resistor: 35µm foil at 0.25mm width gives ~0.5mΩ per millimetre. Push current through and I²R heat must escape through the board surface; the IPC-2152 charts answer "what width for what current at what temperature rise". Rules of thumb for 1oz outer copper at ΔT=10°C: 0.25mm ≈ 1A, 0.5mm ≈ 2A, 1mm ≈ 3.5A. Signals can stay thin; power and motor paths must be wide — or made of polygon pours.\n\nThe least intuitive fact in PCB design: current always flows in loops, and the return current in your ground plane does not take the shortest path — it crowds directly underneath the signal trace, because that geometry minimises the loop\'s inductance. Slot the ground plane (or route a trace across a split) and the return current must detour; the enlarged loop becomes both a transmitting antenna (EMI you radiate) and a receiving one (noise you swallow). One unbroken ground plane on layer 2 is the single highest-value habit in 2-layer design.\n\nDecoupling capacitors close the same story: when an MCU\'s thousands of transistors switch on a clock edge, it demands a current spike in nanoseconds. The supply trace\'s inductance cannot deliver it (V = L·di/dt again — the rail would sag). A 100nF ceramic capacitor placed millimetres from each VCC pin is a local charge reservoir feeding the spike from next door. Placement IS the function: the same capacitor 3cm away is behind too much inductance to help.',
+            'A copper trace is a resistor — I²R heat must escape through the board surface. Rules of thumb for 1oz outer copper at ΔT=10°C: 0.25mm ≈ 1A, 0.5mm ≈ 2A, 1mm ≈ 3.5A. Signals stay thin; power and motor paths must be wide.\n\nCurrent flows in loops, and ground-plane return current crowds directly underneath the signal trace — that geometry minimises loop inductance. Slot the plane and the return must detour; the enlarged loop radiates EMI and picks up noise. One unbroken ground plane is the single highest-value habit in 2-layer design.\n\nDecoupling capacitors close the same story: an MCU demands a current spike in nanoseconds that the supply trace\'s inductance can\'t deliver. A 100nF cap millimetres from each VCC pin is a local reservoir — placement IS the function.',
           diagram: {
             art: `Return current hugs the trace above it:
   top:    ======== signal ========>
@@ -583,19 +709,52 @@ void loop() {
         {
           heading: 'The KiCad workflow — schematic, footprints, layout, DRC',
           body:
-            'KiCad (free, open-source, used professionally) formalises design into stages. Schematic capture: place symbols, wire nets, name them — this defines connectivity, the netlist, with zero geometry. The Electrical Rules Check catches "two outputs shorted" and "input never driven" — your Virtual Lab validator was a baby ERC.\n\nFootprint assignment binds each symbol to a physical land pattern: the same 100nF capacitor can be a hand-solderable 0805 (2mm) or a rice-grain 0402. Choose footprints you can actually assemble — 0805 and SOIC for hand-soldering; finer pitches mean a stencil and hot air.\n\nLayout: place components (connectors at edges, decouplers touching their pins, crystal beside the MCU), then route traces. The Design Rules Check enforces the fab\'s physics — minimum trace width, clearance between copper, annular ring on vias, thermal reliefs (spoke-shaped pad connections so a soldering iron can heat a pad that would otherwise dump heat into the plane). DRC-clean means manufacturable, not correct — correctness died or survived back at the schematic.',
+            'Schematic capture: place symbols, wire nets, name them — defines connectivity (the netlist) with zero geometry. The Electrical Rules Check catches "two outputs shorted" and "input never driven" — your Virtual Lab validator was a baby ERC.\n\nFootprint assignment binds each symbol to a physical land pattern — the same capacitor can be a hand-solderable 0805 or a rice-grain 0402. Choose what you can assemble.\n\nLayout places components, then routes traces. The Design Rules Check enforces the fab\'s physics — trace width, clearance, via annular rings. DRC-clean means manufacturable, not correct — correctness was decided at the schematic.',
+          diagram: {
+            art: `Schematic --ERC--> Footprints --> Layout --DRC--> Gerbers
+  (symbols,   (catches      (assign       (route +    (files
+   nets)      shorts /       packages)     place      sent to
+              unconnected)                 copper)     the fab)`,
+            caption: 'Four stage-gates: each one catches a different class of mistake.',
+          },
         },
         {
           heading: 'Design for manufacturability — and getting boards made from India',
           body:
-            'Fabs publish capabilities: a standard process is 6mil (0.15mm) trace/space, 0.3mm minimum drill, 1.6mm FR4. Design at the standard limits and boards cost almost nothing; demand 3mil traces or blind vias and the price multiplies. DFM is the discipline of staying inside the cheap envelope: respect clearances with margin, prefer one drill size, keep copper balanced across layers so the board doesn\'t warp in reflow.\n\nThe ordering pipeline from Bengaluru: export Gerbers (one file per copper/mask/silk layer) plus the drill file, upload to JLCPCB or PCBWay — five 2-layer 50×50mm boards for $2–4 plus shipping, 7–12 days to your hostel. Indian fabs (PCB Power, Lion Circuits) cost more per board but deliver in 3–5 days with no customs lottery — the lead-time/cost trade-off is itself a supply-chain lesson.\n\nThe professional loop is: order rev A, find the mistakes (there are always mistakes — a swapped RX/TX, a connector mirrored), fix, order rev B. Budget two spins into every project plan, and silkscreen the revision and date onto the board — future-you will be grateful.',
+            'Fabs publish capabilities: a standard process is 6mil (0.15mm) trace/space, 0.3mm minimum drill, 1.6mm FR4. Design at those limits and boards cost almost nothing; demand 3mil traces and the price multiplies. DFM means staying inside that cheap envelope.\n\nFrom Bengaluru: export Gerbers + drill file, upload to JLCPCB/PCBWay — five 2-layer 50×50mm boards for $2–4, 7–12 days. Indian fabs (PCB Power, Lion Circuits) cost more but deliver in 3–5 days, no customs.\n\nThe professional loop: order rev A, find the mistakes (there always are), fix, order rev B. Budget two spins into every project, and silkscreen the revision onto the board.',
+          diagram: {
+            art: `Cheap envelope (standard process):
+  trace/space >= 6 mil (0.15 mm)
+  drill       >= 0.3 mm
+  board        1.6 mm FR4
+
+Pipeline: Gerbers + drill file -> JLCPCB / PCBWay /
+  Lion Circuits -> 5 boards, $2-4, 7-12 days
+  rev A -> find mistakes -> fix -> rev B`,
+            caption: 'Stay inside the cheap envelope and a 2-layer board costs almost nothing.',
+          },
         },
       ],
     },
 
     wiring: {
       intro:
-        'No jumper wires this time — the "wiring" is the KiCad pipeline applied to a board you already understand: the Session 4 weather node (ESP32 + DHT11 + LDR), going from bench circuit to fab-ready files. Each step below is one stage gate.',
+        'No jumper wires this time — the "wiring" is the KiCad pipeline applied to a board you already understand: the Session 4 weather node (ESP32 + DHT11 + LDR), going from bench circuit to fab-ready files.',
+      diagram: {
+        art: `Target layout (50 x 50 mm, 2-layer)
+ +----------------------------------+
+ | [DHT11 hdr]          [LDR hdr]    |
+ |                                   |
+ |        +-----------------+       |
+ |        |  ESP32 DevKit   |        |
+ |        |   (socket)      |        |
+ |        +-----------------+        |
+ |  [100nF][10uF]  near 3V3 pins     |
+ |                                   |
+ | bottom layer: one solid GND plane |
+ +----------------------------------+`,
+        caption: 'Sensors at the edges, decoupling caps tight to the ESP32, solid ground plane below.',
+      },
       steps: [
         { from: 'Virtual Lab bench', to: 'KiCad schematic', purpose: 'Re-draw the proven circuit as symbols and nets: ESP32 module, DHT11 header, LDR divider (now with its explicit 10kΩ resistor), 100nF + 10µF decoupling on 3V3.' },
         { from: 'Schematic', to: 'ERC pass', purpose: 'Run the Electrical Rules Check; annotate every net (3V3, GND, DHT_DATA, LDR_ADC). Unnamed nets become unfindable bugs at layout.' },
