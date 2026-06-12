@@ -22,9 +22,27 @@
 - [x] Phase 2c: public access — homepage, /lab and /ideas need no login or
       database (app/(public)/*); middleware keeps them open even with zero
       Supabase env config
+- [x] Phase 3a: realistic hardware UI — SVG PCB art for all three boards
+      (BoardArt) and illustrated parts (ComponentArt), bench grid canvas,
+      rubber-band wiring with green compatible-target pulses, pin tooltips
+- [x] Phase 3b: failure-first learning — "Run Anyway" on broken circuits
+      plays sparks/smoke/burnout + serial drama, then MistakeExplainer
+      teaches why ​each failure happened (lib/simulator/failure-lessons.ts,
+      FailureCode added to ValidationIssue)
+- [x] Phase 3c: panel polish — gauge bars on readings, colorized serial
+      monitor with clear, grouped diagnostics, parts bin with thumbnails
+- [x] Fix: postcss.config.js was missing — Tailwind never ran in builds
+      (whole site shipped unstyled). Build requires npm i --legacy-peer-deps
+      (react 19 vs @react-email peer conflict).
+- [x] Unit 2 interactive lecture decks at /learn (public, like /lab):
+      4 modules × 4-part structure (physics from scratch → simulator wiring
+      → code execution breakdown → research spark). types/lectures.ts +
+      content/lectures/unit2.ts + LectureViewer; /learn added to middleware
+      public paths.
 - [ ] Phase 2 remaining: saving benches to Supabase, code-block simulation
       (student writes pseudo-sketch), MCP3008 ADC module for the Pi,
       per-session challenge ↔ syllabus links
+- [ ] Lecture decks for Units 1, 3–7 (reuse the Unit 2 template)
 
 ## Completed (do not rebuild)
 

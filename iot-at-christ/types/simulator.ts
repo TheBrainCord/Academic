@@ -153,9 +153,30 @@ export interface Circuit {
 
 export type IssueSeverity = 'error' | 'warning' | 'info'
 
+/**
+ * Machine-readable cause of a validation issue. The UI uses this to pick a
+ * physical failure effect (smoke, spark, dead part…) and the matching lesson
+ * in lib/simulator/failure-lessons.ts when the student runs a broken circuit.
+ */
+export type FailureCode =
+  | 'short-circuit'      // power rail wired straight to ground
+  | 'missing-resistor'   // LED with no series resistor
+  | 'overvoltage'        // supply rail exceeds the part's max voltage
+  | 'undervoltage'       // supply rail below the part's min voltage
+  | 'no-power'           // vcc terminal never reaches a power pin
+  | 'no-ground'          // gnd terminal never reaches a ground pin
+  | 'floating-signal'    // data terminal connected to nothing
+  | 'signal-short'       // data terminal wired straight to power/ground
+  | 'analog-on-digital'  // analog output on a pin with no ADC
+  | 'no-adc-on-board'    // analog sensor on a board with no ADC at all (the Pi)
+  | 'pin-conflict'       // two data signals share one board pin
+  | 'not-wired'          // part on the bench with no wires yet
+
 export interface ValidationIssue {
   severity: IssueSeverity
   message: string
+  /** Machine-readable cause — anchors the failure animation + lesson */
+  code?: FailureCode
   /** Optional anchors so the UI can highlight the offending element */
   wireId?: string
   instanceId?: string

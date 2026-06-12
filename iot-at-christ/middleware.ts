@@ -1,9 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Public paths that don't require authentication — the Virtual Lab and Idea
-// Bank are open to everyone so teaching sessions don't depend on login.
-const PUBLIC_PATHS = ['/auth/login', '/auth/callback', '/research/published', '/lab', '/ideas']
+// Public paths that don't require authentication — the Virtual Lab, Lecture
+// Modules and Idea Bank are open to everyone so teaching sessions don't
+// depend on login.
+const PUBLIC_PATHS = ['/auth/login', '/auth/callback', '/research/published', '/lab', '/learn', '/ideas']
 
 // Map each role to its home dashboard
 const ROLE_DASHBOARD: Record<string, string> = {
@@ -30,7 +31,9 @@ export async function middleware(request: NextRequest) {
   // (MIDDLEWARE_INVOCATION_FAILED). The homepage, Virtual Lab and Idea Bank
   // need no database, so they stay open; everything else gets the setup notice.
   if (!supabaseUrl || !supabaseAnonKey) {
-    const openWithoutDb = path === '/' || path === '/setup' || path.startsWith('/lab') || path.startsWith('/ideas')
+    const openWithoutDb =
+      path === '/' || path === '/setup' ||
+      path.startsWith('/lab') || path.startsWith('/learn') || path.startsWith('/ideas')
     if (openWithoutDb) return NextResponse.next()
     return NextResponse.redirect(new URL('/setup', request.url))
   }
