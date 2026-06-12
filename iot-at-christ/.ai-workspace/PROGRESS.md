@@ -13,9 +13,12 @@
       ideas (types/research-ideas.ts + content/research-ideas/ideas.ts), domain &
       difficulty filters, links into Virtual Lab and Research Lab
 - [x] Student nav: added Virtual Lab + Idea Bank
-- [ ] Phase 2 ideas (not started): guided wiring challenges per session, saving
-      benches to Supabase, code-block simulation (student writes pseudo-sketch),
-      MCP3008 ADC module for the Pi
+- [x] Phase 2a: guided wiring challenges — 6 auto-checked exercises
+      (lib/simulator/challenges.ts + ChallengePanel), live requirement
+      checklist, completions persisted in localStorage
+- [ ] Phase 2 remaining: saving benches to Supabase, code-block simulation
+      (student writes pseudo-sketch), MCP3008 ADC module for the Pi,
+      per-session challenge ↔ syllabus links
 
 ## Completed (do not rebuild)
 

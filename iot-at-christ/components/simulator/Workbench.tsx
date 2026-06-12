@@ -17,6 +17,7 @@ import type {
   WireEnd,
 } from '@/types/simulator'
 import { BoardCanvas } from '@/components/simulator/BoardCanvas'
+import { ChallengePanel } from '@/components/simulator/ChallengePanel'
 import { ValidationPanel } from '@/components/simulator/ValidationPanel'
 import { SerialMonitor } from '@/components/simulator/SerialMonitor'
 import { ReadingsPanel } from '@/components/simulator/ReadingsPanel'
@@ -326,6 +327,7 @@ export function Workbench() {
 
         {/* Side panels — stack below the canvas on mobile */}
         <section className="space-y-4">
+          <ChallengePanel circuit={circuit} validation={validation} />
           <ValidationPanel result={validation} wireCount={circuit.wires.length} />
           <ReadingsPanel readings={frame?.readings ?? []} running={running} />
           <SerialMonitor lines={serial} boardName={board.name} />
