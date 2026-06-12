@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+
+# Next.js build output (the app builds inside iot-at-christ/, but guard the root too)
+.next/
+node_modules/
