@@ -5,6 +5,7 @@ import { getComponent } from '@/lib/simulator/components'
 import type {
   BoardDef,
   Circuit,
+  ComponentId,
   PinDef,
   PlacedComponent,
   ValidationIssue,
@@ -32,6 +33,7 @@ interface BoardCanvasProps {
   onMoveComponent: (instanceId: string, x: number, y: number) => void
   onRemoveComponent: (instanceId: string) => void
   onRemoveWire: (wireId: string) => void
+  onShowGuide: (componentId: ComponentId) => void
 }
 
 function pinColor(pin: PinDef): string {
@@ -104,6 +106,7 @@ export function BoardCanvas({
   onMoveComponent,
   onRemoveComponent,
   onRemoveWire,
+  onShowGuide,
 }: BoardCanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const dragRef = useRef<{ instanceId: string; startSvg: { x: number; y: number }; startPos: { x: number; y: number } } | null>(null)
@@ -288,6 +291,14 @@ export function BoardCanvas({
               <circle cx={placed.x + CARD_W - 6} cy={placed.y + 6} r={7} fill="#C0392B" />
               <text x={placed.x + CARD_W - 6} y={placed.y + 6} textAnchor="middle" dominantBaseline="middle" fontSize={9} fill="white">
                 ×
+              </text>
+            </g>
+
+            {/* How-it-works guide */}
+            <g className="cursor-pointer" onPointerDown={(e) => e.stopPropagation()} onClick={() => onShowGuide(placed.componentId)}>
+              <circle cx={placed.x + 6} cy={placed.y + 6} r={7} fill="#1565C0" />
+              <text x={placed.x + 6} y={placed.y + 6} textAnchor="middle" dominantBaseline="middle" fontSize={9} fill="white" fontStyle="italic">
+                i
               </text>
             </g>
 

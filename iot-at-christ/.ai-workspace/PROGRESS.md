@@ -16,6 +16,12 @@
 - [x] Phase 2a: guided wiring challenges — 6 auto-checked exercises
       (lib/simulator/challenges.ts + ChallengePanel), live requirement
       checklist, completions persisted in localStorage
+- [x] Phase 2b: interactive component guides — how each part works, wiring
+      recipe, real industry uses (lib/simulator/component-guides.ts +
+      ComponentGuide modal, ⓘ on palette chips and placed parts)
+- [x] Phase 2c: public access — homepage, /lab and /ideas need no login or
+      database (app/(public)/*); middleware keeps them open even with zero
+      Supabase env config
 - [ ] Phase 2 remaining: saving benches to Supabase, code-block simulation
       (student writes pseudo-sketch), MCP3008 ADC module for the Pi,
       per-session challenge ↔ syllabus links

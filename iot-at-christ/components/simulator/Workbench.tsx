@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Play, RotateCcw, Square } from 'lucide-react'
+import { Info, Play, RotateCcw, Square } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BOARDS, getBoard } from '@/lib/simulator/boards'
 import { COMPONENTS } from '@/lib/simulator/components'
@@ -18,6 +18,7 @@ import type {
 } from '@/types/simulator'
 import { BoardCanvas } from '@/components/simulator/BoardCanvas'
 import { ChallengePanel } from '@/components/simulator/ChallengePanel'
+import { ComponentGuide } from '@/components/simulator/ComponentGuide'
 import { ValidationPanel } from '@/components/simulator/ValidationPanel'
 import { SerialMonitor } from '@/components/simulator/SerialMonitor'
 import { ReadingsPanel } from '@/components/simulator/ReadingsPanel'
@@ -61,6 +62,7 @@ export function Workbench() {
   const [running, setRunning] = useState(false)
   const [serial, setSerial] = useState<SerialLine[]>([])
   const [frame, setFrame] = useState<SimulationFrame | null>(null)
+  const [guideFor, setGuideFor] = useState<ComponentId | null>(null)
   const tickRef = useRef(0)
   const circuitRef = useRef(circuit)
   circuitRef.current = circuit
@@ -234,21 +236,34 @@ export function Workbench() {
 
       {/* Component palette */}
       <section>
-        <h2 className="text-sm font-display font-semibold text-christ-navy mb-2">Parts bin — tap to add</h2>
+        <h2 className="text-sm font-display font-semibold text-christ-navy mb-2">
+          Parts bin — tap to add, tap <Info className="inline h-3 w-3" /> to learn how it works
+        </h2>
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {Object.values(COMPONENTS).map(def => (
-            <button
+            <div
               key={def.id}
-              onClick={() => addComponent(def.id)}
-              title={def.description}
               className={cn(
-                'flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-body transition-transform active:scale-95',
+                'flex items-center whitespace-nowrap rounded-full border text-xs font-body',
                 CATEGORY_CHIP[def.category],
               )}
             >
-              <span aria-hidden>{def.glyph}</span>
-              <span>{def.name}</span>
-            </button>
+              <button
+                onClick={() => addComponent(def.id)}
+                title={def.description}
+                className="flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 transition-transform active:scale-95"
+              >
+                <span aria-hidden>{def.glyph}</span>
+                <span>{def.name}</span>
+              </button>
+              <button
+                onClick={() => setGuideFor(def.id)}
+                aria-label={`How the ${def.name} works`}
+                className="pr-2.5 pl-1 py-1.5 opacity-60 hover:opacity-100 transition-opacity"
+              >
+                <Info className="h-3.5 w-3.5" />
+              </button>
+            </div>
           ))}
         </div>
       </section>
@@ -272,6 +287,7 @@ export function Workbench() {
             onMoveComponent={moveComponent}
             onRemoveComponent={removeComponent}
             onRemoveWire={removeWire}
+            onShowGuide={setGuideFor}
           />
 
           {/* Run controls */}
@@ -333,6 +349,8 @@ export function Workbench() {
           <SerialMonitor lines={serial} boardName={board.name} />
         </section>
       </div>
+
+      <ComponentGuide componentId={guideFor} onClose={() => setGuideFor(null)} />
     </div>
   )
 }

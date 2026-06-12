@@ -78,7 +78,7 @@ function ChipList({ items }: { items: string[] }) {
   )
 }
 
-function IdeaCard({ idea }: { idea: ResearchIdea }) {
+function IdeaCard({ idea, labHref, researchHref }: { idea: ResearchIdea; labHref: string; researchHref: string }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -138,11 +138,11 @@ function IdeaCard({ idea }: { idea: ResearchIdea }) {
 
       <div className="flex flex-wrap gap-3 pt-2 mt-auto border-t border-christ-navy/10">
         {idea.simulatorFriendly && (
-          <Link href="/student/simulator" className="text-xs font-body text-christ-saffron hover:underline">
+          <Link href={labHref} className="text-xs font-body text-christ-saffron hover:underline">
             Try it in the Virtual Lab
           </Link>
         )}
-        <Link href="/student/research" className="text-xs font-body text-christ-navy hover:underline">
+        <Link href={researchHref} className="text-xs font-body text-christ-navy hover:underline">
           Start this in Research Lab →
         </Link>
       </div>
@@ -150,7 +150,15 @@ function IdeaCard({ idea }: { idea: ResearchIdea }) {
   )
 }
 
-export function IdeaBrowser({ ideas }: { ideas: ResearchIdea[] }) {
+export function IdeaBrowser({
+  ideas,
+  labHref = '/student/simulator',
+  researchHref = '/student/research',
+}: {
+  ideas: ResearchIdea[]
+  labHref?: string
+  researchHref?: string
+}) {
   const [domain, setDomain] = useState<IdeaDomain | 'all'>('all')
   const [difficulty, setDifficulty] = useState<IdeaDifficulty | 'all'>('all')
   const [simOnly, setSimOnly] = useState(false)
@@ -188,7 +196,7 @@ export function IdeaBrowser({ ideas }: { ideas: ResearchIdea[] }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((idea) => (
-          <IdeaCard key={idea.id} idea={idea} />
+          <IdeaCard key={idea.id} idea={idea} labHref={labHref} researchHref={researchHref} />
         ))}
       </div>
     </div>
