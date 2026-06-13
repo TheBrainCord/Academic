@@ -11,7 +11,7 @@ Two modules: Course Platform + Research Lab (ResearchFlow).
 - Frontend: Next.js 14 App Router, TypeScript, Tailwind CSS
 - Backend: Supabase (Postgres, Auth, Edge Functions, Storage)
 - Email: Resend with React Email templates
-- AI: Anthropic claude-sonnet-4-20250514 (server-side only, never client)
+- AI: Anthropic claude-sonnet-4-6 (server-side only, never client)
 - Auth: Google OAuth via Supabase Auth
 - External: Google Classroom API (read-only)
 - Deploy: Vercel (frontend) + Supabase cloud
