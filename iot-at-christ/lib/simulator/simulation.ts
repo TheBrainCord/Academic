@@ -44,12 +44,12 @@ function buildNetFinder(circuit: Circuit): (key: string) => string {
 
 // Deterministic 0..1 pseudo-random value from two integer-ish seeds —
 // no Math.random, so the same (circuit, tick) always produces the same frame.
-function noise(seedA: number, seedB: number): number {
+export function noise(seedA: number, seedB: number): number {
   const x = Math.sin(seedA * 12.9898 + seedB * 78.233) * 43758.5453
   return x - Math.floor(x)
 }
 
-function hashStr(s: string): number {
+export function hashStr(s: string): number {
   let h = 2166136261
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i)
@@ -58,7 +58,7 @@ function hashStr(s: string): number {
   return (h >>> 0) % 100000
 }
 
-function readingValue(seed: number, tick: number, idx: number, min: number, max: number): number {
+export function readingValue(seed: number, tick: number, idx: number, min: number, max: number): number {
   const range = max - min
   const center = min + range * (0.3 + 0.4 * noise(seed + idx * 17, 1))
   const drift = Math.sin(tick * 0.08 + seed * 0.01 + idx) * range * 0.15
@@ -66,7 +66,7 @@ function readingValue(seed: number, tick: number, idx: number, min: number, max:
   return Math.min(max, Math.max(min, center + drift + jitter))
 }
 
-function formatReading(value: number, unit: string): number {
+export function formatReading(value: number, unit: string): number {
   return unit === 'raw' || unit === '' ? Math.round(value) : Math.round(value * 10) / 10
 }
 

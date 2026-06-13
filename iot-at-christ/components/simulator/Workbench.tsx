@@ -30,6 +30,7 @@ import { MistakeExplainer } from '@/components/simulator/MistakeExplainer'
 import { ValidationPanel } from '@/components/simulator/ValidationPanel'
 import { SerialMonitor } from '@/components/simulator/SerialMonitor'
 import { ReadingsPanel, type GaugedReading } from '@/components/simulator/ReadingsPanel'
+import { SketchEditor } from '@/components/simulator/SketchEditor'
 
 const STORAGE_KEY = 'iot-at-christ:simulator:v1'
 const DEFAULT_BOARD: BoardId = 'arduino-uno'
@@ -90,6 +91,7 @@ export function Workbench() {
   const [guideFor, setGuideFor] = useState<ComponentId | null>(null)
   const [failure, setFailure] = useState<FailureRun | null>(null)
   const [explainerOpen, setExplainerOpen] = useState(false)
+  const [sketchActuatorStates, setSketchActuatorStates] = useState<Record<string, boolean | number> | null>(null)
   const tickRef = useRef(0)
   const circuitRef = useRef(circuit)
   circuitRef.current = circuit
@@ -388,7 +390,7 @@ export function Workbench() {
             circuit={circuit}
             pending={pending}
             issues={validation.issues}
-            actuatorStates={runState === 'running' ? (frame?.actuatorStates ?? {}) : {}}
+            actuatorStates={sketchActuatorStates ?? (runState === 'running' ? (frame?.actuatorStates ?? {}) : {})}
             running={running}
             failureEffects={failure?.effects ?? EMPTY_EFFECTS}
             shorted={shorted}
@@ -485,6 +487,9 @@ export function Workbench() {
           <SerialMonitor lines={serial} boardName={board.name} onClear={() => setSerial([])} />
         </section>
       </div>
+
+      {/* Sketch Runner — write and run real code against the wired circuit */}
+      <SketchEditor board={board} circuit={circuit} onActuatorStates={setSketchActuatorStates} />
 
       <ComponentGuide componentId={guideFor} onClose={() => setGuideFor(null)} />
       <MistakeExplainer
