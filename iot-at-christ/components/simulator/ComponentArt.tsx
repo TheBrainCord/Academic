@@ -221,6 +221,86 @@ function SoilArt() {
   )
 }
 
+function Mq2Art() {
+  return (
+    <g>
+      <Legs xs={[48, 62, 76]} y1={66} y2={84} />
+      {/* carrier PCB */}
+      <rect x={30} y={56} width={64} height={14} rx={3} fill="#C62828" />
+      {/* steel mesh can */}
+      <circle cx={62} cy={36} r={24} fill="#B0BEC5" stroke="#78909C" strokeWidth={1.5} />
+      {/* mesh cross-hatch */}
+      <g stroke="#90A4AE" strokeWidth={1}>
+        {[20, 28, 36, 44, 52].map((y) => <line key={`h${y}`} x1={42} y1={y} x2={82} y2={y} />)}
+        {[46, 54, 62, 70, 78].map((x) => <line key={`v${x}`} x1={x} y1={16} x2={x} y2={56} />)}
+      </g>
+      <circle cx={62} cy={36} r={24} fill="none" stroke="#78909C" strokeWidth={2} />
+      <text x={62} y={66.5} textAnchor="middle" fontSize={6.5} fill="#FFCDD2" className="font-mono">MQ-2</text>
+    </g>
+  )
+}
+
+function Ds18b20Art() {
+  return (
+    <g>
+      <Legs xs={[48, 62, 76]} y1={70} y2={84} />
+      {/* cable */}
+      <rect x={56} y={42} width={12} height={30} rx={4} fill="#263238" />
+      {/* steel probe tube */}
+      <rect x={52} y={6} width={20} height={40} rx={9} fill="#B0BEC5" stroke="#78909C" strokeWidth={1.5} />
+      <rect x={52} y={30} width={20} height={8} fill="#90A4AE" />
+      {/* specular line down the tube */}
+      <line x1={58} y1={10} x2={58} y2={42} stroke="white" strokeWidth={2} opacity={0.5} strokeLinecap="round" />
+      <text x={92} y={28} textAnchor="middle" fontSize={7} fill="#607D8B" className="font-mono">1-Wire</text>
+    </g>
+  )
+}
+
+function ServoArt({ active }: { active?: boolean | number }) {
+  // Horn angle follows the drive level: 0 → -80°, 1 → +80°.
+  const angle = -80 + level(active) * 160
+  return (
+    <g>
+      <Legs xs={[44, 62, 80]} y1={66} y2={84} />
+      {/* servo body with mounting ears */}
+      <rect x={26} y={36} width={72} height={30} rx={4} fill="#1565C0" />
+      <rect x={18} y={44} width={8} height={8} rx={2} fill="#0D47A1" />
+      <rect x={98} y={44} width={8} height={8} rx={2} fill="#0D47A1" />
+      <rect x={26} y={36} width={72} height={30} rx={4} fill="none" stroke="#0D47A1" strokeWidth={1.5} />
+      {/* output drum */}
+      <circle cx={48} cy={36} r={11} fill="#ECEFF1" stroke="#B0BEC5" strokeWidth={1.5} />
+      {/* horn — rotates with PWM level */}
+      <g transform={`rotate(${angle} 48 36)`}>
+        <rect x={45.5} y={10} width={5} height={28} rx={2.5} fill="#F5F5F0" stroke="#B0BEC5" strokeWidth={1} />
+        {[15, 21, 27].map((y) => <circle key={y} cx={48} cy={y} r={1.2} fill="#90A4AE" />)}
+      </g>
+      <circle cx={48} cy={36} r={3} fill="#78909C" />
+      <text x={78} y={55} textAnchor="middle" fontSize={7} fill="#BBDEFB" className="font-mono">SG90</text>
+    </g>
+  )
+}
+
+function RelayArt({ active }: { active?: boolean | number }) {
+  const on = level(active) > 0
+  return (
+    <g>
+      <Legs xs={[44, 62, 80]} y1={66} y2={84} />
+      {/* module PCB */}
+      <rect x={22} y={20} width={80} height={48} rx={4} fill="#1565C0" />
+      <rect x={22} y={20} width={80} height={48} rx={4} fill="none" stroke="#0D47A1" strokeWidth={1.5} />
+      {/* the blue relay cube */}
+      <rect x={30} y={26} width={40} height={32} rx={3} fill={on ? '#1E88E5' : '#1976D2'} stroke="#0D47A1" strokeWidth={1.5} />
+      <text x={50} y={45} textAnchor="middle" fontSize={6} fill="#E3F2FD" className="font-mono">RELAY</text>
+      {/* screw terminal block for the load */}
+      <rect x={76} y={28} width={20} height={28} rx={2} fill="#2E7D32" stroke="#1B5E20" strokeWidth={1} />
+      {[35, 44, 52].map((y) => <circle key={y} cx={86} cy={y} r={3} fill="#A5D6A7" stroke="#1B5E20" strokeWidth={1} />)}
+      {/* status LED + click */}
+      <circle cx={32} cy={63} r={2.5} fill={on ? '#FF5252' : '#5D4037'} className={on ? 'sim-glow' : undefined} />
+      {on && <text x={50} y={16} textAnchor="middle" fontSize={9} fill="#1A7A4A" className="font-mono">click!</text>}
+    </g>
+  )
+}
+
 export function ComponentArt({ componentId, active, burned }: ComponentArtProps) {
   switch (componentId) {
     case 'led':
@@ -243,6 +323,14 @@ export function ComponentArt({ componentId, active, burned }: ComponentArtProps)
       return <PotArt active={active} />
     case 'soil-moisture':
       return <SoilArt />
+    case 'mq2-gas':
+      return <Mq2Art />
+    case 'ds18b20':
+      return <Ds18b20Art />
+    case 'servo-sg90':
+      return <ServoArt active={active} />
+    case 'relay-module':
+      return <RelayArt active={active} />
   }
 }
 

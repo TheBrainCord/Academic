@@ -69,6 +69,10 @@ export type ComponentId =
   | 'pir'            // motion
   | 'potentiometer'
   | 'soil-moisture'
+  | 'mq2-gas'        // gas / smoke (analog)
+  | 'ds18b20'        // waterproof temperature probe (one-wire)
+  | 'servo-sg90'     // hobby servo (PWM position)
+  | 'relay-module'   // relay switching external loads
 
 export type ComponentCategory = 'sensor' | 'actuator' | 'passive' | 'input'
 

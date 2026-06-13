@@ -157,6 +157,68 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     readings: [{ label: 'Moisture', unit: '%', min: 10, max: 90 }],
     glyph: 'SM',
   },
+  'mq2-gas': {
+    id: 'mq2-gas',
+    name: 'MQ-2 Gas Sensor',
+    category: 'sensor',
+    terminals: [
+      { id: 'vcc', label: 'VCC', role: 'vcc' },
+      { id: 'aout', label: 'AOUT', role: 'analog-out' },
+      { id: 'gnd', label: 'GND', role: 'gnd' },
+    ],
+    minVoltage: 4.5,
+    maxVoltage: 5.5,
+    description:
+      'Detects smoke, LPG and methane. A heated tin-oxide film changes resistance when gas molecules land on it — AOUT rises with concentration. It needs 5V to run its heater.',
+    readings: [{ label: 'Gas level', unit: 'ppm', min: 180, max: 900 }],
+    glyph: 'GAS',
+  },
+  ds18b20: {
+    id: 'ds18b20',
+    name: 'DS18B20 Temp Probe',
+    category: 'sensor',
+    terminals: [
+      { id: 'vcc', label: 'VCC', role: 'vcc' },
+      { id: 'data', label: 'DATA', role: 'digital-out' },
+      { id: 'gnd', label: 'GND', role: 'gnd' },
+    ],
+    minVoltage: 3,
+    maxVoltage: 5.5,
+    description:
+      'A waterproof digital thermometer in a steel tube. It speaks the 1-Wire protocol, so dozens of probes can share one data pin — each has a unique 64-bit address.',
+    readings: [{ label: 'Temperature', unit: '°C', min: 8, max: 42 }],
+    glyph: 'DS',
+  },
+  'servo-sg90': {
+    id: 'servo-sg90',
+    name: 'SG90 Servo',
+    category: 'actuator',
+    terminals: [
+      { id: 'vcc', label: 'VCC', role: 'vcc' },
+      { id: 'signal', label: 'SIGNAL', role: 'digital-in' },
+      { id: 'gnd', label: 'GND', role: 'gnd' },
+    ],
+    minVoltage: 4.0,
+    maxVoltage: 6,
+    description:
+      'A small motor with built-in position control. Send it a 50Hz PWM pulse (1–2ms wide) on SIGNAL and the horn swings to the matching angle, 0–180°.',
+    glyph: 'SRV',
+  },
+  'relay-module': {
+    id: 'relay-module',
+    name: 'Relay Module',
+    category: 'actuator',
+    terminals: [
+      { id: 'vcc', label: 'VCC', role: 'vcc' },
+      { id: 'in', label: 'IN', role: 'digital-in' },
+      { id: 'gnd', label: 'GND', role: 'gnd' },
+    ],
+    minVoltage: 4.5,
+    maxVoltage: 5.5,
+    description:
+      'An electromagnetic switch: a small coil current from IN pulls a contact that can switch a big external load — a pump, a lamp, even mains (with care). You hear it click.',
+    glyph: 'RLY',
+  },
 }
 
 export function getComponent(id: ComponentId): ComponentDef {

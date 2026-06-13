@@ -24,6 +24,7 @@ import type {
 } from '@/types/simulator'
 import { BoardCanvas } from '@/components/simulator/BoardCanvas'
 import { ChallengePanel } from '@/components/simulator/ChallengePanel'
+import { CodeLab } from '@/components/simulator/CodeLab'
 import { ComponentGuide } from '@/components/simulator/ComponentGuide'
 import { ComponentThumb } from '@/components/simulator/ComponentArt'
 import { MistakeExplainer } from '@/components/simulator/MistakeExplainer'
@@ -90,6 +91,11 @@ export function Workbench() {
   const [guideFor, setGuideFor] = useState<ComponentId | null>(null)
   const [failure, setFailure] = useState<FailureRun | null>(null)
   const [explainerOpen, setExplainerOpen] = useState(false)
+  // Wiring checks can be turned off to run/test code without the validator
+  // gating the bench (advanced students who want to iterate on code fast).
+  const [wiringChecks, setWiringChecks] = useState(true)
+  const [codeRunning, setCodeRunning] = useState(false)
+  const [codeStates, setCodeStates] = useState<Record<string, boolean | number>>({})
   const tickRef = useRef(0)
   const circuitRef = useRef(circuit)
   circuitRef.current = circuit
@@ -174,7 +180,7 @@ export function Workbench() {
 
   const startRun = () => {
     setPending(null)
-    if (validation.ok) {
+    if (validation.ok || !wiringChecks) {
       setRunState('running')
       if (tickRef.current === 0) {
         setSerial(prev => [
@@ -300,8 +306,22 @@ export function Workbench() {
     return out
   }, [frame, circuit.components])
 
-  const running = runState !== 'idle'
+  const running = runState !== 'idle' || codeRunning
   const shorted = failure?.failures.some((f) => f.lesson.code === 'short-circuit') ?? false
+
+  // The bench art is driven by whichever run is live: the student's own
+  // sketch beats the canned demo loop.
+  const liveStates = codeRunning
+    ? codeStates
+    : runState === 'running'
+      ? (frame?.actuatorStates ?? {})
+      : {}
+
+  const appendSerial = useCallback((text: string) => {
+    tickRef.current += 1
+    const tick = tickRef.current
+    setSerial(prev => [...prev, { tick, text }].slice(-MAX_SERIAL_LINES))
+  }, [])
 
   // --- Render ---------------------------------------------------------------
   return (
@@ -388,7 +408,7 @@ export function Workbench() {
             circuit={circuit}
             pending={pending}
             issues={validation.issues}
-            actuatorStates={runState === 'running' ? (frame?.actuatorStates ?? {}) : {}}
+            actuatorStates={liveStates}
             running={running}
             failureEffects={failure?.effects ?? EMPTY_EFFECTS}
             shorted={shorted}
@@ -411,17 +431,17 @@ export function Workbench() {
             ) : (
               <button
                 onClick={startRun}
-                disabled={!hasWiring}
+                disabled={!hasWiring || codeRunning}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-body text-white transition-colors',
-                  !hasWiring
+                  !hasWiring || codeRunning
                     ? 'bg-christ-navy/30 cursor-not-allowed'
-                    : validation.ok
+                    : validation.ok || !wiringChecks
                       ? 'bg-christ-green hover:bg-christ-green/90'
                       : 'bg-christ-saffron hover:bg-christ-saffron/90',
                 )}
               >
-                {validation.ok ? (
+                {validation.ok || !wiringChecks ? (
                   <>
                     <Play className="h-4 w-4" /> Run Simulation
                   </>
@@ -439,8 +459,19 @@ export function Workbench() {
               <RotateCcw className="h-4 w-4" /> Reset Bench
             </button>
 
+            {/* Wiring checks toggle */}
+            <label className="inline-flex items-center gap-1.5 text-[11px] font-body text-christ-navy/60 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={wiringChecks}
+                onChange={(e) => setWiringChecks(e.target.checked)}
+                className="h-3.5 w-3.5 accent-christ-saffron"
+              />
+              Wiring checks
+            </label>
+
             {/* Status chip */}
-            {hasWiring && (
+            {hasWiring && wiringChecks && (
               validation.ok ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-christ-green/10 px-2.5 py-1 text-[11px] font-body text-christ-green">
                   <CheckCircle2 className="h-3.5 w-3.5" /> Bench OK
@@ -462,6 +493,15 @@ export function Workbench() {
             )}
           </div>
 
+          {/* Student-written sketches that act on the wired circuit */}
+          <CodeLab
+            circuit={circuit}
+            demoRunning={runState !== 'idle'}
+            onSerial={appendSerial}
+            onActuators={setCodeStates}
+            onRunningChange={setCodeRunning}
+          />
+
           {/* Teaching notes for the selected board */}
           <div className="rounded-lg border border-christ-navy/10 bg-white p-3">
             <h3 className="text-xs font-display font-semibold text-christ-navy mb-1.5">
@@ -480,7 +520,16 @@ export function Workbench() {
         {/* Side panels — stack below the canvas on mobile */}
         <section className="space-y-4">
           <ChallengePanel circuit={circuit} validation={validation} />
-          <ValidationPanel result={validation} wireCount={circuit.wires.length} />
+          {wiringChecks ? (
+            <ValidationPanel result={validation} wireCount={circuit.wires.length} />
+          ) : (
+            <div className="rounded-lg border border-christ-navy/10 bg-white p-3">
+              <p className="text-xs font-body text-christ-navy/50">
+                Wiring checks are off — the bench runs whatever you built, mistakes included.
+                Re-enable them to get diagnostics and the failure lessons back.
+              </p>
+            </div>
+          )}
           <ReadingsPanel readings={gaugedReadings} running={runState === 'running'} />
           <SerialMonitor lines={serial} boardName={board.name} onClear={() => setSerial([])} />
         </section>

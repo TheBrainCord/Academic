@@ -178,6 +178,58 @@ export const COMPONENT_GUIDES: Record<ComponentId, ComponentGuide> = {
     ],
     keyTakeaway: 'Calibrate it: "dry" and "wet" are voltages you must measure, not constants.',
   },
+  'mq2-gas': {
+    howItWorks:
+      'A tin-dioxide (SnO2) film sits on a tiny heater. In clean air oxygen adsorbs onto the film and traps electrons, keeping resistance high. Combustible gas molecules react with that oxygen, free the electrons, and resistance falls — so the output voltage rises with gas concentration. The heater needs ~150mA, which is why the module insists on 5V.',
+    signal:
+      'Analog: AOUT is a voltage the ADC reads. Real ppm values need calibration against the datasheet curve; raw thresholds ("above 400 = alarm") work for alarms.',
+    wiring: ['VCC → 5V (heater current!)', 'AOUT → analog-in pin', 'GND → GND', 'Let it warm up ~60s before trusting readings'],
+    industryUses: [
+      { sector: 'Home safety', example: 'LPG leak detectors in kitchens across India use MQ-class sensors — the alarm threshold is set well below the explosive limit.' },
+      { sector: 'Industrial monitoring', example: 'Confined-space entry monitors in factories sample for combustible gas before workers enter tanks and sewers.' },
+      { sector: 'Air quality', example: 'Smoke detection in smart-city air quality nodes pairs an MQ-2 with particulate sensors to distinguish cooking smoke from fires.' },
+    ],
+    keyTakeaway: 'It measures resistance change of a heated film — give it 5V, give it warm-up time.',
+  },
+  ds18b20: {
+    howItWorks:
+      'A real digital thermometer chip: a silicon bandgap sensor, a 12-bit ADC and a 1-Wire interface in one package, sealed in a waterproof steel tube. Each chip ships with a unique 64-bit serial number, so many probes can share a single data wire and be addressed individually.',
+    signal:
+      '1-Wire digital protocol on DATA (one shared 4.7kΩ pull-up in real hardware). The board requests a conversion, waits ~750ms, then reads 12 bits of temperature — ±0.5°C accuracy, no calibration needed.',
+    wiring: ['VCC → 3.3V or 5V', 'DATA → any digital/GPIO pin', 'GND → GND'],
+    industryUses: [
+      { sector: 'Cold chain', example: 'Refrigerated trucks thread a chain of DS18B20s through the cargo — one data wire, ten probes, per-pallet temperature history.' },
+      { sector: 'Aquaculture', example: 'Fish-farm tanks monitor water temperature with the waterproof probe directly submerged — the steel tube survives years underwater.' },
+      { sector: 'Server rooms', example: 'Rack inlet/outlet temperature pairs detect failing fans hours before thermal shutdown.' },
+    ],
+    keyTakeaway: 'One wire, many probes, each with its own address — and it is accurate out of the box.',
+  },
+  'servo-sg90': {
+    howItWorks:
+      'Inside: a DC motor, a gear train, a potentiometer on the output shaft, and a control board. The pot reports the current angle; the board compares it to the angle you asked for and drives the motor until they match — a complete closed-loop position controller for ₹150.',
+    signal:
+      'PWM at 50Hz: a 1ms pulse means 0°, 1.5ms means 90°, 2ms means 180°. The pulse WIDTH carries the command, not the duty cycle — which is why servo libraries exist.',
+    wiring: ['VCC (red) → 5V', 'SIGNAL (orange) → a PWM pin', 'GND (brown) → GND', 'Under load, power the servo from its own 5V supply'],
+    industryUses: [
+      { sector: 'Robotics', example: 'Every robotic arm kit, pan-tilt camera mount and animatronic uses hobby servos — position control without writing a control loop.' },
+      { sector: 'Agriculture', example: 'Automated greenhouse vents and seed-dispensing gates are servo-actuated — small motion, precise position, low power.' },
+      { sector: 'Camera systems', example: 'Solar trackers and inspection cameras sweep with two servos (pan + tilt) driven by the same 50Hz PWM you generate here.' },
+    ],
+    keyTakeaway: 'A servo is a motor with feedback built in — you command an angle, not a speed.',
+  },
+  'relay-module': {
+    howItWorks:
+      'A small electromagnet coil sits next to a sprung metal contact. Drive IN and the coil\'s magnetic field pulls the contact over — click — closing a completely separate high-power circuit. Coil side and contact side share no wires, so 5V logic can switch 230V mains with full electrical isolation.',
+    signal:
+      'Digital input: IN is HIGH/LOW from any GPIO pin (most modules are active-LOW — check yours!). The module\'s transistor and flyback diode protect your pin from the coil.',
+    wiring: ['VCC → 5V', 'IN → any digital/GPIO pin', 'GND → GND', 'Load side: COM + NO terminals switch the external circuit'],
+    industryUses: [
+      { sector: 'Agriculture', example: 'Irrigation pump controllers are a soil sensor + a relay — the entire smart-farming starter kit switches one big load.' },
+      { sector: 'Building automation', example: 'Smart switchboards retrofit existing lights and geysers by putting relay modules behind the wall plate.' },
+      { sector: 'Industrial control', example: 'PLCs end most output chains in a relay — the universal interface between logic and high-power machinery for 100+ years.' },
+    ],
+    keyTakeaway: 'The relay is galvanic isolation: the pin moves a magnet, never touches the load.',
+  },
 }
 
 export function getGuide(id: ComponentId): ComponentGuide {
