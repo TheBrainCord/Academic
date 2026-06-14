@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CheckCircle2, Circle, Lightbulb, Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { trackEvent } from '@/lib/telemetry/track'
 import { CHALLENGES } from '@/lib/simulator/challenges'
 import type { Circuit, ValidationResult } from '@/types/simulator'
 
@@ -50,7 +51,8 @@ export function ChallengePanel({
     } catch {
       // Storage unavailable — completion just won't persist.
     }
-  }, [result.complete, challenge.id, completed])
+    trackEvent('challenge_completed', { challengeId: challenge.id, boardId: circuit.boardId })
+  }, [result.complete, challenge.id, completed, circuit.boardId])
 
   return (
     <div className="rounded-lg border border-christ-navy/10 bg-white p-3 space-y-2.5">

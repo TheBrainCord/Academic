@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { buildProfileUpsert } from '@/lib/auth/profile'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -12,15 +13,16 @@ export async function GET(request: NextRequest) {
 
     if (!error && data.user) {
       // Create profile row on first login (upsert — safe to call every time)
-      const googleIdentity = data.user.identities?.find(i => i.provider === 'google')
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        email: data.user.email,
-        full_name: data.user.user_metadata.full_name,
-        avatar_url: data.user.user_metadata.avatar_url,
-        google_id: googleIdentity?.id,
-        // role defaults to 'student' in DB; teacher is set manually
-      }, { onConflict: 'id', ignoreDuplicates: false })
+      // role defaults to 'student' in DB; teacher is set manually
+      await supabase.from('profiles').upsert(buildProfileUpsert(data.user), { onConflict: 'id', ignoreDuplicates: false })
+
+      // Telemetry — track sign-ins so usage can be seen on /teacher/usage.
+      await supabase.from('simulator_events').insert({
+        event_type: 'sign_in',
+        session_id: data.user.id,
+        user_id: data.user.id,
+        path: '/auth/callback',
+      })
 
       // role-based redirect is handled by /dashboard
       return NextResponse.redirect(`${origin}/dashboard`)

@@ -216,6 +216,23 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['notifications']['Insert']>
       }
 
+      simulator_events: {
+        Row: {
+          id:           string
+          event_type:   'lab_view' | 'sign_in' | 'challenge_completed' | 'sketch_run'
+          session_id:   string
+          user_id:      string | null
+          path:         string | null
+          board_id:     string | null
+          challenge_id: string | null
+          metadata:     Json | null
+          created_at:   string
+        }
+        Insert: Omit<Database['public']['Tables']['simulator_events']['Row'], 'id' | 'created_at'>
+          & { id?: string; created_at?: string }
+        Update: Partial<Database['public']['Tables']['simulator_events']['Insert']>
+      }
+
       // Legacy tables (unchanged)
       units: { Row: Record<string, Json>; Insert: Record<string, Json>; Update: Record<string, Json> }
       sessions: { Row: Record<string, Json>; Insert: Record<string, Json>; Update: Record<string, Json> }
