@@ -157,6 +157,73 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     readings: [{ label: 'Moisture', unit: '%', min: 10, max: 90 }],
     glyph: 'SM',
   },
+  mpu6050: {
+    id: 'mpu6050',
+    name: 'MPU6050 (Gyro/Accel)',
+    category: 'sensor',
+    terminals: [
+      { id: 'vcc', label: 'VCC', role: 'vcc' },
+      { id: 'scl', label: 'SCL', role: 'digital-out' },
+      { id: 'sda', label: 'SDA', role: 'digital-out' },
+      { id: 'gnd', label: 'GND', role: 'gnd' },
+    ],
+    minVoltage: 3,
+    maxVoltage: 5.5,
+    description:
+      'A 6-axis MEMS accelerometer + gyroscope on an I2C bus. Measures tilt, motion and rotation — the heart of every "smart" wearable and drone.',
+    readings: [
+      { label: 'Accel X', unit: 'g', min: -2, max: 2 },
+      { label: 'Gyro Z', unit: '°/s', min: -250, max: 250 },
+      { label: 'Temp', unit: '°C', min: 20, max: 40 },
+    ],
+    glyph: 'IMU',
+  },
+  'ir-sensor': {
+    id: 'ir-sensor',
+    name: 'IR Obstacle Sensor',
+    category: 'sensor',
+    terminals: [
+      { id: 'vcc', label: 'VCC', role: 'vcc' },
+      { id: 'out', label: 'OUT', role: 'digital-out' },
+      { id: 'gnd', label: 'GND', role: 'gnd' },
+    ],
+    minVoltage: 3.3,
+    maxVoltage: 5,
+    description:
+      'An IR LED constantly floods the area ahead with invisible light; a phototransistor watches for its reflection. OUT goes LOW the moment something reflects it back — a line-follower\'s "eye".',
+    readings: [{ label: 'Obstacle', unit: '', min: 0, max: 1 }],
+    glyph: 'IR',
+  },
+  'servo-motor': {
+    id: 'servo-motor',
+    name: 'Servo Motor',
+    category: 'actuator',
+    terminals: [
+      { id: 'signal', label: 'Signal', role: 'digital-in' },
+      { id: 'vcc', label: 'VCC', role: 'vcc' },
+      { id: 'gnd', label: 'GND', role: 'gnd' },
+    ],
+    minVoltage: 4.8,
+    maxVoltage: 6,
+    description:
+      'A small DC motor + gearbox + potentiometer in a feedback loop. A 50Hz pulse on Signal whose width (1–2ms) tells the internal controller what angle (0–180°) to hold.',
+    glyph: 'SRV',
+  },
+  'l298n-motor': {
+    id: 'l298n-motor',
+    name: 'DC Motor + L298N',
+    category: 'actuator',
+    terminals: [
+      { id: 'ena', label: 'ENA (~)', role: 'digital-in' },
+      { id: 'vcc', label: 'Motor VCC', role: 'vcc' },
+      { id: 'gnd', label: 'GND', role: 'gnd' },
+    ],
+    minVoltage: 6,
+    maxVoltage: 12,
+    description:
+      'A geared DC motor wired through an L298N H-bridge driver. The ENA pin (PWM) sets speed; IN1/IN2 (not modelled here) set direction. The motor rail needs its own 6–12V supply — never power it from the board\'s 5V pin.',
+    glyph: 'MOT',
+  },
 }
 
 export function getComponent(id: ComponentId): ComponentDef {

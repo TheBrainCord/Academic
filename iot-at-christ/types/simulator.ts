@@ -7,7 +7,7 @@
 // Boards
 // ---------------------------------------------------------------------------
 
-export type BoardId = 'arduino-uno' | 'esp32-devkit' | 'raspberry-pi-4'
+export type BoardId = 'arduino-uno' | 'esp32-devkit' | 'raspberry-pi-4' | 'nodemcu-esp8266'
 
 /**
  * What a single board pin is electrically capable of. A physical pin may
@@ -69,6 +69,10 @@ export type ComponentId =
   | 'pir'            // motion
   | 'potentiometer'
   | 'soil-moisture'
+  | 'mpu6050'        // accelerometer + gyroscope (I2C)
+  | 'ir-sensor'      // IR obstacle/proximity sensor
+  | 'servo-motor'    // PWM-positioned servo
+  | 'l298n-motor'    // DC motor driven through an L298N H-bridge
 
 export type ComponentCategory = 'sensor' | 'actuator' | 'passive' | 'input'
 

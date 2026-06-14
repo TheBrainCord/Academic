@@ -241,6 +241,78 @@ function RaspberryPiArt({ running, shorted }: { running: boolean; shorted: boole
   )
 }
 
+function NodeMcuArt({ running, shorted }: { running: boolean; shorted: boolean }) {
+  const shieldY = BOARD_Y + 70
+  return (
+    <g>
+      <rect x={BOARD_X} y={BOARD_Y} width={BOARD_W} height={BOARD_H} rx={12} fill="#0F9D58" stroke="#0B7A43" strokeWidth={2} />
+      <MountingHoles color="#0B7A43" />
+      <HeaderStrips />
+
+      {/* ESP8266 module + antenna trace */}
+      <rect x={CX - 52} y={shieldY} width={104} height={92} rx={5} fill="#1B1D22" stroke="#101114" strokeWidth={1.5} />
+      <path
+        d={`M ${CX - 40} ${shieldY + 70} V ${shieldY + 30} H ${CX - 22} V ${shieldY + 64} H ${CX - 4} V ${shieldY + 30} H ${CX + 14} V ${shieldY + 64} H ${CX + 32} V ${shieldY + 30}`}
+        fill="none"
+        stroke="#D4AF37"
+        strokeWidth={3}
+        strokeLinecap="round"
+      />
+      <text x={CX} y={shieldY + 86} textAnchor="middle" fontSize={8} fill="#B0BEC5" className="font-mono">ESP-12E</text>
+
+      {/* Branding */}
+      <text
+        x={CX}
+        y={BOARD_Y + 230}
+        textAnchor="middle"
+        fontSize={20}
+        fill="white"
+        opacity={0.92}
+        className="font-display font-bold"
+        transform={`rotate(-90 ${CX} ${BOARD_Y + 230})`}
+      >
+        NodeMCU
+      </text>
+      <text x={CX} y={shieldY + 200} textAnchor="middle" fontSize={9} fill="white" opacity={0.75} className="font-mono">
+        ESP8266 · Wi-Fi
+      </text>
+
+      {/* Power LED + silk */}
+      <PowerLed x={CX - 44} y={shieldY + 112} running={running} shorted={shorted} />
+      <circle cx={CX + 44} cy={shieldY + 110} r={3} fill={running && !shorted ? '#69F0AE' : '#1B3A2A'} className={running && !shorted ? 'sim-flicker' : undefined} />
+
+      {/* CP2102 USB-serial chip */}
+      <rect x={CX - 18} y={BOARD_Y + 380} width={36} height={20} rx={2} fill="#C9CED4" stroke="#9AA4AE" strokeWidth={1} />
+      <text x={CX} y={BOARD_Y + 393} textAnchor="middle" fontSize={6.5} fill="#5B6770" className="font-mono">CP2102</text>
+
+      {/* FLASH / RST buttons */}
+      <rect x={CX - 56} y={BOARD_Y + 446} width={26} height={20} rx={3} fill="#C9CED4" stroke="#9AA4AE" strokeWidth={1} />
+      <text x={CX - 43} y={BOARD_Y + 480} textAnchor="middle" fontSize={7} fill="#B0BEC5" className="font-mono">FLASH</text>
+      <rect x={CX + 30} y={BOARD_Y + 446} width={26} height={20} rx={3} fill="#C9CED4" stroke="#9AA4AE" strokeWidth={1} />
+      <text x={CX + 43} y={BOARD_Y + 480} textAnchor="middle" fontSize={7} fill="#B0BEC5" className="font-mono">RST</text>
+
+      {/* Micro-USB (overhangs the bottom edge) */}
+      <rect x={CX - 16} y={BOARD_Y + BOARD_H - 14} width={32} height={22} rx={3} fill="#C9CED4" stroke="#9AA4AE" strokeWidth={1.5} />
+      <rect x={CX - 10} y={BOARD_Y + BOARD_H - 8} width={20} height={10} rx={2} fill="#AEB6BE" />
+    </g>
+  )
+}
+
+/** Small standalone board thumbnail used in the controller picker. */
+export function BoardThumb({ board, size = 64 }: { board: BoardDef; size?: number }) {
+  return (
+    <svg
+      viewBox={`${BOARD_X - 10} ${BOARD_Y - 14} ${BOARD_W + 20} ${BOARD_H + 28}`}
+      width={(size * (BOARD_W + 20)) / (BOARD_H + 28)}
+      height={size}
+      aria-hidden
+      className="pointer-events-none"
+    >
+      <BoardArt board={board} running={false} shorted={false} />
+    </svg>
+  )
+}
+
 export function BoardArt({ board, running, shorted }: BoardArtProps) {
   switch (board.id) {
     case 'arduino-uno':
@@ -249,5 +321,7 @@ export function BoardArt({ board, running, shorted }: BoardArtProps) {
       return <Esp32Art running={running} shorted={shorted} />
     case 'raspberry-pi-4':
       return <RaspberryPiArt running={running} shorted={shorted} />
+    case 'nodemcu-esp8266':
+      return <NodeMcuArt running={running} shorted={shorted} />
   }
 }

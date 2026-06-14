@@ -130,7 +130,7 @@ export function simulateStep(circuit: Circuit, tick: number): SimulationFrame {
 
       const values = def.readings.map((r, idx) => {
         let raw: number
-        if (def.id === 'pir') {
+        if (def.id === 'pir' || def.id === 'ir-sensor') {
           raw = tick % 13 < 2 ? 1 : 0
         } else {
           raw = readingValue(seed, tick, idx, r.min, r.max)
@@ -150,6 +150,8 @@ export function simulateStep(circuit: Circuit, tick: number): SimulationFrame {
       const reading = values.map((v) => `${v.label}: ${v.value}${v.unit ? ` ${v.unit}` : ''}`).join('  ')
       if (def.id === 'pir') {
         if (values[0].value === 1) serial.push({ tick, text: `[${def.name}] Motion detected!` })
+      } else if (def.id === 'ir-sensor') {
+        serial.push({ tick, text: `[${def.name}] OUT ${values[0].value === 1 ? 'LOW (obstacle!)' : 'HIGH (clear)'}` })
       } else {
         serial.push({ tick, text: `[${def.name}] ${reading}` })
       }
@@ -173,7 +175,13 @@ export function simulateStep(circuit: Circuit, tick: number): SimulationFrame {
       if (pwmPin) {
         const level = Math.round(((Math.sin(tick * 0.3) + 1) / 2) * 100) / 100
         actuatorStates[placed.instanceId] = level
-        serial.push({ tick, text: `[${def.name}] PWM ${Math.round(level * 100)}%` })
+        if (def.id === 'servo-motor') {
+          serial.push({ tick, text: `[${def.name}] angle ${Math.round(level * 180)}°` })
+        } else if (def.id === 'l298n-motor') {
+          serial.push({ tick, text: `[${def.name}] speed ${Math.round(level * 100)}%` })
+        } else {
+          serial.push({ tick, text: `[${def.name}] PWM ${Math.round(level * 100)}%` })
+        }
       } else {
         const on = tick % 2 === 0
         actuatorStates[placed.instanceId] = on

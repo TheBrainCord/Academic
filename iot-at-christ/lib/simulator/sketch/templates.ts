@@ -94,6 +94,34 @@ while True:
     time.sleep(1)
 `
 
+const NODEMCU_BLINK = `void setup() {
+  pinMode(D4, OUTPUT);
+  Serial.begin(115200);
+}
+
+void loop() {
+  digitalWrite(D4, HIGH);
+  Serial.println("LED on");
+  delay(1000);
+  digitalWrite(D4, LOW);
+  Serial.println("LED off");
+  delay(1000);
+}
+`
+
+const NODEMCU_READ_SENSOR = `void setup() {
+  pinMode(D1, INPUT);
+  Serial.begin(115200);
+}
+
+void loop() {
+  int value = digitalRead(D1);
+  Serial.print("Sensor reading: ");
+  Serial.println(value);
+  delay(1000);
+}
+`
+
 const TEMPLATES_BY_BOARD: Record<BoardId, SketchTemplate[]> = {
   'arduino-uno': [
     { id: 'blink', label: 'Blink an LED (D13)', description: 'Toggle digital pin 13 on and off once a second.', code: ARDUINO_BLINK },
@@ -106,6 +134,10 @@ const TEMPLATES_BY_BOARD: Record<BoardId, SketchTemplate[]> = {
   'raspberry-pi-4': [
     { id: 'blink', label: 'Blink an LED (GPIO17)', description: 'Toggle GPIO17 on and off once a second.', code: PI_BLINK },
     { id: 'read-sensor', label: 'Read a sensor (GPIO4)', description: 'Read a digital sensor on GPIO4 and print it.', code: PI_READ_SENSOR },
+  ],
+  'nodemcu-esp8266': [
+    { id: 'blink', label: 'Blink an LED (D4)', description: 'Toggle pin D4 on and off once a second.', code: NODEMCU_BLINK },
+    { id: 'read-sensor', label: 'Read a sensor (D1)', description: 'Read a digital sensor on pin D1 and print it.', code: NODEMCU_READ_SENSOR },
   ],
 }
 

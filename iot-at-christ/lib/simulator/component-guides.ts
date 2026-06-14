@@ -178,6 +178,71 @@ export const COMPONENT_GUIDES: Record<ComponentId, ComponentGuide> = {
     ],
     keyTakeaway: 'Calibrate it: "dry" and "wet" are voltages you must measure, not constants.',
   },
+  mpu6050: {
+    howItWorks:
+      'Inside the MPU6050 are tiny MEMS (Micro-Electro-Mechanical System) structures etched into silicon — microscopic suspended masses on springs, smaller than a hair\'s width. When the board accelerates or tilts, inertia makes each mass shift very slightly relative to the chip around it; that shift changes a tiny capacitance, which the chip\'s electronics convert into a voltage and then a digital number. The gyroscope side uses vibrating MEMS structures and the Coriolis effect: a vibrating mass deflects sideways when the chip rotates, and that deflection is measured the same capacitive way. A separate on-chip diode also reports temperature.',
+    signal:
+      'Digital, over I2C. SDA carries data, SCL carries the clock — both wires are shared with any other I2C sensor on the same bus. The board asks the MPU6050 (at I2C address 0x68) for 14 bytes every loop: 3 axes of acceleration, temperature, and 3 axes of rotation rate, each as a 16-bit signed number you scale into g\'s and °/s.',
+    wiring: [
+      'VCC → 3.3V or 5V (most breakout boards have an onboard regulator)',
+      'SCL → board\'s I2C clock pin (A5 on Uno, D1 on NodeMCU, GPIO22 on ESP32)',
+      'SDA → board\'s I2C data pin (A4 on Uno, D2 on NodeMCU, GPIO21 on ESP32)',
+      'GND → GND',
+    ],
+    industryUses: [
+      { sector: 'Wearables & fitness', example: 'Smartwatches and fitness bands use the exact same accelerometer+gyro combo to count steps, detect falls, and recognise gestures like a wrist-flick.' },
+      { sector: 'Drones & robotics', example: 'Every quadcopter\'s flight controller fuses gyro + accelerometer readings hundreds of times a second to know which way is "up" and correct tilt instantly.' },
+      { sector: 'Smart manufacturing', example: 'Vibration signatures from MEMS accelerometers bolted to motors and pumps feed predictive-maintenance models — a bearing starts "sounding" different weeks before it fails.' },
+    ],
+    keyTakeaway: 'A spring-mounted microscopic mass turns motion into capacitance, capacitance into voltage, voltage into an I2C number.',
+  },
+  'ir-sensor': {
+    howItWorks:
+      'One half of the module is an IR LED — it constantly emits infrared light (≈940nm, invisible to your eyes but visible to a phone camera). The other half is a phototransistor: in darkness it conducts almost no current, but infrared photons hitting its junction free up charge carriers, letting current flow. When nothing is in front of the sensor, the emitted IR scatters away and the receiver sees little; when an object enters the beam\'s path, IR reflects straight back into the phototransistor, its conduction jumps, and an onboard comparator (often an LM393) snaps the OUT pin from HIGH to LOW. A small potentiometer on the module sets the comparator\'s trigger threshold — effectively the "sensitivity" or detection range.',
+    signal:
+      'Digital output, already comparator-cleaned — no ADC needed. OUT idles HIGH with nothing in range and drops to LOW the instant an object reflects the IR beam back. Ambient IR (sunlight, incandescent bulbs) is the classic false-trigger source because it floods the receiver the same way a reflection would.',
+    wiring: ['VCC → 3.3V or 5V', 'OUT → any digital/GPIO pin (read digitalRead — LOW means obstacle)', 'GND → GND'],
+    industryUses: [
+      { sector: 'Line-following robots', example: 'Pairs of IR sensors aimed at the floor read black-line-vs-white-floor reflectance differences — the most common student robotics project worldwide.' },
+      { sector: 'Automated dispensers', example: 'Touchless soap and hand-sanitiser dispensers use exactly this emitter/receiver pair to detect a hand without contact.' },
+      { sector: 'Conveyor & packaging lines', example: 'IR break-beam and reflective sensors count items and detect jams on factory conveyors — fast, contactless, and immune to dust better than mechanical switches.' },
+    ],
+    keyTakeaway: 'IR out, IR back, comparator decides — OUT goes LOW exactly when something is close enough to bounce the beam back.',
+  },
+  'servo-motor': {
+    howItWorks:
+      'Inside a servo are four things working together: a small DC motor, a reduction gearbox (so the motor\'s fast-but-weak spin becomes slow-but-strong), a potentiometer mechanically linked to the output shaft, and a tiny control board. The board reads a pulse on the Signal wire every 20ms (50Hz). The pulse\'s width — between roughly 1ms and 2ms — encodes the target angle: 1ms ≈ 0°, 1.5ms ≈ 90°, 2ms ≈ 180°. The control board compares the potentiometer\'s current voltage (the actual shaft angle) against the target angle implied by the pulse, and drives the motor forward or backward until they match — a real-time feedback loop, entirely inside the servo.',
+    signal:
+      'PWM, but a special kind: what matters is the pulse WIDTH (1–2ms), not the duty cycle percentage — a 1.5ms pulse means "90°" whether the period is 20ms or 18ms. Libraries like Servo.h generate this pulse train for you; analogWrite\'s usual 490Hz PWM is the wrong frequency for a servo.',
+    wiring: [
+      'Signal → any digital pin (Servo.h takes over its timer)',
+      'VCC → 5V — servos draw real current (100mA–1A under load); on small boards power it from a separate 5V supply, not the board\'s onboard regulator',
+      'GND → GND, shared with the board\'s GND',
+    ],
+    industryUses: [
+      { sector: 'Robotics arms & grippers', example: 'Every low-cost robotic arm joint and gripper finger in student projects is a servo — cheap, self-contained position control.' },
+      { sector: 'Camera gimbals & pan-tilt', example: 'Security cameras and phone gimbals use servo-class motors for smooth, precise pan/tilt positioning.' },
+      { sector: 'Automated valves & dampers', example: 'HVAC dampers and small irrigation valves use servo-style actuators to move to a commanded position and hold it without continuous power.' },
+    ],
+    keyTakeaway: 'Pulse width = angle. The feedback loop (motor + potentiometer + comparator) lives entirely inside the servo, not in your code.',
+  },
+  'l298n-motor': {
+    howItWorks:
+      'A GPIO pin cannot drive a motor directly (Module 3\'s "current chasm") — the L298N is the staged-amplification stage made into a chip. Inside it are two H-bridges: four power transistors arranged so that, by switching diagonal pairs, current can be pushed through the motor in either direction (forward) or the other (reverse), or blocked (stop). IN1/IN2 pick the direction by choosing which diagonal pair conducts; ENA — a PWM input — switches the whole bridge on and off rapidly, and the motor\'s inertia averages those pulses into a proportional speed, exactly like dimming an LED. The L298N has its own 12V logic supply pin and a separate motor-voltage rail (6–12V) — the GPIO side and the motor-power side are different voltage domains, connected only through the switching transistors.',
+    signal:
+      'Three digital control lines per motor channel: IN1 and IN2 (direction — one HIGH/one LOW for forward, swapped for reverse, both same for brake) and ENA (PWM — speed via duty cycle). This simulator models only ENA; in a real build, IN1/IN2 also connect to GPIO pins.',
+    wiring: [
+      'ENA (~) → a PWM-capable pin for speed control',
+      'Motor VCC → a dedicated 6–12V supply (NOT the board\'s 5V/3.3V — that rail cannot supply motor current)',
+      'GND → common ground shared between the L298N, the motor supply, and the board (grounds MUST be common or PWM timing references drift)',
+    ],
+    industryUses: [
+      { sector: 'Mobile robotics', example: 'Two-wheeled differential-drive robots — line followers, maze solvers — almost universally start with an L298N driving two geared DC motors.' },
+      { sector: 'Automated irrigation & curtains', example: 'Small DC-motor-driven valves and curtain/blind motors in smart-home kits use H-bridge drivers identical in principle, just packaged differently.' },
+      { sector: 'Conveyor & feed mechanisms', example: 'Low-cost automation prototypes (seed feeders, sorting arms) use H-bridge modules to reverse motors for jam-clearing without rewiring.' },
+    ],
+    keyTakeaway: 'The H-bridge is staged amplification with direction control: GPIO picks the diagonal, the motor rail supplies the amps.',
+  },
 }
 
 export function getGuide(id: ComponentId): ComponentGuide {
