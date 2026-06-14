@@ -282,6 +282,7 @@ export function createRuntime(circuit: Circuit, language: 'arduino-cpp' | 'micro
     interp.defineGlobal('INPUT_PULLUP', 'INPUT_PULLUP')
     interp.defineGlobal('LED_BUILTIN', 13)
     for (let i = 0; i <= 5; i++) interp.defineGlobal(`A${i}`, `A${i}`)
+    for (let i = 0; i <= 8; i++) interp.defineGlobal(`D${i}`, `D${i}`)
 
     interp.defineGlobal('pinMode', nativeFn('pinMode', (args, line) => {
       const pinId = requirePin(args[0], line)

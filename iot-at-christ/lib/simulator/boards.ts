@@ -79,6 +79,31 @@ const RASPBERRY_PI_PINS: PinDef[] = [
   { id: 'gpio24', label: 'GPIO24', capabilities: ['digital'], side: 'right', index: 8 },
 ]
 
+// NodeMCU labels its pins by the silkscreen "D" numbers, not the underlying
+// GPIO numbers — that's what students see printed on the board, so that's
+// what we show. A0 is the single 10-bit ADC channel.
+const NODEMCU_PINS: PinDef[] = [
+  { id: '3v3', label: '3V3', capabilities: ['power-3v3'], side: 'left', index: 0 },
+  { id: 'gnd-l', label: 'GND', capabilities: ['ground'], side: 'left', index: 1 },
+  { id: 'a0', label: 'A0', capabilities: ['analog-in'], side: 'left', index: 2 },
+  { id: 'd0', label: 'D0', capabilities: ['digital'], side: 'left', index: 3 },
+  { id: 'd1', label: 'D1', capabilities: ['digital', 'pwm', 'i2c-scl'], side: 'left', index: 4 },
+  { id: 'd2', label: 'D2', capabilities: ['digital', 'pwm', 'i2c-sda'], side: 'left', index: 5 },
+  { id: 'd3', label: 'D3', capabilities: ['digital', 'pwm'], side: 'left', index: 6 },
+  { id: 'd4', label: 'D4', capabilities: ['digital', 'pwm'], side: 'left', index: 7 },
+  { id: 'rx', label: 'RX', capabilities: ['digital', 'uart-rx'], side: 'left', index: 8 },
+  { id: 'tx', label: 'TX', capabilities: ['digital', 'uart-tx'], side: 'left', index: 9 },
+  { id: 'vin', label: 'VIN (5V)', capabilities: ['power-5v'], side: 'right', index: 0 },
+  { id: 'gnd-r1', label: 'GND', capabilities: ['ground'], side: 'right', index: 1 },
+  { id: 'gnd-r2', label: 'GND', capabilities: ['ground'], side: 'right', index: 2 },
+  { id: 'd8', label: 'D8', capabilities: ['digital', 'pwm'], side: 'right', index: 3 },
+  { id: 'd7', label: 'D7', capabilities: ['digital', 'pwm'], side: 'right', index: 4 },
+  { id: 'd6', label: 'D6', capabilities: ['digital', 'pwm'], side: 'right', index: 5 },
+  { id: 'd5', label: 'D5', capabilities: ['digital', 'pwm'], side: 'right', index: 6 },
+  { id: 'gnd-r3', label: 'GND', capabilities: ['ground'], side: 'right', index: 7 },
+  { id: '3v3-r', label: '3V3', capabilities: ['power-3v3'], side: 'right', index: 8 },
+]
+
 export const BOARDS: Record<BoardId, BoardDef> = {
   'arduino-uno': {
     id: 'arduino-uno',
@@ -124,6 +149,21 @@ export const BOARDS: Record<BoardId, BoardDef> = {
       'GPIO2 and GPIO3 carry the I2C bus — the easiest way to attach digital sensors to a Pi.',
     ],
     accentColor: '#C7053D',
+  },
+  'nodemcu-esp8266': {
+    id: 'nodemcu-esp8266',
+    name: 'NodeMCU (ESP8266)',
+    logicVoltage: 3.3,
+    hasAnalogIn: true,
+    pins: NODEMCU_PINS,
+    description: 'A pocket-sized Wi-Fi board — the cheapest way to get a sensor talking to the internet.',
+    teachingNotes: [
+      'GPIO pins are 3.3V — a 5V sensor signal (like the HC-SR04 ECHO) can damage it without a divider.',
+      'Only A0 is analog, and it is 0–1.0V on most boards (some breakout boards add a divider to read 0–3.3V) — and only 10-bit (0–1023).',
+      'D1/D2 double as the I2C bus (SCL/SDA) for the MPU6050 and similar smart sensors.',
+      'VIN accepts 5V from USB; the onboard regulator drops it to 3.3V for the ESP8266 chip itself.',
+    ],
+    accentColor: '#0F9D58',
   },
 }
 

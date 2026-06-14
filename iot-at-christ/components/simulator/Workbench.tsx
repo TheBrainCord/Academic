@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Flame, Info, Play, RotateCcw, Square } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { AlertTriangle, CheckCircle2, ChevronDown, Flame, Info, Play, RotateCcw, Square } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BOARDS, getBoard } from '@/lib/simulator/boards'
 import { COMPONENTS, getComponent } from '@/lib/simulator/components'
@@ -23,6 +23,7 @@ import type {
   WireEnd,
 } from '@/types/simulator'
 import { BoardCanvas } from '@/components/simulator/BoardCanvas'
+import { BoardThumb } from '@/components/simulator/BoardArt'
 import { ChallengePanel } from '@/components/simulator/ChallengePanel'
 import { ComponentGuide } from '@/components/simulator/ComponentGuide'
 import { ComponentThumb } from '@/components/simulator/ComponentArt'
@@ -67,6 +68,36 @@ function newId(): string {
     return crypto.randomUUID()
   }
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+}
+
+/** A side panel that starts collapsed — the canvas is the star of the show. */
+function CollapsiblePanel({
+  title,
+  defaultOpen = false,
+  badge,
+  children,
+}: {
+  title: string
+  defaultOpen?: boolean
+  badge?: ReactNode
+  children?: ReactNode
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between gap-2 rounded-lg border border-christ-navy/10 bg-white px-3 py-2 text-left hover:border-christ-saffron/40 transition-colors"
+      >
+        <span className="flex items-center gap-2 text-xs font-display font-semibold text-christ-navy/70 uppercase tracking-wide">
+          {title}
+          {badge}
+        </span>
+        <ChevronDown className={cn('h-4 w-4 text-christ-navy/40 transition-transform', open && 'rotate-180')} />
+      </button>
+      {open && <div className="mt-2">{children}</div>}
+    </div>
+  )
 }
 
 function sameEnd(a: WireEnd, b: WireEnd): boolean {
@@ -310,28 +341,30 @@ export function Workbench() {
     <div className="space-y-4">
       {/* Board switcher */}
       <section>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {Object.values(BOARDS).map(b => (
             <button
               key={b.id}
               onClick={() => switchBoard(b.id)}
               className={cn(
-                'rounded-lg border bg-white p-3 text-left transition-colors',
+                'rounded-lg border bg-white p-3 text-left transition-colors flex items-center gap-3',
                 b.id === circuit.boardId
                   ? 'border-christ-saffron ring-1 ring-christ-saffron'
                   : 'border-christ-navy/10 hover:border-christ-saffron/50',
               )}
             >
-              <span className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: b.accentColor }} />
+              <span className="shrink-0 rounded-md bg-christ-navy/5 p-1">
+                <BoardThumb board={b} size={48} />
+              </span>
+              <span className="min-w-0">
+                <span className="flex items-center justify-between gap-2">
                   <span className="font-display font-semibold text-sm text-christ-navy">{b.name}</span>
                 </span>
-                <span className="font-mono text-[10px] text-christ-gold border border-christ-gold/30 rounded-full px-1.5 py-0.5 whitespace-nowrap">
+                <span className="inline-block font-mono text-[10px] text-christ-gold border border-christ-gold/30 rounded-full px-1.5 py-0.5 whitespace-nowrap mt-0.5">
                   {b.logicVoltage}V logic
                 </span>
+                <span className="block text-xs font-body text-christ-navy/50 mt-1">{b.description}</span>
               </span>
-              <span className="block text-xs font-body text-christ-navy/50 mt-1">{b.description}</span>
             </button>
           ))}
         </div>
@@ -375,9 +408,9 @@ export function Workbench() {
         </div>
       </section>
 
-      {/* Workbench split: canvas (left on md+) and panels */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-        <section className="md:col-span-2 space-y-3">
+      {/* Workbench split: canvas (left on lg+, and given most of the width) and panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
+        <section className="lg:col-span-3 space-y-3">
           {pending && (
             <div className="rounded-md border border-christ-saffron/40 bg-christ-saffron/10 px-3 py-2 text-xs font-body text-christ-saffron">
               Now tap where this wire should go — the <span className="text-christ-green font-semibold">green pulsing rings</span> mark
@@ -479,12 +512,40 @@ export function Workbench() {
           </div>
         </section>
 
-        {/* Side panels — stack below the canvas on mobile */}
-        <section className="space-y-4">
-          <ChallengePanel circuit={circuit} validation={validation} />
-          <ValidationPanel result={validation} wireCount={circuit.wires.length} />
-          <ReadingsPanel readings={gaugedReadings} running={runState === 'running'} />
-          <SerialMonitor lines={serial} boardName={board.name} onClear={() => setSerial([])} />
+        {/* Side panels — collapsed by default to keep the canvas front and centre */}
+        <section className="space-y-2">
+          <CollapsiblePanel title="Readings" defaultOpen={gaugedReadings.length > 0}>
+            <ReadingsPanel readings={gaugedReadings} running={runState === 'running'} />
+          </CollapsiblePanel>
+          <CollapsiblePanel
+            title="Wiring check"
+            defaultOpen={false}
+            badge={
+              !validation.ok && (
+                <span className="rounded-full bg-christ-red/10 px-1.5 py-0.5 text-[10px] font-mono text-christ-red">
+                  {errorCount}
+                </span>
+              )
+            }
+          >
+            <ValidationPanel result={validation} wireCount={circuit.wires.length} />
+          </CollapsiblePanel>
+          <CollapsiblePanel title="Wiring challenges" defaultOpen={false}>
+            <ChallengePanel circuit={circuit} validation={validation} />
+          </CollapsiblePanel>
+          <CollapsiblePanel
+            title="Serial monitor"
+            defaultOpen={false}
+            badge={
+              serial.length > 0 && (
+                <span className="rounded-full bg-christ-navy/10 px-1.5 py-0.5 text-[10px] font-mono text-christ-navy/60">
+                  {serial.length}
+                </span>
+              )
+            }
+          >
+            <SerialMonitor lines={serial} boardName={board.name} onClear={() => setSerial([])} />
+          </CollapsiblePanel>
         </section>
       </div>
 

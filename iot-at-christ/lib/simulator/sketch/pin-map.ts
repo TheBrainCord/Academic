@@ -14,6 +14,7 @@ export function resolvePinId(board: BoardDef, value: RuntimeValue): string | nul
       'arduino-uno': `d${n}`,
       'esp32-devkit': `gpio${n}`,
       'raspberry-pi-4': `gpio${n}`,
+      'nodemcu-esp8266': `d${n}`,
     }
     const candidate = candidates[board.id]
     return pinIds.has(candidate) ? candidate : null
@@ -42,5 +43,7 @@ export function pinHint(board: BoardDef): string {
       return 'Use the GPIO number, e.g. pinMode(4, OUTPUT) for GPIO4.'
     case 'raspberry-pi-4':
       return 'Use the BCM GPIO number, e.g. GPIO.setup(17, GPIO.OUT) for GPIO17.'
+    case 'nodemcu-esp8266':
+      return 'Use the silkscreen D-number, e.g. digitalWrite(D1, HIGH) or pinMode(2, OUTPUT) for D2. A0 is the analog pin.'
   }
 }

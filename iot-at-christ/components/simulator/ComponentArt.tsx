@@ -221,6 +221,93 @@ function SoilArt() {
   )
 }
 
+function Mpu6050Art() {
+  return (
+    <g>
+      <Legs xs={[34, 46, 78, 90]} y1={56} y2={84} />
+      <rect x={24} y={14} width={76} height={42} rx={3} fill="#1565C0" />
+      <rect x={24} y={14} width={76} height={42} rx={3} fill="none" stroke="#0D47A1" strokeWidth={1.5} />
+      {/* MPU-6050 chip package, centred */}
+      <rect x={44} y={24} width={36} height={22} rx={2} fill="#212121" />
+      <rect x={44} y={24} width={36} height={22} rx={2} fill="none" stroke="#000" strokeWidth={1} />
+      <circle cx={50} cy={30} r={1.4} fill="#FFD54F" />
+      <text x={62} y={38} textAnchor="middle" fontSize={6} fill="#B0BEC5" className="font-mono">MPU-6050</text>
+      <text x={62} y={12} textAnchor="middle" fontSize={6.5} fill="#1B2E4B" opacity={0.6} className="font-mono">accel · gyro</text>
+    </g>
+  )
+}
+
+function IrSensorArt({ active }: { active?: boolean | number }) {
+  const tripped = level(active) > 0
+  return (
+    <g>
+      <Legs xs={[44, 62, 80]} y1={60} y2={84} />
+      <rect x={28} y={18} width={68} height={42} rx={4} fill="#8E44AD" />
+      <rect x={28} y={18} width={68} height={42} rx={4} fill="none" stroke="#6C3483" strokeWidth={1.5} />
+      {/* IR LED (emitter) */}
+      <circle cx={48} cy={39} r={11} fill="#37474F" />
+      <circle cx={48} cy={39} r={11} fill="none" stroke="#263238" strokeWidth={1} />
+      {/* phototransistor (receiver) */}
+      <circle cx={76} cy={39} r={11} fill={tripped ? '#1A7A4A' : '#263238'} />
+      <circle cx={76} cy={39} r={11} fill="none" stroke="#0E0E0E" strokeWidth={1} />
+      {/* IR beam, visible when tripped */}
+      {tripped && (
+        <g stroke="#E8720C" strokeWidth={1.6} strokeDasharray="3 2" className="sim-glow">
+          <line x1={48} y1={28} x2={48} y2={6} />
+          <line x1={48} y1={6} x2={76} y2={6} />
+          <line x1={76} y1={6} x2={76} y2={28} />
+        </g>
+      )}
+      <text x={62} y={64} textAnchor="middle" fontSize={6.5} fill="#1B2E4B" opacity={0.6} className="font-mono">IR pair</text>
+    </g>
+  )
+}
+
+function ServoArt({ active }: { active?: boolean | number }) {
+  const angle = level(active) * 180 - 90 // -90..+90 degrees
+  return (
+    <g>
+      <Legs xs={[52, 62, 72]} y1={70} y2={84} />
+      {/* body */}
+      <rect x={32} y={30} width={60} height={40} rx={4} fill="#37474F" />
+      <rect x={32} y={30} width={60} height={40} rx={4} fill="none" stroke="#263238" strokeWidth={1.5} />
+      {/* output spline (pivot) */}
+      <circle cx={62} cy={28} r={6} fill="#90A4AE" stroke="#546E7A" strokeWidth={1} />
+      {/* rotating horn */}
+      <g transform={`rotate(${angle} 62 28)`}>
+        <rect x={40} y={25.5} width={44} height={5} rx={2.5} fill="#ECEFF1" stroke="#B0BEC5" strokeWidth={1} />
+        <circle cx={62} cy={28} r={2.5} fill="#B0BEC5" />
+      </g>
+      <text x={62} y={56} textAnchor="middle" fontSize={7} fill="#CFD8DC" className="font-mono">SERVO</text>
+    </g>
+  )
+}
+
+function L298nMotorArt({ active }: { active?: boolean | number }) {
+  const spinning = level(active) > 0.05
+  return (
+    <g>
+      <Legs xs={[31, 47, 62]} y1={70} y2={84} />
+      {/* L298N driver board */}
+      <rect x={14} y={36} width={48} height={34} rx={3} fill="#C0392B" />
+      <rect x={14} y={36} width={48} height={34} rx={3} fill="none" stroke="#922B21" strokeWidth={1.5} />
+      {[20, 30, 40, 50].map((x) => (
+        <rect key={x} x={x} y={42} width={5} height={9} fill="#1B1B1B" />
+      ))}
+      <text x={38} y={64} textAnchor="middle" fontSize={6} fill="#FADBD8" className="font-mono">L298N</text>
+      {/* DC motor */}
+      <circle cx={92} cy={42} r={22} fill="#90A4AE" stroke="#607D8B" strokeWidth={2} />
+      <circle cx={92} cy={42} r={6} fill="#37474F" />
+      <g className={spinning ? 'sim-spin' : undefined} stroke="#37474F" strokeWidth={3} strokeLinecap="round">
+        <line x1={92} y1={42} x2={92} y2={24} />
+        <line x1={92} y1={42} x2={107} y2={51} />
+        <line x1={92} y1={42} x2={77} y2={51} />
+      </g>
+      <line x1={62} y1={50} x2={70} y2={50} stroke="#9AA4AE" strokeWidth={3} />
+    </g>
+  )
+}
+
 export function ComponentArt({ componentId, active, burned }: ComponentArtProps) {
   switch (componentId) {
     case 'led':
@@ -243,6 +330,14 @@ export function ComponentArt({ componentId, active, burned }: ComponentArtProps)
       return <PotArt active={active} />
     case 'soil-moisture':
       return <SoilArt />
+    case 'mpu6050':
+      return <Mpu6050Art />
+    case 'ir-sensor':
+      return <IrSensorArt active={active} />
+    case 'servo-motor':
+      return <ServoArt active={active} />
+    case 'l298n-motor':
+      return <L298nMotorArt active={active} />
   }
 }
 
