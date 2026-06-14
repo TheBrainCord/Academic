@@ -100,6 +100,38 @@ function CollapsiblePanel({
   )
 }
 
+/** Tabbed group for the secondary panels — Readings is the default "live data" view. */
+function PanelTabs({
+  tabs,
+}: {
+  tabs: { id: string; label: string; badge?: ReactNode; content: ReactNode }[]
+}) {
+  const [active, setActive] = useState(tabs[0]?.id)
+  const activeTab = tabs.find((t) => t.id === active) ?? tabs[0]
+  return (
+    <div className="rounded-lg border border-christ-navy/10 bg-white overflow-hidden">
+      <div className="flex flex-wrap border-b border-christ-navy/10">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setActive(t.id)}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-2 text-xs font-display font-semibold transition-colors border-b-2 -mb-px',
+              t.id === activeTab?.id
+                ? 'border-christ-saffron text-christ-navy'
+                : 'border-transparent text-christ-navy/40 hover:text-christ-navy/70',
+            )}
+          >
+            {t.label}
+            {t.badge}
+          </button>
+        ))}
+      </div>
+      <div className="p-3">{activeTab?.content}</div>
+    </div>
+  )
+}
+
 function sameEnd(a: WireEnd, b: WireEnd): boolean {
   if (a.kind === 'board' && b.kind === 'board') return a.pinId === b.pinId
   if (a.kind === 'component' && b.kind === 'component') {
@@ -373,42 +405,7 @@ export function Workbench() {
         </p>
       </section>
 
-      {/* Parts bin */}
-      <section>
-        <h2 className="text-sm font-display font-semibold text-christ-navy mb-2">
-          Parts bin — tap a part to add it, tap <Info className="inline h-3 w-3" /> to learn how it works
-        </h2>
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-          {Object.values(COMPONENTS).map(def => (
-            <div
-              key={def.id}
-              className="relative rounded-lg border border-christ-navy/10 bg-white hover:border-christ-saffron/60 hover:shadow-sm transition-all"
-            >
-              <button
-                onClick={() => addComponent(def.id)}
-                title={def.description}
-                className="w-full flex flex-col items-center gap-1 px-1.5 pt-2 pb-1.5 active:scale-95 transition-transform"
-              >
-                <ComponentThumb componentId={def.id} size={52} />
-                <span className="text-[11px] font-body text-christ-navy leading-tight text-center">{def.name}</span>
-                <span className="flex items-center gap-1 text-[9px] font-mono text-christ-navy/40 uppercase tracking-wide">
-                  <span className={cn('h-1.5 w-1.5 rounded-full', CATEGORY_DOT[def.category])} />
-                  {CATEGORY_LABEL[def.category]}
-                </span>
-              </button>
-              <button
-                onClick={() => setGuideFor(def.id)}
-                aria-label={`How the ${def.name} works`}
-                className="absolute top-1 right-1 rounded-full p-1 text-christ-navy/40 hover:text-christ-saffron hover:bg-christ-saffron/10 transition-colors"
-              >
-                <Info className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Workbench split: canvas (left on lg+, and given most of the width) and panels */}
+      {/* Workbench split: canvas (left on lg+, and given most of the width) and side panels */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
         <section className="lg:col-span-3 space-y-3">
           {pending && (
@@ -510,41 +507,86 @@ export function Workbench() {
               ))}
             </ul>
           </div>
+
+          {/* Bottom panel group — tabbed, Readings shown by default for live data */}
+          <PanelTabs
+            tabs={[
+              {
+                id: 'readings',
+                label: 'Readings',
+                content: <ReadingsPanel readings={gaugedReadings} running={runState === 'running'} />,
+              },
+              {
+                id: 'wiring-check',
+                label: 'Wiring check',
+                badge: !validation.ok && (
+                  <span className="rounded-full bg-christ-red/10 px-1.5 py-0.5 text-[10px] font-mono text-christ-red">
+                    {errorCount}
+                  </span>
+                ),
+                content: <ValidationPanel result={validation} wireCount={circuit.wires.length} />,
+              },
+              {
+                id: 'wiring-challenges',
+                label: 'Wiring challenges',
+                content: <ChallengePanel circuit={circuit} validation={validation} />,
+              },
+              {
+                id: 'serial-monitor',
+                label: 'Serial monitor',
+                badge: serial.length > 0 && (
+                  <span className="rounded-full bg-christ-navy/10 px-1.5 py-0.5 text-[10px] font-mono text-christ-navy/60">
+                    {serial.length}
+                  </span>
+                ),
+                content: <SerialMonitor lines={serial} boardName={board.name} onClear={() => setSerial([])} />,
+              },
+            ]}
+          />
         </section>
 
-        {/* Side panels — collapsed by default to keep the canvas front and centre */}
-        <section className="space-y-2">
-          <CollapsiblePanel title="Readings" defaultOpen={gaugedReadings.length > 0}>
-            <ReadingsPanel readings={gaugedReadings} running={runState === 'running'} />
-          </CollapsiblePanel>
+        {/* Parts bin — collapsible side drawer with small thumbnails */}
+        <section>
           <CollapsiblePanel
-            title="Wiring check"
-            defaultOpen={false}
+            title="Parts bin"
+            defaultOpen
             badge={
-              !validation.ok && (
-                <span className="rounded-full bg-christ-red/10 px-1.5 py-0.5 text-[10px] font-mono text-christ-red">
-                  {errorCount}
-                </span>
-              )
+              <span className="rounded-full bg-christ-navy/10 px-1.5 py-0.5 text-[10px] font-mono text-christ-navy/60">
+                {Object.keys(COMPONENTS).length}
+              </span>
             }
           >
-            <ValidationPanel result={validation} wireCount={circuit.wires.length} />
-          </CollapsiblePanel>
-          <CollapsiblePanel title="Wiring challenges" defaultOpen={false}>
-            <ChallengePanel circuit={circuit} validation={validation} />
-          </CollapsiblePanel>
-          <CollapsiblePanel
-            title="Serial monitor"
-            defaultOpen={false}
-            badge={
-              serial.length > 0 && (
-                <span className="rounded-full bg-christ-navy/10 px-1.5 py-0.5 text-[10px] font-mono text-christ-navy/60">
-                  {serial.length}
-                </span>
-              )
-            }
-          >
-            <SerialMonitor lines={serial} boardName={board.name} onClear={() => setSerial([])} />
+            <p className="text-[11px] font-body text-christ-navy/40 mb-2">
+              Tap a part to drop it on the bench, tap <Info className="inline h-3 w-3" /> to learn how it works.
+            </p>
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-3 gap-1.5">
+              {Object.values(COMPONENTS).map(def => (
+                <div
+                  key={def.id}
+                  className="relative rounded-lg border border-christ-navy/10 bg-white hover:border-christ-saffron/60 hover:shadow-sm transition-all"
+                >
+                  <button
+                    onClick={() => addComponent(def.id)}
+                    title={def.description}
+                    className="w-full flex flex-col items-center gap-0.5 px-1 pt-1.5 pb-1 active:scale-95 transition-transform"
+                  >
+                    <ComponentThumb componentId={def.id} size={36} />
+                    <span className="text-[10px] font-body text-christ-navy leading-tight text-center">{def.name}</span>
+                    <span className="flex items-center gap-1 text-[8px] font-mono text-christ-navy/40 uppercase tracking-wide">
+                      <span className={cn('h-1.5 w-1.5 rounded-full', CATEGORY_DOT[def.category])} />
+                      {CATEGORY_LABEL[def.category]}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setGuideFor(def.id)}
+                    aria-label={`How the ${def.name} works`}
+                    className="absolute top-0.5 right-0.5 rounded-full p-0.5 text-christ-navy/40 hover:text-christ-saffron hover:bg-christ-saffron/10 transition-colors"
+                  >
+                    <Info className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </CollapsiblePanel>
         </section>
       </div>
