@@ -76,7 +76,14 @@ export async function middleware(request: NextRequest) {
     const role = profile?.role as string | undefined
 
     if (!role) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
+      // Authenticated with Supabase but no profile row (e.g. an earlier
+      // sign-in was interrupted before /auth/callback could register them).
+      // Sign out so the stale session doesn't bounce /auth/login <-> here
+      // forever — the user can sign in again and get registered properly.
+      await supabase.auth.signOut()
+      const response = NextResponse.redirect(new URL('/auth/login?error=no_profile', request.url))
+      supabaseResponse.cookies.getAll().forEach(cookie => response.cookies.set(cookie))
+      return response
     }
 
     // /dashboard → redirect to role-specific home

@@ -42,6 +42,11 @@ export default async function LoginPage({
             Sign-in failed. Please try again.
           </p>
         )}
+        {error === 'no_profile' && (
+          <p className="text-sm font-body text-christ-red">
+            Your previous sign-in didn&apos;t finish setting up your account. Please sign in again.
+          </p>
+        )}
 
         <p className="text-xs text-christ-navy/40">
           Use your Christ University Google account
