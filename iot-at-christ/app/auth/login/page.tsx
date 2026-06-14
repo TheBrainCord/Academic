@@ -2,11 +2,17 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { LoginButton } from './LoginButton'
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: { error?: string }
+}) {
   // If already authenticated, skip straight to role-based redirect
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (user) redirect('/dashboard')
+
+  const error = searchParams.error
 
   return (
     <main className="min-h-screen bg-christ-bg flex items-center justify-center p-4">
@@ -25,6 +31,17 @@ export default async function LoginPage() {
         </div>
 
         <LoginButton />
+
+        {error === 'domain_not_allowed' && (
+          <p className="text-sm font-body text-christ-red">
+            Sign-in is restricted to Christ University Google accounts (@christ&hellip;.com).
+          </p>
+        )}
+        {error === 'auth_failed' && (
+          <p className="text-sm font-body text-christ-red">
+            Sign-in failed. Please try again.
+          </p>
+        )}
 
         <p className="text-xs text-christ-navy/40">
           Use your Christ University Google account

@@ -7,6 +7,7 @@ import { BOARDS, getBoard } from '@/lib/simulator/boards'
 import { COMPONENTS, getComponent } from '@/lib/simulator/components'
 import { validateCircuit } from '@/lib/simulator/validation'
 import { simulateStep } from '@/lib/simulator/simulation'
+import { trackEvent } from '@/lib/telemetry/track'
 import {
   failureEffectMap,
   triggeredFailures,
@@ -179,6 +180,12 @@ export function Workbench() {
       // Corrupted save — quietly start with a fresh bench.
     }
     setHydrated(true)
+  }, [])
+
+  // Telemetry — one lab_view per page load, board picked up at mount time.
+  useEffect(() => {
+    trackEvent('lab_view', { boardId: circuit.boardId })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

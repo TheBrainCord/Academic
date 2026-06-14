@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { buildProfileUpsert } from '@/lib/auth/profile'
+import { isAllowedSignupEmail, roleForNewProfile } from '@/lib/auth/access'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -11,16 +13,35 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.user) {
-      // Create profile row on first login (upsert — safe to call every time)
-      const googleIdentity = data.user.identities?.find(i => i.provider === 'google')
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        email: data.user.email,
-        full_name: data.user.user_metadata.full_name,
-        avatar_url: data.user.user_metadata.avatar_url,
-        google_id: googleIdentity?.id,
-        // role defaults to 'student' in DB; teacher is set manually
-      }, { onConflict: 'id', ignoreDuplicates: false })
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle()
+
+      // First-time sign-in: only Christ University accounts (and the admin
+      // account) may register. Reject and sign out everyone else.
+      if (!existingProfile && !isAllowedSignupEmail(data.user.email)) {
+        await supabase.auth.signOut()
+        return NextResponse.redirect(`${origin}/auth/login?error=domain_not_allowed`)
+      }
+
+      // Create profile row on first login (upsert — safe to call every time).
+      // Role is only set for brand-new profiles; returning users keep their
+      // existing role (e.g. a teacher-promoted student).
+      const role = existingProfile ? undefined : roleForNewProfile(data.user.email)
+      await supabase.from('profiles').upsert(
+        buildProfileUpsert(data.user, role),
+        { onConflict: 'id', ignoreDuplicates: false }
+      )
+
+      // Telemetry — track sign-ins so usage can be seen on /teacher/usage.
+      await supabase.from('simulator_events').insert({
+        event_type: 'sign_in',
+        session_id: data.user.id,
+        user_id: data.user.id,
+        path: '/auth/callback',
+      })
 
       // role-based redirect is handled by /dashboard
       return NextResponse.redirect(`${origin}/dashboard`)

@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 const navItems = [
   { href: '/teacher/dashboard',   label: 'Dashboard' },
+  { href: '/teacher/usage',       label: 'Simulator Usage' },
   { href: '/teacher/curriculum',  label: 'Curriculum' },
   { href: '/teacher/students',    label: 'Students' },
   { href: '/teacher/assignments', label: 'Assignments' },
