@@ -153,3 +153,11 @@ Fonts (all via Google Fonts, imported in `app/layout.tsx`):
 - **Reminder idempotency.** Always check `reminder_schedules` before sending. Running the Edge Function twice must not produce duplicate emails.
 - **No hardcoded subject logic.** `subject_id` is always read from the DB. The `slug` in YAML is the only identifier.
 - **Teacher's own research project** (Underwater Acoustic Modem / UWAC) is seeded on first boot under the teacher profile.
+
+---
+
+## Git Workflow
+
+- **Never commit or push directly to `main`.** Every change — features, fixes, even small tweaks — goes on its own new branch (e.g. `claude/<short-description>-<id>`).
+- After pushing the branch, **open a pull request into `main`** describing the change and a test plan.
+- Only merge a PR when the user explicitly asks for it.
