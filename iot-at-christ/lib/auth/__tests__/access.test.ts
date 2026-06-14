@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import {
+  ADMIN_EMAIL,
   dashboardForRole,
+  isAllowedSignupEmail,
   isPathAllowedForRole,
   isProtectedPath,
   isPublicPath,
+  roleForNewProfile,
 } from '../access'
 
 describe('isPublicPath', () => {
@@ -81,5 +84,42 @@ describe('isPathAllowedForRole', () => {
   it('denies an unknown role everywhere', () => {
     expect(isPathAllowedForRole(undefined, '/teacher/dashboard')).toBe(false)
     expect(isPathAllowedForRole('bogus', '/student/dashboard')).toBe(false)
+  })
+})
+
+describe('isAllowedSignupEmail', () => {
+  it('allows Christ University accounts', () => {
+    expect(isAllowedSignupEmail('jane.doe@christuniversity.com')).toBe(true)
+    expect(isAllowedSignupEmail('student@christ.com')).toBe(true)
+    expect(isAllowedSignupEmail('Student@ChristUniversity.COM')).toBe(true)
+  })
+
+  it('allows the admin account regardless of domain', () => {
+    expect(isAllowedSignupEmail(ADMIN_EMAIL)).toBe(true)
+    expect(isAllowedSignupEmail('Ravesh.Ashok.Naik@gmail.com')).toBe(true)
+  })
+
+  it('rejects other domains, including lookalikes', () => {
+    expect(isAllowedSignupEmail('student@gmail.com')).toBe(false)
+    expect(isAllowedSignupEmail('student@christuniversity.in')).toBe(false)
+    expect(isAllowedSignupEmail('student@notchrist.com')).toBe(false)
+    expect(isAllowedSignupEmail('student@christ.org')).toBe(false)
+  })
+
+  it('rejects missing emails', () => {
+    expect(isAllowedSignupEmail(undefined)).toBe(false)
+    expect(isAllowedSignupEmail(null)).toBe(false)
+    expect(isAllowedSignupEmail('')).toBe(false)
+  })
+})
+
+describe('roleForNewProfile', () => {
+  it('makes the admin account a teacher on first sign-in', () => {
+    expect(roleForNewProfile(ADMIN_EMAIL)).toBe('teacher')
+    expect(roleForNewProfile('Ravesh.Ashok.Naik@gmail.com')).toBe('teacher')
+  })
+
+  it('defaults everyone else to student', () => {
+    expect(roleForNewProfile('jane.doe@christuniversity.com')).toBe('student')
   })
 })

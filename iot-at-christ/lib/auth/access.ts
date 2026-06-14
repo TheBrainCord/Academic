@@ -47,3 +47,27 @@ export function isPathAllowedForRole(role: string | undefined, path: string): bo
   const prefixes = ROLE_PREFIXES[role as UserRole] ?? []
   return prefixes.some(prefix => path.startsWith(prefix))
 }
+
+// ─── Signup gating ──────────────────────────────────────────────────────────
+
+// The one non-Christ account that gets staff access — can view student
+// details, simulator usage and assign tasks.
+export const ADMIN_EMAIL = 'ravesh.ashok.naik@gmail.com'
+
+// Christ University Google Workspace accounts, e.g. name@christuniversity.com
+const CHRIST_EMAIL_PATTERN = /^[^@\s]+@christ[a-z0-9-]*\.com$/i
+
+/**
+ * Only Christ University email addresses (and the admin account) may
+ * register on first sign-in. Returning users with an existing profile are
+ * not re-checked.
+ */
+export function isAllowedSignupEmail(email: string | undefined | null): boolean {
+  if (!email) return false
+  return email.toLowerCase() === ADMIN_EMAIL || CHRIST_EMAIL_PATTERN.test(email)
+}
+
+/** Role to assign a brand-new profile based on its email. */
+export function roleForNewProfile(email: string | undefined | null): UserRole {
+  return email?.toLowerCase() === ADMIN_EMAIL ? 'teacher' : 'student'
+}

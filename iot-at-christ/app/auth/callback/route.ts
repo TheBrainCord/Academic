@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { buildProfileUpsert } from '@/lib/auth/profile'
+import { isAllowedSignupEmail, roleForNewProfile } from '@/lib/auth/access'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -12,9 +13,27 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.user) {
-      // Create profile row on first login (upsert — safe to call every time)
-      // role defaults to 'student' in DB; teacher is set manually
-      await supabase.from('profiles').upsert(buildProfileUpsert(data.user), { onConflict: 'id', ignoreDuplicates: false })
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle()
+
+      // First-time sign-in: only Christ University accounts (and the admin
+      // account) may register. Reject and sign out everyone else.
+      if (!existingProfile && !isAllowedSignupEmail(data.user.email)) {
+        await supabase.auth.signOut()
+        return NextResponse.redirect(`${origin}/auth/login?error=domain_not_allowed`)
+      }
+
+      // Create profile row on first login (upsert — safe to call every time).
+      // Role is only set for brand-new profiles; returning users keep their
+      // existing role (e.g. a teacher-promoted student).
+      const role = existingProfile ? undefined : roleForNewProfile(data.user.email)
+      await supabase.from('profiles').upsert(
+        buildProfileUpsert(data.user, role),
+        { onConflict: 'id', ignoreDuplicates: false }
+      )
 
       // Telemetry — track sign-ins so usage can be seen on /teacher/usage.
       await supabase.from('simulator_events').insert({

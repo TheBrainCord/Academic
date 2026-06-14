@@ -39,4 +39,12 @@ describe('buildProfileUpsert', () => {
     const user = makeUser({ identities: [] })
     expect(buildProfileUpsert(user).google_id).toBeUndefined()
   })
+
+  it('omits role when not given, so a returning user keeps theirs', () => {
+    expect(buildProfileUpsert(makeUser()).role).toBeUndefined()
+  })
+
+  it('sets role only when explicitly provided (new profile)', () => {
+    expect(buildProfileUpsert(makeUser(), 'teacher').role).toBe('teacher')
+  })
 })
