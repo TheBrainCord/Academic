@@ -1,12 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import {
   ADMIN_EMAIL,
+  canTogglePreviewRole,
   dashboardForRole,
   isAllowedSignupEmail,
   isPathAllowedForRole,
   isProtectedPath,
   isPublicPath,
   roleForNewProfile,
+  togglePreviewRole,
 } from '../access'
 
 describe('isPublicPath', () => {
@@ -121,5 +123,29 @@ describe('roleForNewProfile', () => {
 
   it('defaults everyone else to student', () => {
     expect(roleForNewProfile('jane.doe@christuniversity.com')).toBe('student')
+  })
+})
+
+describe('canTogglePreviewRole', () => {
+  it('allows only the admin account', () => {
+    expect(canTogglePreviewRole(ADMIN_EMAIL)).toBe(true)
+    expect(canTogglePreviewRole('Ravesh.Ashok.Naik@gmail.com')).toBe(true)
+  })
+
+  it('rejects everyone else', () => {
+    expect(canTogglePreviewRole('jane.doe@christuniversity.com')).toBe(false)
+    expect(canTogglePreviewRole(undefined)).toBe(false)
+    expect(canTogglePreviewRole(null)).toBe(false)
+  })
+})
+
+describe('togglePreviewRole', () => {
+  it('switches teacher to student and back', () => {
+    expect(togglePreviewRole('teacher')).toBe('student')
+    expect(togglePreviewRole('student')).toBe('teacher')
+  })
+
+  it('defaults to teacher when the current role is missing', () => {
+    expect(togglePreviewRole(undefined)).toBe('teacher')
   })
 })

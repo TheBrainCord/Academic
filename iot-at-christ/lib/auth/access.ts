@@ -71,3 +71,15 @@ export function isAllowedSignupEmail(email: string | undefined | null): boolean 
 export function roleForNewProfile(email: string | undefined | null): UserRole {
   return email?.toLowerCase() === ADMIN_EMAIL ? 'teacher' : 'student'
 }
+
+// ─── Student-mode preview (admin only) ─────────────────────────────────────
+
+/** Only the admin account may toggle between the teacher and student views. */
+export function canTogglePreviewRole(email: string | undefined | null): boolean {
+  return email?.toLowerCase() === ADMIN_EMAIL
+}
+
+/** The role the admin's "Preview as Student" / "Back to Teacher view" toggle switches to. */
+export function togglePreviewRole(role: string | undefined): UserRole {
+  return role === 'teacher' ? 'student' : 'teacher'
+}
