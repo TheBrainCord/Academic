@@ -25,7 +25,7 @@ export default async function TeacherStudentsPage() {
         <ClassroomSyncStatus lastSync={lastSync} />
       </div>
 
-      <div className="rounded-lg border border-christ-navy/10 bg-white overflow-hidden">
+      <div className="rounded-lg border border-christ-navy/10 bg-white overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-christ-bg border-b border-christ-navy/10">
             <tr>
