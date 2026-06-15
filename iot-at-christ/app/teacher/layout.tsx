@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { canTogglePreviewRole } from '@/lib/auth/access'
 import { togglePreviewRoleAction } from '@/app/actions/preview-role'
+import { MobileNav } from '@/components/layout/MobileNav'
 
 const navItems = [
   { href: '/teacher/dashboard',   label: 'Dashboard' },
@@ -41,19 +41,8 @@ export default async function TeacherLayout({ children }: { children: ReactNode 
             <span className="font-mono text-xs font-bold text-christ-blue border border-christ-blue/30 px-2 py-0.5 rounded-full">
               Teacher
             </span>
+            <MobileNav items={navItems} />
           </div>
-        </div>
-        {/* Scrollable nav row */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-4 overflow-x-auto pb-2 -mt-1 scrollbar-none">
-          {navItems.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-xs font-body whitespace-nowrap text-christ-navy/60 hover:text-christ-saffron transition-colors pb-1"
-            >
-              {item.label}
-            </Link>
-          ))}
         </div>
       </nav>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
