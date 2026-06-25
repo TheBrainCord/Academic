@@ -2,6 +2,29 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🚀 Token Optimization Guides (READ FIRST)
+
+**Before starting any feature, bug fix, or update, read these guides for 50-60% faster delivery and lower token costs:**
+
+1. **[TOKEN_OPTIMIZATION.md](./TOKEN_OPTIMIZATION.md)** — Comprehensive guide with real examples (15 min read)
+   - Planning phase strategies
+   - Implementation patterns for different task types
+   - Common anti-patterns to avoid
+   - Token budgets by task type
+
+2. **[QUICK_START.md](./QUICK_START.md)** — 30-second copy-paste reference (bookmark this)
+   - Request templates for different scenarios
+   - File locations and paths
+   - Common mistakes and fixes
+   - Decision tree for workflow choice
+
+3. **[WORKFLOW.md](./WORKFLOW.md)** — Visual guides and timelines
+   - Workflow diagrams for bug fixes, medium, and complex features
+   - Timeline estimates and token budgets
+   - Daily target tracking
+
+**Quick rule:** Exact file paths + line numbers = 50% fewer tokens. Vague "help me design" = 2-3x more tokens.
+
 ---
 
 ## Project Identity
