@@ -64,6 +64,25 @@ export default async function TeacherSessionDetailPage({
         </section>
       )}
 
+      {((session.case_study as any)?.references?.length ?? 0) > 0 && (
+        <section aria-labelledby="verification-sources">
+          <h2 id="verification-sources" className="text-lg font-display font-semibold text-christ-navy mb-3">
+            Living curriculum update · verification sources
+          </h2>
+          <ul className="space-y-3">
+            {(session.case_study as any).references.map((reference: any) => (
+              <li key={reference.authoritativeUrl} className="rounded-lg border border-christ-saffron/30 bg-christ-saffron/5 p-4">
+                <a className="font-display font-semibold text-christ-navy underline" href={reference.authoritativeUrl} target="_blank" rel="noreferrer">
+                  {reference.title}
+                </a>
+                <p className="text-xs font-mono text-christ-navy/50">{reference.publisher} · Verified {reference.lastVerified}</p>
+                <p className="mt-1 text-sm text-christ-navy/75">Supports: {reference.claimScope}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {/* Schedule setter — client component */}
       <SessionScheduler sessionId={session.id} currentScheduledAt={session.scheduled_at} />
     </div>

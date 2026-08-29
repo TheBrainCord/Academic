@@ -14,6 +14,10 @@ name: "ML at CHRIST"
 description: "..."
 year: "2025-26"
 semester: "Semester 3"
+curriculumStatus:
+  officialSyllabusLabel: "Official syllabus content"
+  livingCurriculumLabel: "Living curriculum update"
+  lastVerified: "2026-08-29"
 units:
   - number: 1
     title: "Introduction to ML"
@@ -33,5 +37,10 @@ units:
           xp: 50
           due_days: 7
 ```
+
+Time-sensitive product availability, law, version, deployment-scale, and measured-outcome
+claims must include session-level `references`. Each reference records a title, authoritative
+URL, publisher, the exact claim scope it supports, and an ISO `lastVerified` date. Unsupported
+figures should be removed or explicitly presented as hypothetical assignment inputs.
 
 See `iot.yaml` for a complete example with all optional fields.

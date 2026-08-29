@@ -14,6 +14,14 @@ export interface CaseStudy {
   description: string
 }
 
+export interface Reference {
+  title: string
+  authoritativeUrl: string
+  publisher: string
+  claimScope: string
+  lastVerified: string
+}
+
 export interface Session {
   number:               number
   title:                string
@@ -24,6 +32,7 @@ export interface Session {
   tools?:               string[]
   assignment?:          Assignment
   no_hw_alternative?:   string
+  references?:          Reference[]
 }
 
 export interface Unit {
@@ -56,6 +65,11 @@ export interface Subject {
   description: string
   year:        string
   semester:    string
+  curriculumStatus: {
+    officialSyllabusLabel: string
+    livingCurriculumLabel: 'Living curriculum update'
+    lastVerified: string
+  }
   units:       Unit[]
   missions?:   Mission[]
 }
