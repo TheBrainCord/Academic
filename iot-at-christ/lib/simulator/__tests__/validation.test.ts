@@ -189,3 +189,60 @@ describe('simulateStep', () => {
     expect(hum!.value).toBeLessThanOrEqual(85)
   })
 })
+
+describe('ESP32 pin direction and cautions', () => {
+  it('rejects an actuator that requires GPIO34 to drive an output', () => {
+    const circuit: Circuit = {
+      boardId: 'esp32-devkit',
+      components: [place('buzz1', 'buzzer')],
+      wires: [
+        wire('w1', { kind: 'board', pinId: 'gpio34' }, { kind: 'component', instanceId: 'buzz1', terminalId: 'positive' }),
+        wire('w2', { kind: 'board', pinId: 'gnd-l' }, { kind: 'component', instanceId: 'buzz1', terminalId: 'negative' }),
+      ],
+    }
+
+    const result = validateCircuit(circuit)
+    expect(result.ok).toBe(false)
+    expect(result.issues).toContainEqual(expect.objectContaining({
+      severity: 'error',
+      code: 'unsupported-pin-direction',
+      pinId: 'gpio34',
+    }))
+  })
+
+  it('permits a digital sensor signal on input-only GPIO35', () => {
+    const circuit: Circuit = {
+      boardId: 'esp32-devkit',
+      components: [place('pir1', 'pir')],
+      wires: [
+        wire('w1', { kind: 'board', pinId: 'vin' }, { kind: 'component', instanceId: 'pir1', terminalId: 'vcc' }),
+        wire('w2', { kind: 'board', pinId: 'gnd-l' }, { kind: 'component', instanceId: 'pir1', terminalId: 'gnd' }),
+        wire('w3', { kind: 'board', pinId: 'gpio35' }, { kind: 'component', instanceId: 'pir1', terminalId: 'out' }),
+      ],
+    }
+
+    const result = validateCircuit(circuit)
+    expect(result.ok).toBe(true)
+    expect(result.issues).not.toContainEqual(expect.objectContaining({ code: 'unsupported-pin-direction' }))
+  })
+
+  it('warns about a strapping pin without rejecting an otherwise valid sensor connection', () => {
+    const circuit: Circuit = {
+      boardId: 'esp32-devkit',
+      components: [place('pir1', 'pir')],
+      wires: [
+        wire('w1', { kind: 'board', pinId: 'vin' }, { kind: 'component', instanceId: 'pir1', terminalId: 'vcc' }),
+        wire('w2', { kind: 'board', pinId: 'gnd-l' }, { kind: 'component', instanceId: 'pir1', terminalId: 'gnd' }),
+        wire('w3', { kind: 'board', pinId: 'gpio12' }, { kind: 'component', instanceId: 'pir1', terminalId: 'out' }),
+      ],
+    }
+
+    const result = validateCircuit(circuit)
+    expect(result.ok).toBe(true)
+    expect(result.issues).toContainEqual(expect.objectContaining({
+      severity: 'warning',
+      code: 'pin-caution',
+      pinId: 'gpio12',
+    }))
+  })
+})
