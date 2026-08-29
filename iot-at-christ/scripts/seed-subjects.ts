@@ -92,7 +92,11 @@ async function seedSubject(filePath: string): Promise<void> {
           hours:              session.hours,
           topics:             session.topics,
           keywords:           session.keywords,
-          case_study:         session.case_study ?? null,
+          // References travel with the case-study JSON because the existing table has no
+          // standalone references column. The full, canonical structure also remains in config.
+          case_study:         session.case_study
+            ? { ...session.case_study, references: session.references ?? [] }
+            : null,
           tools:              session.tools ?? null,
           assignment:         session.assignment ?? null,
           no_hw_alternative:  session.no_hw_alternative ?? null,

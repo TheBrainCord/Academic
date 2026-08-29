@@ -1,5 +1,14 @@
 import { z } from 'zod'
 
+/** A primary or otherwise authoritative source supporting mutable course content. */
+export const ReferenceSchema = z.object({
+  title:         z.string().min(1),
+  authoritativeUrl: z.string().url(),
+  publisher:     z.string().min(1),
+  claimScope:    z.string().min(1),
+  lastVerified:  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use an ISO YYYY-MM-DD date'),
+})
+
 // Zod schema for subject YAML files
 // Any .yaml file in /content/subjects/ that passes this will work with the platform.
 
@@ -26,6 +35,7 @@ export const SessionSchema = z.object({
   tools:              z.array(z.string()).optional(),
   assignment:         AssignmentSchema.optional(),
   no_hw_alternative:  z.string().optional(),
+  references:          z.array(ReferenceSchema).optional(),
 })
 
 export const UnitSchema = z.object({
@@ -58,6 +68,11 @@ export const SubjectSchema = z.object({
   description: z.string(),
   year:        z.string(),
   semester:    z.string(),
+  curriculumStatus: z.object({
+    officialSyllabusLabel: z.string().min(1),
+    livingCurriculumLabel: z.literal('Living curriculum update'),
+    lastVerified: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  }),
   units:       z.array(UnitSchema),
   missions:    z.array(MissionSchema).optional(),
 })

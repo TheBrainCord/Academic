@@ -6,15 +6,28 @@ export default async function TeacherCurriculumPage() {
 
   const { data: subject } = await supabase
     .from('subjects')
-    .select('id, name, units(id, number, title, hours, icon, color_hex, sessions(id, number, title, hours))')
+    .select('id, name, config, units(id, number, title, hours, icon, color_hex, sessions(id, number, title, hours))')
     .eq('slug', 'iot')
     .single()
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-display font-bold text-christ-navy">
-        {subject?.name ?? 'Curriculum'}
-      </h1>
+      <div>
+        <p className="text-xs font-mono uppercase tracking-widest text-christ-navy/50">
+          {(subject?.config as any)?.curriculumStatus?.officialSyllabusLabel ?? 'Official syllabus content'}
+        </p>
+        <h1 className="text-3xl font-display font-bold text-christ-navy">{subject?.name ?? 'Curriculum'}</h1>
+      </div>
+
+      <aside className="rounded-lg border border-christ-saffron/30 bg-christ-saffron/5 px-5 py-4">
+        <p className="font-display font-semibold text-christ-navy">
+          {(subject?.config as any)?.curriculumStatus?.livingCurriculumLabel ?? 'Living curriculum update'}
+        </p>
+        <p className="mt-1 text-sm text-christ-navy/65">
+          Modern platform, standards, and legal-status notes are maintained separately from the official syllabus.
+          {' '}Verified {(subject?.config as any)?.curriculumStatus?.lastVerified ?? 'date unavailable'}.
+        </p>
+      </aside>
 
       <div className="space-y-6">
         {subject?.units?.map((unit: any) => (
