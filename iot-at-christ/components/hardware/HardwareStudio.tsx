@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Eye, EyeOff, Maximize2, Pause, Play, RotateCcw, StickyNote, Tag, Timer, TriangleAlert } from 'lucide-react'
+import { AlertTriangle, Eye, EyeOff, Maximize2, Pause, Play, RotateCcw, StickyNote, Tag, Timer } from 'lucide-react'
 import type { HardwareLesson } from '@/content/hardware-lessons'
 import type { BoardId } from '@/types/simulator'
 import { BoardExplorer } from './BoardExplorer'
@@ -46,7 +46,7 @@ export function HardwareStudio({ lesson }: { lesson: HardwareLesson }) {
       <button className={control} onClick={() => setLabels(v => !v)} aria-pressed={labels}><Tag className="h-4 w-4"/>{labels ? 'Hide labels' : 'Reveal labels'}</button>
       <button className={control} onClick={() => setNotes(v => !v)} aria-expanded={notes}>{notes ? <EyeOff className="h-4 w-4"/> : <StickyNote className="h-4 w-4"/>}Notes</button>
       <button className={control} onClick={() => document.documentElement.requestFullscreen?.()}><Maximize2 className="h-4 w-4"/>Present</button>
-      <button className={`${control} text-red-700`} onClick={() => { setFault(true); setRunning(false) }}><TriangleAlert className="h-4 w-4"/>Inject fault</button>
+      <button className={`${control} text-red-700`} onClick={() => { setFault(true); setRunning(false) }}><AlertTriangle className="h-4 w-4"/>Inject fault</button>
       <button className={control} onClick={reset}><RotateCcw className="h-4 w-4"/>Reset</button>
       <span className="ml-auto hidden items-center gap-2 px-3 font-mono text-xs text-christ-navy/50 md:flex"><Timer className="h-4 w-4"/>Space = run/pause</span>
     </div>
