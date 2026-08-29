@@ -1,627 +1,1105 @@
 slug: iot
-name: "IoT at CHRIST"
-description: "A hands-on, project-driven course exploring the Internet of Things — from sensors to cloud, security to AI — built for Christ University Bengaluru's M.Tech CSE programme."
-year: "2025-26"
-semester: "Semester 2"
-
+name: IoT at CHRIST
+description: >-
+  A 40-hour Internet of Things course for CHRIST (Deemed to be University)'s MSc Computer Science and Applications
+  programme.
+year: 2025-26
+semester: Semester 2
 units:
   - number: 1
-    title: "IoT Universe — The Big Picture"
+    title: Introduction to the Internet of Things
     hours: 6
-    icon: "🌐"
-    color: "#1565C0"
+    icon: 🌐
+    color: '#1565C0'
     sessions:
       - number: 1
-        title: "What is IoT? Beyond the Buzzword"
-        hours: 2
+        title: Introduction to the Internet of Things
+        hours: 6
         topics:
-          - "Definition & evolution: M2M → IoT → IIoT → AIoT"
-          - "The 4-layer architecture: Perception → Network → Middleware → Application"
-          - "Why IoT matters: economic scale, social impact, India's National IoT Policy"
-        keywords: ["Perception Layer", "Edge Node", "M2M", "IIoT", "AIoT", "4-Layer Architecture"]
-        case_study:
-          title: "Bengaluru Flood Early Warning"
-          org: "BBMP + KSCST"
-          description: "How 200 flood-level sensors across storm drains feed a real-time dashboard, enabling BBMP to issue ward-level warnings 3 hours before flooding."
-        tools: ["Wokwi.com", "Node-RED", "Home Assistant"]
-        assignment:
-          type: "Observation"
-          task: "Walk around college campus. Identify 10 IoT candidates — devices that don't yet communicate but could. For each: describe the sensor, the data it would produce, and the decision it could enable."
-          xp: 50
-          due_days: 7
-        no_hw_alternative: "Use Wokwi.com to simulate an Arduino/ESP32 in the browser"
-
-      - number: 2
-        title: "IoT Ecosystems — Who Builds What"
-        hours: 2
-        topics:
-          - "The IoT value chain: device makers, connectivity providers, platform vendors, integrators"
-          - "Major platforms: AWS IoT Core, Azure IoT Hub, Google Cloud IoT, ThingsBoard"
-          - "India's IoT ecosystem: C-DOT, BSNL NB-IoT, Smart Cities Mission"
-          - "Open-source vs proprietary: tradeoffs in an academic setting"
-        keywords: ["IoT Platform", "MQTT Broker", "Device Shadow", "Digital Twin", "Smart Cities Mission"]
-        case_study:
-          title: "Pune Smart City — Integrated Command Centre"
-          org: "Pune Smart City Development Corporation"
-          description: "How 10,000 sensors (traffic, air quality, flood, energy) feed a single command centre, reducing emergency response time by 40%."
-        tools: ["ThingsBoard Community", "Wokwi.com"]
-        assignment:
-          type: "Research"
-          task: "Compare AWS IoT Core vs ThingsBoard (open-source). Create a 1-page comparison table covering: cost, scalability, data ownership, ease of setup, India deployment. Recommend one for a college campus project with ₹0 budget."
-          xp: 60
-          due_days: 7
-
-      - number: 3
-        title: "The IoT Device Lifecycle"
-        hours: 2
-        topics:
-          - "Provisioning, onboarding, and fleet management"
-          - "OTA (Over-The-Air) firmware updates — why they matter for security"
-          - "Device decommissioning and data retention policies"
-          - "GDPR and India's DPDPA (Digital Personal Data Protection Act) for IoT"
-        keywords: ["OTA Update", "Device Provisioning", "Fleet Management", "DPDPA", "Data Retention"]
-        case_study:
-          title: "Tesla OTA — The 'Braking Bug' Fix"
-          org: "Tesla Inc."
-          description: "How Tesla silently patched a braking distance bug on 130,000 cars overnight via OTA — and why this model is being adopted by Indian two-wheeler EV makers."
-        tools: ["ESP32 Arduino IDE OTA example", "Wokwi.com"]
-        assignment:
-          type: "Design"
-          task: "Design a device lifecycle policy for a fleet of 500 IoT soil sensors deployed across farms in Karnataka. Cover: provisioning, OTA cadence, data retention (DPDPA compliance), and decommissioning. One-page policy document."
-          xp: 70
-          due_days: 10
-
+          - Internet of Things foundations and characteristics
+          - IoT physical and logical design
+          - IoT enabling technologies and domain-specific applications
+        keywords:
+          - IoT
+          - Physical Design
+          - Logical Design
+          - Enabling Technologies
   - number: 2
-    title: "Hardware Layer — Sensors, Boards & Components"
-    hours: 8
-    icon: "🔧"
-    color: "#2E7D32"
+    title: IoT Architecture and Devices
+    hours: 7
+    icon: 🔧
+    color: '#2E7D32'
+    sessions:
+      - number: 2
+        title: IoT Architecture and Devices
+        hours: 7
+        topics:
+          - IoT architecture and functional blocks
+          - Sensors, actuators, embedded devices, and gateways
+          - Device design constraints and interfacing
+        keywords:
+          - IoT Architecture
+          - Sensors
+          - Actuators
+          - Gateways
+  - number: 3
+    title: IoT Communication and Protocols
+    hours: 7
+    icon: 📡
+    color: '#6A1B9A'
+    sessions:
+      - number: 3
+        title: IoT Communication and Protocols
+        hours: 7
+        topics:
+          - IoT network and communication models
+          - Connectivity and application-layer protocols
+          - Addressing, routing, and interoperability
+        keywords:
+          - Connectivity
+          - Protocols
+          - Interoperability
+          - Routing
+  - number: 4
+    title: IoT Data and Services
+    hours: 5
+    icon: ☁️
+    color: '#00695C'
     sessions:
       - number: 4
-        title: "Microcontrollers vs Microprocessors"
-        hours: 2
+        title: IoT Data and Services
+        hours: 5
         topics:
-          - "MCU vs MPU: when to use Arduino, ESP32, Raspberry Pi, Jetson Nano"
-          - "GPIO, ADC, DAC, PWM, I2C, SPI, UART — the communication interfaces"
-          - "Power budgets: battery-powered IoT at 50μA vs mains-powered at 5W"
-          - "India-made boards: Bolt IoT, Atomberg, C-DAC's SHAKTI processor"
-        keywords: ["MCU", "GPIO", "I2C", "SPI", "UART", "ADC", "Power Budget", "ESP32"]
-        case_study:
-          title: "Precision Agriculture with ESP32 — Nashik Vineyards"
-          org: "Maharashtra Agri Dept + IIT Bombay"
-          description: "ESP32-based soil moisture and canopy sensors deployed across 200 hectares, reducing water use by 35% while maintaining yield."
-        tools: ["Wokwi.com (ESP32)", "Arduino IDE", "TinkerCAD Circuits"]
-        assignment:
-          type: "Simulation"
-          task: "On Wokwi.com: wire an ESP32 to a DHT22 (temperature/humidity) and an LDR (light). Write Arduino code to read all sensors every 5 seconds and print to Serial Monitor in CSV format. Screenshot the simulation + paste the code."
-          xp: 80
-          due_days: 7
-        no_hw_alternative: "The assignment IS the simulation — Wokwi.com, no hardware needed"
-
-      - number: 5
-        title: "Sensors Deep Dive"
-        hours: 2
-        topics:
-          - "Sensor taxonomy: physical, chemical, biological"
-          - "Accuracy vs precision vs resolution vs range"
-          - "Sensor fusion: combining GPS + accelerometer + barometer for indoor positioning"
-          - "Calibration and drift: why your soil sensor needs annual recalibration"
-        keywords: ["Sensor Fusion", "Calibration", "Accuracy", "Precision", "Resolution", "Drift"]
-        case_study:
-          title: "Apollo Hospitals Remote Patient Monitoring"
-          org: "Apollo Hospitals + Philips"
-          description: "How fusing SpO2, ECG, and accelerometer data reduces false alarms by 60% compared to single-sensor monitoring in hospital wards."
-        tools: ["Wokwi.com", "Sensor Datasheet reading exercise"]
-        assignment:
-          type: "Analysis"
-          task: "Download the datasheet for the DHT22 sensor. Answer: What is the accuracy for temperature? Humidity? What is the sampling rate? What voltage does it operate at? What is the response time? Now compare with the BME280 on the same parameters. Which would you choose for a weather station in Bengaluru? Justify."
-          xp: 70
-          due_days: 7
-
-      - number: 6
-        title: "Actuators, Displays & Real Output"
-        hours: 2
-        topics:
-          - "Actuator types: relays, solenoids, servo/stepper motors, peristaltic pumps"
-          - "E-ink displays for ultra-low-power dashboards"
-          - "Driving high-current loads safely: MOSFETs, transistors, optocouplers"
-          - "Real-world IoT: closing the loop from sensor to actuator"
-        keywords: ["Relay", "Solenoid", "PWM Control", "MOSFET", "Optocoupler", "E-ink", "Servo"]
-        case_study:
-          title: "ISRO Chandrayaan-3 Lander — Actuator Design"
-          org: "ISRO"
-          description: "How ISRO's engineers designed the Vikram lander's leg deployment actuators for a one-shot, no-repair mission — lessons in fail-safe actuator design."
-        tools: ["Wokwi.com", "TinkerCAD Circuits"]
-        assignment:
-          type: "Simulation"
-          task: "On Wokwi.com: simulate an automatic plant watering system. DHT22 reads soil moisture (simulate with a potentiometer). If moisture < 30%, a relay turns on a water pump (LED as proxy). If moisture > 60%, pump turns off. Add an LCD showing current moisture and pump state."
-          xp: 100
-          due_days: 10
-        no_hw_alternative: "Full simulation available on Wokwi.com"
-
-      - number: 7
-        title: "PCB Design Fundamentals & Prototyping"
-        hours: 2
-        topics:
-          - "Breadboard → perfboard → custom PCB: when to make the jump"
-          - "KiCad basics: schematic capture, footprint assignment, routing"
-          - "Design for manufacturability: clearance, trace width, thermal relief"
-          - "Ordering PCBs from JLCPCB/PCBWay — cost, lead time, minimum order"
-        keywords: ["PCB", "KiCad", "Schematic", "Trace Width", "Design Rule Check", "Gerber", "BOM"]
-        case_study:
-          title: "Niramai's Thermal Imaging Breast Cancer Screening Device"
-          org: "Niramai Health Analytix, Bengaluru"
-          description: "How a Bengaluru startup went from Arduino prototype to a CE-marked medical device in 18 months, using iterative PCB design."
-        tools: ["KiCad (free)", "Wokwi.com", "JLCPCB online Gerber viewer"]
-        assignment:
-          type: "Design"
-          task: "In KiCad (or draw on paper): design a schematic for an ESP32-based air quality monitor with: MQ-135 gas sensor, BME280 temp/humidity, 0.96\" OLED display, Li-Po battery with TP4056 charging circuit, USB-C power input. Label all connections, include decoupling capacitors."
-          xp: 120
-          due_days: 14
-
-  - number: 3
-    title: "Connectivity & Protocols"
-    hours: 8
-    icon: "📡"
-    color: "#6A1B9A"
-    sessions:
-      - number: 8
-        title: "Short-Range Protocols — Wi-Fi, Bluetooth, Zigbee, Z-Wave"
-        hours: 2
-        topics:
-          - "Wi-Fi (802.11): power cost, range, throughput — when not to use it"
-          - "Bluetooth Classic vs BLE: hearing aids to fitness trackers"
-          - "Zigbee and Z-Wave: mesh networking for smart homes"
-          - "Thread + Matter: the new universal smart home standard"
-        keywords: ["BLE", "Zigbee", "Z-Wave", "Thread", "Matter", "Mesh Network", "Wi-Fi 6"]
-        case_study:
-          title: "Philips Hue Smart Lighting — Zigbee at Scale"
-          org: "Philips"
-          description: "How Philips built a self-healing Zigbee mesh network that maintains connectivity with 50+ bulbs, and why they're migrating to Matter."
-        tools: ["Wokwi.com", "Home Assistant (virtual)"]
-        assignment:
-          type: "Comparison"
-          task: "Build a comparison table for: Wi-Fi, BLE, Zigbee, Z-Wave, Thread. Columns: Range, Data Rate, Power Consumption, Topology, Frequency, Typical Cost Per Node, Best Use Case. Add a row for your recommendation for a hospital patient-tracking system with 500 wearable devices."
-          xp: 70
-          due_days: 7
-
-      - number: 9
-        title: "Long-Range Protocols — LoRa, NB-IoT, LTE-M, Sigfox"
-        hours: 2
-        topics:
-          - "LPWAN (Low Power Wide Area Networks): the tradeoff triangle (power, range, data rate)"
-          - "LoRaWAN: how the network architecture works, India coverage"
-          - "NB-IoT: carrier-based, licensed spectrum, BSNL deployment"
-          - "Sigfox: global, ultranarrow-band, no base station needed"
-        keywords: ["LPWAN", "LoRaWAN", "NB-IoT", "LTE-M", "Sigfox", "Spreading Factor", "ADR"]
-        case_study:
-          title: "BSNL + Nokia NB-IoT Smart Meter Rollout"
-          org: "BSNL + Nokia + BESCOM"
-          description: "How BESCOM (Bengaluru Electricity Supply) is deploying 500,000 NB-IoT smart meters over BSNL's network, eliminating meter reading staff."
-        tools: ["The Things Network Console (free LoRaWAN sandbox)", "Wokwi.com LoRa simulation"]
-        assignment:
-          type: "Design"
-          task: "You are deploying 1,000 water-quality sensors along the Cauvery river (350km stretch). Choose a connectivity protocol. Justify: coverage, power, cost, data frequency needed (pH, turbidity, flow rate once every 15 minutes). Calculate estimated annual SIM/connectivity cost."
-          xp: 90
-          due_days: 10
-
-      - number: 10
-        title: "Application Protocols — MQTT, CoAP, AMQP, HTTP/2"
-        hours: 2
-        topics:
-          - "MQTT: publish-subscribe, broker, QoS levels 0/1/2, retained messages"
-          - "CoAP: REST for constrained devices, confirmable vs non-confirmable"
-          - "AMQP: enterprise messaging, RabbitMQ"
-          - "When to use WebSockets vs MQTT for real-time dashboards"
-        keywords: ["MQTT", "CoAP", "AMQP", "QoS", "Retained Message", "Broker", "Topic", "Payload"]
-        case_study:
-          title: "Twitter's Real-Time Pipeline — Why IoT Borrowed from Social Media"
-          org: "Eclipse Mosquitto / HiveMQ"
-          description: "MQTT was invented in 1999 for oil pipeline monitoring. How Facebook Messenger and IoT platforms converged on the same pub-sub model."
-        tools: ["Mosquitto (free MQTT broker)", "MQTT Explorer", "Node-RED", "Wokwi.com"]
-        assignment:
-          type: "Implementation"
-          task: "Set up a local Mosquitto MQTT broker. Write two Python scripts: publisher (simulates a temperature sensor, publishes to topic 'lab/temp' every 2 seconds) and subscriber (listens and prints received values with timestamp). Demonstrate QoS 0 vs QoS 2 — what happens when you kill and restart the subscriber?"
-          xp: 100
-          due_days: 10
-
-      - number: 11
-        title: "Network Architecture — Gateways, Edge Routers, and IP"
-        hours: 2
-        topics:
-          - "The gateway's role: protocol translation, local buffering, pre-processing"
-          - "IPv6 and 6LoWPAN: why IoT needs a new addressing scheme"
-          - "DNS-SD and mDNS: zero-configuration networking"
-          - "NAT traversal for IoT: STUN, TURN, and hole-punching"
-        keywords: ["Gateway", "6LoWPAN", "IPv6", "mDNS", "NAT Traversal", "Edge Router", "Protocol Bridge"]
-        case_study:
-          title: "Indian Railways Remote Level Crossing Monitoring"
-          org: "Indian Railways + RDSO"
-          description: "How RDSO deployed LoRa-to-4G gateways at 2,000 unmanned level crossings, with local edge processing to detect obstructions before transmitting alerts."
-        tools: ["Raspberry Pi as gateway (or Wokwi.com ESP32 + Node-RED bridge simulation)"]
-        assignment:
-          type: "Architecture"
-          task: "Draw the network architecture for a smart irrigation system spanning 50 farms in a 20km radius. Each farm has 10 soil sensors. Design: sensor-to-gateway protocol, gateway-to-cloud protocol, cloud platform, and the dashboard. Justify each protocol choice. Include a failure mode analysis: what happens when the gateway loses internet?"
-          xp: 110
-          due_days: 14
-
-  - number: 4
-    title: "Cloud, Data & IoT Platforms"
-    hours: 6
-    icon: "☁️"
-    color: "#00695C"
-    sessions:
-      - number: 12
-        title: "Cloud Architecture for IoT"
-        hours: 2
-        topics:
-          - "IoT ingestion pipelines: device → broker → stream processor → storage → analytics"
-          - "Time-series databases: InfluxDB, TimescaleDB, Amazon Timestream"
-          - "Hot vs warm vs cold storage for sensor data"
-          - "Data compression for IoT: why raw ADC values are wasteful"
-        keywords: ["Time-Series DB", "InfluxDB", "Stream Processing", "Hot Storage", "Cold Storage", "Data Ingestion"]
-        case_study:
-          title: "Tata Power Smart Grid — Real-Time Demand Forecasting"
-          org: "Tata Power + C-DOT"
-          description: "How Tata Power ingests 10 million meter readings per hour into a time-series pipeline to predict grid demand 30 minutes ahead and prevent brownouts."
-        tools: ["InfluxDB Cloud (free tier)", "Grafana", "ThingsBoard"]
-        assignment:
-          type: "Implementation"
-          task: "Set up a free InfluxDB Cloud account. Write a Python script that simulates 5 temperature sensors and writes data every 10 seconds for 10 minutes. Build a Grafana dashboard showing: line chart of all 5 sensors, min/max/avg panel, and an alert when any sensor exceeds 40°C. Screenshot your dashboard."
-          xp: 120
-          due_days: 14
-
-      - number: 13
-        title: "Edge Computing & Fog Computing"
-        hours: 2
-        topics:
-          - "Edge vs fog vs cloud: where to process, where to store"
-          - "Edge inference: running TFLite on ESP32, TensorRT on Jetson Nano"
-          - "AWS Greengrass, Azure IoT Edge, Google Coral"
-          - "Latency requirements: when cloud round-trip is too slow (autonomous vehicles, surgery robots)"
-        keywords: ["Edge Computing", "Fog Computing", "TFLite", "Latency", "AWS Greengrass", "TensorRT", "Coral"]
-        case_study:
-          title: "Ola Electric — Edge Processing in EV Charging Stations"
-          org: "Ola Electric"
-          description: "How Ola's S1 charging stations run a local ML model to predict charging completion time and manage load balancing without cloud connectivity."
-        tools: ["Google Coral Edge TPU (demo)", "TFLite converter (Colab notebook)"]
-        assignment:
-          type: "Analysis"
-          task: "You are building a defect detection system for a chip manufacturing plant. The conveyor belt produces 200 chips/minute. Each image is 1MB. Cloud inference takes 300ms. Edge inference takes 12ms. Calculate: maximum throughput possible with cloud only, edge only, and a hybrid approach. At what production speed does cloud-only become impossible? Show your calculations."
-          xp: 90
-          due_days: 10
-
-      - number: 14
-        title: "Data Analytics, Dashboards & Decision Systems"
-        hours: 2
-        topics:
-          - "Descriptive → diagnostic → predictive → prescriptive analytics"
-          - "Anomaly detection: statistical methods vs ML for IoT streams"
-          - "Digital twins: simulation-first design"
-          - "No-code IoT dashboards: Node-RED, ThingsBoard, Grafana"
-        keywords: ["Digital Twin", "Anomaly Detection", "Predictive Analytics", "Node-RED", "Grafana", "Dashboard"]
-        case_study:
-          title: "Siemens Gamesa Wind Farm Digital Twin — Gujarat"
-          org: "Siemens Gamesa + NTPC"
-          description: "How digital twins of 50 wind turbines in Gujarat's Rann of Kutch simulate failure scenarios, cutting unplanned downtime by 30%."
-        tools: ["Node-RED", "ThingsBoard", "Grafana"]
-        assignment:
-          type: "Build"
-          task: "Using Node-RED: build a flow that simulates 3 industrial machines (each generating random temperature + vibration readings). Add anomaly detection: if vibration > 2σ from the 10-minute rolling mean, send an alert to a dashboard. Visualise on the built-in Node-RED dashboard. Export and submit your flow.json."
-          xp: 130
-          due_days: 14
-
+          - IoT data acquisition and service models
+          - Data storage, processing, and visualisation
+          - IoT platforms and service composition
+        keywords:
+          - Data Acquisition
+          - IoT Services
+          - Visualisation
+          - Platforms
   - number: 5
-    title: "IoT Security — Defence to Consumer"
+    title: IoT Security and Management
     hours: 6
-    icon: "🔐"
-    color: "#B71C1C"
+    icon: 🔐
+    color: '#B71C1C'
     sessions:
-      - number: 15
-        title: "The IoT Attack Surface"
-        hours: 2
+      - number: 5
+        title: IoT Security and Management
+        hours: 6
         topics:
-          - "OWASP IoT Top 10: weak passwords, insecure update mechanisms, lack of TLS"
-          - "The Mirai botnet: 600,000 webcams took down half the internet"
-          - "Shodan: the search engine for exposed IoT devices"
-          - "India's CERT-In IoT guidelines and mandatory reporting"
-        keywords: ["OWASP IoT Top 10", "Mirai Botnet", "Shodan", "CERT-In", "Attack Surface", "CVE"]
-        case_study:
-          title: "Stuxnet — When IoT Security Became a Geopolitical Weapon"
-          org: "ICS-CERT"
-          description: "How a USB drive with 4 zero-days destroyed 1,000 Iranian uranium centrifuges — and why every IIoT device is now a potential weapon."
-        tools: ["Shodan.io (free account)", "OWASP IoT Attack Surface Areas checklist"]
-        assignment:
-          type: "Audit"
-          task: "Search Shodan for exposed devices in Bengaluru (filter: city:Bengaluru). Find 3 categories of exposed devices. For each: describe the risk, the likely misconfiguration, and a 2-sentence fix. Do NOT interact with or attempt to access any device — this is a passive observation exercise only."
-          xp: 80
-          due_days: 7
-
-      - number: 16
-        title: "Securing the IoT Stack — TLS, PKI, and Secrets Management"
-        hours: 2
-        topics:
-          - "TLS 1.3 on constrained devices: mbedTLS, WolfSSL"
-          - "Certificate lifecycle: provisioning, rotation, revocation on 10M devices"
-          - "Hardware Security Modules (HSM) vs software key stores"
-          - "AWS IoT certificate vending machine pattern"
-        keywords: ["TLS 1.3", "PKI", "X.509", "HSM", "Certificate Pinning", "Secret Rotation", "mbedTLS"]
-        case_study:
-          title: "Ring Doorbell Authentication Bypass (2019)"
-          org: "Ring / Amazon"
-          description: "How Ring's lack of TLS certificate pinning allowed attackers to intercept streams — and the ₹450 crore security overhaul that followed."
-        tools: ["OpenSSL CLI", "Let's Encrypt (for gateway TLS)", "MQTT with TLS in Mosquitto"]
-        assignment:
-          type: "Implementation"
-          task: "Configure Mosquitto to require TLS. Generate a self-signed CA, server cert, and client cert using OpenSSL. Connect an MQTT client with mutual TLS authentication. Publish a test message. Document every command used and explain why mutual TLS (client cert + server cert) is better than one-way TLS for IoT."
-          xp: 120
-          due_days: 14
-
-      - number: 17
-        title: "Zero Trust for IIoT and Industrial Systems"
-        hours: 2
-        topics:
-          - "Zero Trust Architecture: never trust, always verify"
-          - "Micro-segmentation in factory networks"
-          - "OT/IT convergence risks: when SCADA meets the internet"
-          - "India's Critical Information Infrastructure (CII) protection framework"
-        keywords: ["Zero Trust", "Micro-Segmentation", "SCADA", "OT/IT Convergence", "CII", "Industrial IoT"]
-        case_study:
-          title: "Mumbai Power Grid Attack (2020)"
-          org: "Maharashtra State Electricity Transmission Co."
-          description: "How a suspected state-level actor penetrated MSETCL's SCADA system months before a power failure during the COVID lockdown — and what zero-trust architecture would have prevented."
-        tools: ["Wireshark (packet analysis)", "Nmap (network scanning — lab use only)"]
-        assignment:
-          type: "Design"
-          task: "Design a Zero Trust network architecture for AIIMS Delhi's ICU, which has 200 connected medical devices (ventilators, infusion pumps, monitors). Draw the network diagram. Identify: which devices should be on a separate VLAN, where TLS termination happens, how device identity is verified, and what triggers an automatic quarantine. 2-page design doc + diagram."
-          xp: 150
-          due_days: 14
-
+          - IoT security requirements, threats, and controls
+          - Identity, privacy, trust, and device management
+          - Secure deployment and lifecycle considerations
+        keywords:
+          - IoT Security
+          - Privacy
+          - Identity
+          - Device Management
   - number: 6
-    title: "AI + IoT = AIoT"
-    hours: 6
-    icon: "🧠"
-    color: "#E65100"
+    title: IoT Applications and Case Studies
+    hours: 9
+    icon: 🚀
+    color: '#E65100'
     sessions:
-      - number: 18
-        title: "Machine Learning on the Edge"
-        hours: 2
+      - number: 6
+        title: IoT Applications and Case Studies
+        hours: 9
         topics:
-          - "TinyML: running neural networks on microcontrollers with <256KB RAM"
-          - "Model quantisation: FP32 → INT8, accuracy vs memory tradeoffs"
-          - "TensorFlow Lite Micro, Edge Impulse, Arduino Machine Learning"
-          - "Keyword spotting, gesture recognition, vibration anomaly detection"
-        keywords: ["TinyML", "TFLite Micro", "Quantisation", "Edge Impulse", "Keyword Spotting", "INT8", "Model Pruning"]
-        case_study:
-          title: "Google's Coral — Keyword Detection Without Cloud"
-          org: "Google"
-          description: "How 'Hey Google' detection runs on a 0.5W chip entirely offline, with < 1ms latency — and why this matters for privacy in IoT devices."
-        tools: ["Edge Impulse Studio (free)", "Wokwi.com", "Google Colab (model training)"]
-        assignment:
-          type: "Build"
-          task: "Use Edge Impulse Studio (free): collect 40 samples each of two vibration patterns using your phone's accelerometer (e.g. 'tapping table' vs 'phone resting'). Train a neural network classifier. Target: > 85% accuracy. Export as Arduino library. Deploy to Wokwi ESP32 or a physical Arduino. Report: model size (KB), inference time (ms), accuracy."
-          xp: 150
-          due_days: 14
-
-      - number: 19
-        title: "Computer Vision at the Edge"
-        hours: 2
-        topics:
-          - "Object detection: YOLO on Raspberry Pi, MobileNet on Coral"
-          - "Anomaly detection in manufacturing: missing bolt, wrong label"
-          - "Privacy-preserving edge vision: process locally, never upload faces"
-          - "Thermal imaging + CV: fire detection, fever screening"
-        keywords: ["YOLO", "MobileNet", "OpenCV", "Edge Inference", "Thermal Imaging", "Object Detection", "TensorRT"]
-        case_study:
-          title: "Bosch's AI Quality Control — Pune Plant"
-          org: "Bosch India + IIT Bombay"
-          description: "How Bosch deployed edge vision cameras at their Pune manufacturing plant to detect micro-cracks in engine parts at 10,000 units/hour — replacing 12 manual inspectors."
-        tools: ["Raspberry Pi Camera Module (or laptop webcam)", "OpenCV", "YOLOv8n (nano model)"]
-        assignment:
-          type: "Implementation"
-          task: "Using OpenCV and a pre-trained MobileNet-SSD model: write a Python script that detects objects in a live webcam feed (or video file). Count the number of times a 'person' appears per minute. Log to a CSV file. This simulates occupancy monitoring. If using Wokwi: simulate with a stored image array instead of live video."
-          xp: 130
-          due_days: 14
-
-      - number: 20
-        title: "Generative AI and LLMs in IoT Systems"
-        hours: 2
-        topics:
-          - "LLMs as IoT orchestrators: natural language to device commands"
-          - "RAG (Retrieval Augmented Generation) with sensor history"
-          - "Anomaly explanation: 'Why did my sensor spike at 3AM?'"
-          - "Limits and risks: LLM hallucination in safety-critical IoT"
-        keywords: ["LLM", "RAG", "Function Calling", "AI Agent", "Natural Language Interface", "Hallucination", "Tool Use"]
-        case_study:
-          title: "Siemens MindSphere + GPT-4 for Predictive Maintenance"
-          org: "Siemens + OpenAI"
-          description: "How Siemens used GPT-4 with function calling to let factory managers ask 'Which machines are likely to fail this week?' and get actionable answers from 2 million sensor readings."
-        tools: ["Claude API (Anthropic)", "Node-RED", "InfluxDB"]
-        assignment:
-          type: "Build"
-          task: "Using the Anthropic or OpenAI API: build a Python chatbot that has access to a CSV of simulated sensor readings (last 24h). The user can ask natural language questions like 'Was there any anomaly yesterday?' or 'What was the peak temperature and when?'. The LLM should use tool calling to query the CSV and return accurate answers. Demonstrate 3 queries."
-          xp: 160
-          due_days: 14
-
-  - number: 7
-    title: "Project Studio — Build & Present"
-    hours: 10
-    icon: "🚀"
-    color: "#4A148C"
-    sessions:
-      - number: 21
-        title: "Project Ideation & Scoping"
-        hours: 2
-        topics:
-          - "Problem-first vs technology-first thinking"
-          - "IoT project canvas: problem, stakeholders, sensors, connectivity, cloud, outcome"
-          - "Feasibility assessment: budget, timeline, skill, hardware availability"
-          - "India-relevant problem spaces: agriculture, healthcare, smart city, defence, education"
-        keywords: ["Project Canvas", "Problem Statement", "Stakeholder", "Feasibility", "MVP", "Scope Creep"]
-        case_study:
-          title: "IIT Madras Rural Water Quality Monitor — From Idea to Deployment in 6 Weeks"
-          org: "IIT Madras + Rural Development Dept"
-          description: "How a 3-person student team built a solar-powered, NB-IoT water quality monitor for rural Tamil Nadu hand pumps — and got it deployed in 6 weeks on a ₹8,000 budget."
-        tools: ["IoT Project Canvas template", "Wokwi.com for prototyping"]
-        assignment:
-          type: "Project"
-          task: "Define your semester project. Submit: 1-paragraph problem statement, stakeholder map, sensor list with justification, connectivity choice with justification, cloud platform, expected outcome. Peer feedback: swap with one other student and give written feedback on feasibility."
-          xp: 100
-          due_days: 7
-
-      - number: 22
-        title: "Prototyping Sprint 1 — Hardware + Connectivity"
-        hours: 2
-        topics:
-          - "Agile for hardware: 2-week sprints, physical demo at end of each"
-          - "Debugging hardware: oscilloscope, logic analyser, serial monitor tricks"
-          - "Power measurement: INA219 current sensor for battery life estimation"
-          - "Version controlling hardware: KiCad + Git"
-        keywords: ["Sprint", "Prototype", "Debugging", "INA219", "Logic Analyser", "Hardware Versioning"]
-        assignment:
-          type: "Project"
-          task: "Sprint 1 deliverable: working hardware prototype with all sensors connected and reading data. Demo: show serial monitor output with real sensor readings. If using simulation, show Wokwi project with all sensors wired. Submit: GitHub repo link, Wokwi project link, and a 2-minute screen recording of your demo."
-          xp: 150
-          due_days: 14
-
-      - number: 23
-        title: "Prototyping Sprint 2 — Cloud + Dashboard"
-        hours: 2
-        topics:
-          - "Connecting your prototype to the cloud"
-          - "Building a real-time dashboard"
-          - "Setting up alerts and notifications"
-          - "Data logging and history"
-        keywords: ["MQTT", "Dashboard", "Alert", "Notification", "Data Logging", "Cloud Platform"]
-        assignment:
-          type: "Project"
-          task: "Sprint 2 deliverable: sensor data flowing to cloud platform, live dashboard showing real-time and historical data. At least one alert configured (e.g. temperature > threshold → email/SMS). Submit: dashboard screenshot, alert test screenshot, updated GitHub repo."
-          xp: 150
-          due_days: 14
-
-      - number: 24
-        title: "Testing, Optimisation & Documentation"
-        hours: 2
-        topics:
-          - "IoT testing: unit tests, integration tests, field tests"
-          - "Power optimisation: deep sleep, duty cycling, adaptive sampling"
-          - "Writing technical documentation for IoT projects"
-          - "Open-sourcing your project: README, LICENSE, circuit diagram"
-        keywords: ["Deep Sleep", "Duty Cycle", "Power Optimisation", "Technical Documentation", "Open Source"]
-        assignment:
-          type: "Project"
-          task: "Measure your project's power consumption (use INA219 or estimate from datasheets). Calculate estimated battery life. Implement at least one power optimisation (deep sleep, reduced polling rate, etc). Measure improvement. Update your GitHub README with: project description, setup instructions, circuit diagram, and power analysis."
-          xp: 120
-          due_days: 14
-
-      - number: 25
-        title: "Final Presentations"
-        hours: 2
-        topics:
-          - "Communicating technical work to non-technical stakeholders"
-          - "Live demo best practices: what to do when it fails"
-          - "Peer evaluation and constructive feedback"
-          - "Publishing your project: GitHub, Hackster.io, Instructables"
-        keywords: ["Presentation", "Demo", "Peer Review", "Publication", "Portfolio"]
-        assignment:
-          type: "Project"
-          task: "Final presentation: 10-minute live demo + 5-minute Q&A. Evaluation criteria: working demo (40%), problem relevance (20%), technical depth (20%), presentation clarity (10%), documentation quality (10%). Publish your project to Hackster.io or Instructables after presentation."
-          xp: 200
-          due_days: 21
-
-missions:
-  - title: "Operation BorderSense"
-    story: "At 2237 hours, Sector 7 border surveillance goes dark. 40km of unmanned sensor grid offline. Possible drone incursion window: 45 minutes."
-    situation: "You are the on-call IoT engineer at a defence tech startup. DRDO has deployed your company's LoRa-based sensor grid along a sensitive border sector. Three gateway nodes have simultaneously failed — likely jamming or hardware fault. The field unit cannot reach the site in time."
-    challenge: "Diagnose the failure remotely, reroute traffic through backup nodes, restore at least 80% sensor coverage before the window closes. You have SSH access to the cloud platform and the one remaining gateway."
-    deliverables:
-      - "Failure diagnosis: identify which nodes failed and probable cause"
-      - "Rerouting plan: which sensors can reach the backup gateway, signal strength calculations"
-      - "Recovery script: Node-RED or Python script to reconfigure routing"
-      - "Incident report: 1-page DRDO-format incident report"
-    hints:
-      - "LoRa Adaptive Data Rate (ADR) can extend range if you lower the data rate"
-      - "Check if the failures are correlated with a specific frequency band"
-      - "DRDO incident reports require: timeline, impact assessment, root cause, corrective action"
-    domain: "Defence"
-    difficulty: "Hard"
-    xp: 300
-    status: "active"
-    tags: ["LoRa", "Network Resilience", "Security", "IIoT"]
-
-  - title: "Code Blue: Village Clinic"
-    story: "Three cardiac patients in a remote Rajasthan clinic. Nearest hospital: 4 hours by road. One Raspberry Pi. ₹2,000 budget. The doctor just left for the city."
-    situation: "A NITI Aayog pilot has given a rural health clinic one Raspberry Pi 4, a USB ECG sensor, and ₹2,000 for connectivity. The clinic nurse needs to monitor three at-risk patients overnight and alert the city doctor if any deteriorate."
-    challenge: "Design and prototype a remote patient monitoring system that works on 2G connectivity, costs under ₹2,000, runs unattended overnight, and sends alerts to a WhatsApp number."
-    deliverables:
-      - "System architecture diagram with all components and costs"
-      - "Python code for ECG reading + alert logic (threshold-based)"
-      - "WhatsApp alert integration (Twilio or Ultramsg API)"
-      - "Failure mode analysis: what happens if internet goes down?"
-    hints:
-      - "Twilio has a free WhatsApp sandbox — no paid account needed for the prototype"
-      - "A Raspberry Pi can run for 8 hours on a 20,000mAh power bank"
-      - "Consider local data logging as a fallback if connectivity fails"
-    domain: "Health"
-    difficulty: "Medium"
-    xp: 200
-    status: "active"
-    tags: ["Healthcare", "Raspberry Pi", "Low-Cost IoT", "Rural"]
-
-  - title: "Bengaluru Flood Command"
-    story: "72 hours of heavy rain. 50 flood sensors deployed. Zero cloud dependency allowed — the data centre is in the flood zone."
-    situation: "BBMP has deployed 50 LoRa water-level sensors across storm drains. You're the engineer on-call when the city's cloud platform goes unreachable (the data centre is flooding). You have a Raspberry Pi gateway, local storage, and a satellite uplink that allows 100KB/hour."
-    challenge: "Build a local-first system that aggregates sensor data on the Raspberry Pi, generates flood warnings using local logic (no internet), and sends a compressed 10-minute summary via the satellite link."
-    deliverables:
-      - "Local data pipeline on Raspberry Pi: MQTT broker + InfluxDB + alert engine"
-      - "Flood prediction algorithm using water-level rate-of-change (not just threshold)"
-      - "Compression scheme: fit 50 sensor readings per 10 minutes into < 1KB"
-      - "SMS/satellite alert format with ward-level flood probability"
-    hints:
-      - "Delta encoding: store the difference from the previous reading, not the absolute value"
-      - "Rate-of-change is more predictive than absolute level for flash floods"
-      - "InfluxDB and Mosquitto run fine on a Raspberry Pi 3"
-    domain: "Smart City"
-    difficulty: "Medium"
-    xp: 250
-    status: "active"
-    tags: ["LoRa", "Edge Computing", "Disaster Response", "Smart City"]
-
-  - title: "The Dying Mango Orchard"
-    story: "A farmer in Ratnagiri has seen 40% yield loss for three seasons. He has ₹8,000 and one weekend. The harvest is in 6 weeks."
-    situation: "Rajesh Patil grows Alphonso mangoes on 2 hectares. Three bad seasons have forced him to consider giving up. A local NGO has ₹8,000 to spend on IoT. You have one weekend to deploy something meaningful."
-    challenge: "Design and prototype a precision irrigation system using the cheapest possible components that Rajesh can maintain himself (no coding knowledge). The system must pay for itself in one season through water savings."
-    deliverables:
-      - "Bill of materials under ₹8,000 (with Flipkart/Amazon India links)"
-      - "Circuit diagram and wiring guide with photos/diagrams Rajesh can follow"
-      - "Arduino code with self-diagnostic LED indicators (Rajesh can't read a serial monitor)"
-      - "ROI calculation: water saved × cost/litre vs system cost"
-    hints:
-      - "Capacitive soil moisture sensors (₹80 each) are more durable than resistive ones in soil"
-      - "A 5V relay module (₹60) can control a 24V solenoid valve"
-      - "Solar charging: a 6V 1W panel + TP4056 + 18650 cell = < ₹400"
-    domain: "Agriculture"
-    difficulty: "Easy"
-    xp: 150
-    status: "active"
-    tags: ["Agriculture", "Low-Cost", "Solar", "Arduino", "Precision Irrigation"]
-
-  - title: "AIIMS Zero-Trust Defence"
-    story: "2,000 connected medical devices. A nation-state attacker has been inside the network for 60 days. You have 48 hours before the next scheduled attack window."
-    situation: "AIIMS Delhi has discovered an advanced persistent threat (APT) in their network after a ransomware attack warning from CERT-In. 2,000 IoT medical devices — ventilators, infusion pumps, imaging systems — are potentially compromised. You are the incident response lead."
-    challenge: "Design and begin implementing a Zero Trust segmentation plan that isolates the most critical devices within 48 hours without disrupting patient care. Then design the long-term architecture to prevent recurrence."
-    deliverables:
-      - "Asset inventory and criticality matrix (200 devices categorised in 4 tiers)"
-      - "48-hour containment plan: which VLANs, which devices first, how to test without downtime"
-      - "Zero Trust architecture diagram for the permanent solution"
-      - "Vendor briefing: 1-page document for Philips/GE (device manufacturers) on required firmware updates"
-    hints:
-      - "Start with air-gapping devices that have no legitimate internet need (most infusion pumps)"
-      - "Medical devices often can't be patched — compensating controls (network segmentation) are the answer"
-      - "CERT-In requires breach notification within 6 hours for healthcare CII"
-    domain: "Healthcare + Security"
-    difficulty: "Hard"
-    xp: 350
-    status: "locked"
-    unlock_after_unit: 5
-    tags: ["Zero Trust", "Healthcare", "ICS Security", "Incident Response", "CII"]
+          - IoT solution design across application domains
+          - System integration and deployment case studies
+          - Evaluation of complete IoT solutions
+        keywords:
+          - IoT Applications
+          - System Integration
+          - Case Studies
+          - Solution Design
+living_curriculum_updates:
+  label: Living curriculum updates — supplementary, not university-approved syllabus
+  status: supplementary_not_university_approved
+  description: >-
+    Optional teaching enrichments retained for interactive boards, simulation, projects, and coverage of evolving IoT
+    practice. These items do not alter the six official units or their 40 contact hours.
+  units:
+    - number: 1
+      title: IoT Universe — The Big Picture
+      hours: 6
+      icon: 🌐
+      color: '#1565C0'
+      sessions:
+        - number: 1
+          title: What is IoT? Beyond the Buzzword
+          hours: 2
+          topics:
+            - 'Definition & evolution: M2M → IoT → IIoT → AIoT'
+            - 'The 4-layer architecture: Perception → Network → Middleware → Application'
+            - 'Why IoT matters: economic scale, social impact, India''s National IoT Policy'
+          keywords:
+            - Perception Layer
+            - Edge Node
+            - M2M
+            - IIoT
+            - AIoT
+            - 4-Layer Architecture
+          case_study:
+            title: Bengaluru Flood Early Warning
+            org: BBMP + KSCST
+            description: >-
+              How 200 flood-level sensors across storm drains feed a real-time dashboard, enabling BBMP to issue
+              ward-level warnings 3 hours before flooding.
+          tools:
+            - Wokwi.com
+            - Node-RED
+            - Home Assistant
+          assignment:
+            type: Observation
+            task: >-
+              Walk around college campus. Identify 10 IoT candidates — devices that don't yet communicate but could. For
+              each: describe the sensor, the data it would produce, and the decision it could enable.
+            xp: 50
+            due_days: 7
+          no_hw_alternative: Use Wokwi.com to simulate an Arduino/ESP32 in the browser
+        - number: 2
+          title: IoT Ecosystems — Who Builds What
+          hours: 2
+          topics:
+            - 'The IoT value chain: device makers, connectivity providers, platform vendors, integrators'
+            - 'Major platforms: AWS IoT Core, Azure IoT Hub, Google Cloud IoT, ThingsBoard'
+            - 'India''s IoT ecosystem: C-DOT, BSNL NB-IoT, Smart Cities Mission'
+            - 'Open-source vs proprietary: tradeoffs in an academic setting'
+          keywords:
+            - IoT Platform
+            - MQTT Broker
+            - Device Shadow
+            - Digital Twin
+            - Smart Cities Mission
+          case_study:
+            title: Pune Smart City — Integrated Command Centre
+            org: Pune Smart City Development Corporation
+            description: >-
+              How 10,000 sensors (traffic, air quality, flood, energy) feed a single command centre, reducing emergency
+              response time by 40%.
+          tools:
+            - ThingsBoard Community
+            - Wokwi.com
+          assignment:
+            type: Research
+            task: >-
+              Compare AWS IoT Core vs ThingsBoard (open-source). Create a 1-page comparison table covering: cost,
+              scalability, data ownership, ease of setup, India deployment. Recommend one for a college campus project
+              with ₹0 budget.
+            xp: 60
+            due_days: 7
+        - number: 3
+          title: The IoT Device Lifecycle
+          hours: 2
+          topics:
+            - Provisioning, onboarding, and fleet management
+            - OTA (Over-The-Air) firmware updates — why they matter for security
+            - Device decommissioning and data retention policies
+            - GDPR and India's DPDPA (Digital Personal Data Protection Act) for IoT
+          keywords:
+            - OTA Update
+            - Device Provisioning
+            - Fleet Management
+            - DPDPA
+            - Data Retention
+          case_study:
+            title: Tesla OTA — The 'Braking Bug' Fix
+            org: Tesla Inc.
+            description: >-
+              How Tesla silently patched a braking distance bug on 130,000 cars overnight via OTA — and why this model
+              is being adopted by Indian two-wheeler EV makers.
+          tools:
+            - ESP32 Arduino IDE OTA example
+            - Wokwi.com
+          assignment:
+            type: Design
+            task: >-
+              Design a device lifecycle policy for a fleet of 500 IoT soil sensors deployed across farms in Karnataka.
+              Cover: provisioning, OTA cadence, data retention (DPDPA compliance), and decommissioning. One-page policy
+              document.
+            xp: 70
+            due_days: 10
+    - number: 2
+      title: Hardware Layer — Sensors, Boards & Components
+      hours: 8
+      icon: 🔧
+      color: '#2E7D32'
+      sessions:
+        - number: 4
+          title: Microcontrollers vs Microprocessors
+          hours: 2
+          topics:
+            - 'MCU vs MPU: when to use Arduino, ESP32, Raspberry Pi, Jetson Nano'
+            - GPIO, ADC, DAC, PWM, I2C, SPI, UART — the communication interfaces
+            - 'Power budgets: battery-powered IoT at 50μA vs mains-powered at 5W'
+            - 'India-made boards: Bolt IoT, Atomberg, C-DAC''s SHAKTI processor'
+          keywords:
+            - MCU
+            - GPIO
+            - I2C
+            - SPI
+            - UART
+            - ADC
+            - Power Budget
+            - ESP32
+          case_study:
+            title: Precision Agriculture with ESP32 — Nashik Vineyards
+            org: Maharashtra Agri Dept + IIT Bombay
+            description: >-
+              ESP32-based soil moisture and canopy sensors deployed across 200 hectares, reducing water use by 35% while
+              maintaining yield.
+          tools:
+            - Wokwi.com (ESP32)
+            - Arduino IDE
+            - TinkerCAD Circuits
+          assignment:
+            type: Simulation
+            task: >-
+              On Wokwi.com: wire an ESP32 to a DHT22 (temperature/humidity) and an LDR (light). Write Arduino code to
+              read all sensors every 5 seconds and print to Serial Monitor in CSV format. Screenshot the simulation +
+              paste the code.
+            xp: 80
+            due_days: 7
+          no_hw_alternative: The assignment IS the simulation — Wokwi.com, no hardware needed
+        - number: 5
+          title: Sensors Deep Dive
+          hours: 2
+          topics:
+            - 'Sensor taxonomy: physical, chemical, biological'
+            - Accuracy vs precision vs resolution vs range
+            - 'Sensor fusion: combining GPS + accelerometer + barometer for indoor positioning'
+            - 'Calibration and drift: why your soil sensor needs annual recalibration'
+          keywords:
+            - Sensor Fusion
+            - Calibration
+            - Accuracy
+            - Precision
+            - Resolution
+            - Drift
+          case_study:
+            title: Apollo Hospitals Remote Patient Monitoring
+            org: Apollo Hospitals + Philips
+            description: >-
+              How fusing SpO2, ECG, and accelerometer data reduces false alarms by 60% compared to single-sensor
+              monitoring in hospital wards.
+          tools:
+            - Wokwi.com
+            - Sensor Datasheet reading exercise
+          assignment:
+            type: Analysis
+            task: >-
+              Download the datasheet for the DHT22 sensor. Answer: What is the accuracy for temperature? Humidity? What
+              is the sampling rate? What voltage does it operate at? What is the response time? Now compare with the
+              BME280 on the same parameters. Which would you choose for a weather station in Bengaluru? Justify.
+            xp: 70
+            due_days: 7
+        - number: 6
+          title: Actuators, Displays & Real Output
+          hours: 2
+          topics:
+            - 'Actuator types: relays, solenoids, servo/stepper motors, peristaltic pumps'
+            - E-ink displays for ultra-low-power dashboards
+            - 'Driving high-current loads safely: MOSFETs, transistors, optocouplers'
+            - 'Real-world IoT: closing the loop from sensor to actuator'
+          keywords:
+            - Relay
+            - Solenoid
+            - PWM Control
+            - MOSFET
+            - Optocoupler
+            - E-ink
+            - Servo
+          case_study:
+            title: ISRO Chandrayaan-3 Lander — Actuator Design
+            org: ISRO
+            description: >-
+              How ISRO's engineers designed the Vikram lander's leg deployment actuators for a one-shot, no-repair
+              mission — lessons in fail-safe actuator design.
+          tools:
+            - Wokwi.com
+            - TinkerCAD Circuits
+          assignment:
+            type: Simulation
+            task: >-
+              On Wokwi.com: simulate an automatic plant watering system. DHT22 reads soil moisture (simulate with a
+              potentiometer). If moisture < 30%, a relay turns on a water pump (LED as proxy). If moisture > 60%, pump
+              turns off. Add an LCD showing current moisture and pump state.
+            xp: 100
+            due_days: 10
+          no_hw_alternative: Full simulation available on Wokwi.com
+        - number: 7
+          title: PCB Design Fundamentals & Prototyping
+          hours: 2
+          topics:
+            - 'Breadboard → perfboard → custom PCB: when to make the jump'
+            - 'KiCad basics: schematic capture, footprint assignment, routing'
+            - 'Design for manufacturability: clearance, trace width, thermal relief'
+            - Ordering PCBs from JLCPCB/PCBWay — cost, lead time, minimum order
+          keywords:
+            - PCB
+            - KiCad
+            - Schematic
+            - Trace Width
+            - Design Rule Check
+            - Gerber
+            - BOM
+          case_study:
+            title: Niramai's Thermal Imaging Breast Cancer Screening Device
+            org: Niramai Health Analytix, Bengaluru
+            description: >-
+              How a Bengaluru startup went from Arduino prototype to a CE-marked medical device in 18 months, using
+              iterative PCB design.
+          tools:
+            - KiCad (free)
+            - Wokwi.com
+            - JLCPCB online Gerber viewer
+          assignment:
+            type: Design
+            task: >-
+              In KiCad (or draw on paper): design a schematic for an ESP32-based air quality monitor with: MQ-135 gas
+              sensor, BME280 temp/humidity, 0.96" OLED display, Li-Po battery with TP4056 charging circuit, USB-C power
+              input. Label all connections, include decoupling capacitors.
+            xp: 120
+            due_days: 14
+    - number: 3
+      title: Connectivity & Protocols
+      hours: 8
+      icon: 📡
+      color: '#6A1B9A'
+      sessions:
+        - number: 8
+          title: Short-Range Protocols — Wi-Fi, Bluetooth, Zigbee, Z-Wave
+          hours: 2
+          topics:
+            - 'Wi-Fi (802.11): power cost, range, throughput — when not to use it'
+            - 'Bluetooth Classic vs BLE: hearing aids to fitness trackers'
+            - 'Zigbee and Z-Wave: mesh networking for smart homes'
+            - 'Thread + Matter: the new universal smart home standard'
+          keywords:
+            - BLE
+            - Zigbee
+            - Z-Wave
+            - Thread
+            - Matter
+            - Mesh Network
+            - Wi-Fi 6
+          case_study:
+            title: Philips Hue Smart Lighting — Zigbee at Scale
+            org: Philips
+            description: >-
+              How Philips built a self-healing Zigbee mesh network that maintains connectivity with 50+ bulbs, and why
+              they're migrating to Matter.
+          tools:
+            - Wokwi.com
+            - Home Assistant (virtual)
+          assignment:
+            type: Comparison
+            task: >-
+              Build a comparison table for: Wi-Fi, BLE, Zigbee, Z-Wave, Thread. Columns: Range, Data Rate, Power
+              Consumption, Topology, Frequency, Typical Cost Per Node, Best Use Case. Add a row for your recommendation
+              for a hospital patient-tracking system with 500 wearable devices.
+            xp: 70
+            due_days: 7
+        - number: 9
+          title: Long-Range Protocols — LoRa, NB-IoT, LTE-M, Sigfox
+          hours: 2
+          topics:
+            - 'LPWAN (Low Power Wide Area Networks): the tradeoff triangle (power, range, data rate)'
+            - 'LoRaWAN: how the network architecture works, India coverage'
+            - 'NB-IoT: carrier-based, licensed spectrum, BSNL deployment'
+            - 'Sigfox: global, ultranarrow-band, no base station needed'
+          keywords:
+            - LPWAN
+            - LoRaWAN
+            - NB-IoT
+            - LTE-M
+            - Sigfox
+            - Spreading Factor
+            - ADR
+          case_study:
+            title: BSNL + Nokia NB-IoT Smart Meter Rollout
+            org: BSNL + Nokia + BESCOM
+            description: >-
+              How BESCOM (Bengaluru Electricity Supply) is deploying 500,000 NB-IoT smart meters over BSNL's network,
+              eliminating meter reading staff.
+          tools:
+            - The Things Network Console (free LoRaWAN sandbox)
+            - Wokwi.com LoRa simulation
+          assignment:
+            type: Design
+            task: >-
+              You are deploying 1,000 water-quality sensors along the Cauvery river (350km stretch). Choose a
+              connectivity protocol. Justify: coverage, power, cost, data frequency needed (pH, turbidity, flow rate
+              once every 15 minutes). Calculate estimated annual SIM/connectivity cost.
+            xp: 90
+            due_days: 10
+        - number: 10
+          title: Application Protocols — MQTT, CoAP, AMQP, HTTP/2
+          hours: 2
+          topics:
+            - 'MQTT: publish-subscribe, broker, QoS levels 0/1/2, retained messages'
+            - 'CoAP: REST for constrained devices, confirmable vs non-confirmable'
+            - 'AMQP: enterprise messaging, RabbitMQ'
+            - When to use WebSockets vs MQTT for real-time dashboards
+          keywords:
+            - MQTT
+            - CoAP
+            - AMQP
+            - QoS
+            - Retained Message
+            - Broker
+            - Topic
+            - Payload
+          case_study:
+            title: Twitter's Real-Time Pipeline — Why IoT Borrowed from Social Media
+            org: Eclipse Mosquitto / HiveMQ
+            description: >-
+              MQTT was invented in 1999 for oil pipeline monitoring. How Facebook Messenger and IoT platforms converged
+              on the same pub-sub model.
+          tools:
+            - Mosquitto (free MQTT broker)
+            - MQTT Explorer
+            - Node-RED
+            - Wokwi.com
+          assignment:
+            type: Implementation
+            task: >-
+              Set up a local Mosquitto MQTT broker. Write two Python scripts: publisher (simulates a temperature sensor,
+              publishes to topic 'lab/temp' every 2 seconds) and subscriber (listens and prints received values with
+              timestamp). Demonstrate QoS 0 vs QoS 2 — what happens when you kill and restart the subscriber?
+            xp: 100
+            due_days: 10
+        - number: 11
+          title: Network Architecture — Gateways, Edge Routers, and IP
+          hours: 2
+          topics:
+            - 'The gateway''s role: protocol translation, local buffering, pre-processing'
+            - 'IPv6 and 6LoWPAN: why IoT needs a new addressing scheme'
+            - 'DNS-SD and mDNS: zero-configuration networking'
+            - 'NAT traversal for IoT: STUN, TURN, and hole-punching'
+          keywords:
+            - Gateway
+            - 6LoWPAN
+            - IPv6
+            - mDNS
+            - NAT Traversal
+            - Edge Router
+            - Protocol Bridge
+          case_study:
+            title: Indian Railways Remote Level Crossing Monitoring
+            org: Indian Railways + RDSO
+            description: >-
+              How RDSO deployed LoRa-to-4G gateways at 2,000 unmanned level crossings, with local edge processing to
+              detect obstructions before transmitting alerts.
+          tools:
+            - Raspberry Pi as gateway (or Wokwi.com ESP32 + Node-RED bridge simulation)
+          assignment:
+            type: Architecture
+            task: >-
+              Draw the network architecture for a smart irrigation system spanning 50 farms in a 20km radius. Each farm
+              has 10 soil sensors. Design: sensor-to-gateway protocol, gateway-to-cloud protocol, cloud platform, and
+              the dashboard. Justify each protocol choice. Include a failure mode analysis: what happens when the
+              gateway loses internet?
+            xp: 110
+            due_days: 14
+    - number: 4
+      title: Cloud, Data & IoT Platforms
+      hours: 6
+      icon: ☁️
+      color: '#00695C'
+      sessions:
+        - number: 12
+          title: Cloud Architecture for IoT
+          hours: 2
+          topics:
+            - 'IoT ingestion pipelines: device → broker → stream processor → storage → analytics'
+            - 'Time-series databases: InfluxDB, TimescaleDB, Amazon Timestream'
+            - Hot vs warm vs cold storage for sensor data
+            - 'Data compression for IoT: why raw ADC values are wasteful'
+          keywords:
+            - Time-Series DB
+            - InfluxDB
+            - Stream Processing
+            - Hot Storage
+            - Cold Storage
+            - Data Ingestion
+          case_study:
+            title: Tata Power Smart Grid — Real-Time Demand Forecasting
+            org: Tata Power + C-DOT
+            description: >-
+              How Tata Power ingests 10 million meter readings per hour into a time-series pipeline to predict grid
+              demand 30 minutes ahead and prevent brownouts.
+          tools:
+            - InfluxDB Cloud (free tier)
+            - Grafana
+            - ThingsBoard
+          assignment:
+            type: Implementation
+            task: >-
+              Set up a free InfluxDB Cloud account. Write a Python script that simulates 5 temperature sensors and
+              writes data every 10 seconds for 10 minutes. Build a Grafana dashboard showing: line chart of all 5
+              sensors, min/max/avg panel, and an alert when any sensor exceeds 40°C. Screenshot your dashboard.
+            xp: 120
+            due_days: 14
+        - number: 13
+          title: Edge Computing & Fog Computing
+          hours: 2
+          topics:
+            - 'Edge vs fog vs cloud: where to process, where to store'
+            - 'Edge inference: running TFLite on ESP32, TensorRT on Jetson Nano'
+            - AWS Greengrass, Azure IoT Edge, Google Coral
+            - 'Latency requirements: when cloud round-trip is too slow (autonomous vehicles, surgery robots)'
+          keywords:
+            - Edge Computing
+            - Fog Computing
+            - TFLite
+            - Latency
+            - AWS Greengrass
+            - TensorRT
+            - Coral
+          case_study:
+            title: Ola Electric — Edge Processing in EV Charging Stations
+            org: Ola Electric
+            description: >-
+              How Ola's S1 charging stations run a local ML model to predict charging completion time and manage load
+              balancing without cloud connectivity.
+          tools:
+            - Google Coral Edge TPU (demo)
+            - TFLite converter (Colab notebook)
+          assignment:
+            type: Analysis
+            task: >-
+              You are building a defect detection system for a chip manufacturing plant. The conveyor belt produces 200
+              chips/minute. Each image is 1MB. Cloud inference takes 300ms. Edge inference takes 12ms. Calculate:
+              maximum throughput possible with cloud only, edge only, and a hybrid approach. At what production speed
+              does cloud-only become impossible? Show your calculations.
+            xp: 90
+            due_days: 10
+        - number: 14
+          title: Data Analytics, Dashboards & Decision Systems
+          hours: 2
+          topics:
+            - Descriptive → diagnostic → predictive → prescriptive analytics
+            - 'Anomaly detection: statistical methods vs ML for IoT streams'
+            - 'Digital twins: simulation-first design'
+            - 'No-code IoT dashboards: Node-RED, ThingsBoard, Grafana'
+          keywords:
+            - Digital Twin
+            - Anomaly Detection
+            - Predictive Analytics
+            - Node-RED
+            - Grafana
+            - Dashboard
+          case_study:
+            title: Siemens Gamesa Wind Farm Digital Twin — Gujarat
+            org: Siemens Gamesa + NTPC
+            description: >-
+              How digital twins of 50 wind turbines in Gujarat's Rann of Kutch simulate failure scenarios, cutting
+              unplanned downtime by 30%.
+          tools:
+            - Node-RED
+            - ThingsBoard
+            - Grafana
+          assignment:
+            type: Build
+            task: >-
+              Using Node-RED: build a flow that simulates 3 industrial machines (each generating random temperature +
+              vibration readings). Add anomaly detection: if vibration > 2σ from the 10-minute rolling mean, send an
+              alert to a dashboard. Visualise on the built-in Node-RED dashboard. Export and submit your flow.json.
+            xp: 130
+            due_days: 14
+    - number: 5
+      title: IoT Security — Defence to Consumer
+      hours: 6
+      icon: 🔐
+      color: '#B71C1C'
+      sessions:
+        - number: 15
+          title: The IoT Attack Surface
+          hours: 2
+          topics:
+            - 'OWASP IoT Top 10: weak passwords, insecure update mechanisms, lack of TLS'
+            - 'The Mirai botnet: 600,000 webcams took down half the internet'
+            - 'Shodan: the search engine for exposed IoT devices'
+            - India's CERT-In IoT guidelines and mandatory reporting
+          keywords:
+            - OWASP IoT Top 10
+            - Mirai Botnet
+            - Shodan
+            - CERT-In
+            - Attack Surface
+            - CVE
+          case_study:
+            title: Stuxnet — When IoT Security Became a Geopolitical Weapon
+            org: ICS-CERT
+            description: >-
+              How a USB drive with 4 zero-days destroyed 1,000 Iranian uranium centrifuges — and why every IIoT device
+              is now a potential weapon.
+          tools:
+            - Shodan.io (free account)
+            - OWASP IoT Attack Surface Areas checklist
+          assignment:
+            type: Audit
+            task: >-
+              Search Shodan for exposed devices in Bengaluru (filter: city:Bengaluru). Find 3 categories of exposed
+              devices. For each: describe the risk, the likely misconfiguration, and a 2-sentence fix. Do NOT interact
+              with or attempt to access any device — this is a passive observation exercise only.
+            xp: 80
+            due_days: 7
+        - number: 16
+          title: Securing the IoT Stack — TLS, PKI, and Secrets Management
+          hours: 2
+          topics:
+            - 'TLS 1.3 on constrained devices: mbedTLS, WolfSSL'
+            - 'Certificate lifecycle: provisioning, rotation, revocation on 10M devices'
+            - Hardware Security Modules (HSM) vs software key stores
+            - AWS IoT certificate vending machine pattern
+          keywords:
+            - TLS 1.3
+            - PKI
+            - X.509
+            - HSM
+            - Certificate Pinning
+            - Secret Rotation
+            - mbedTLS
+          case_study:
+            title: Ring Doorbell Authentication Bypass (2019)
+            org: Ring / Amazon
+            description: >-
+              How Ring's lack of TLS certificate pinning allowed attackers to intercept streams — and the ₹450 crore
+              security overhaul that followed.
+          tools:
+            - OpenSSL CLI
+            - Let's Encrypt (for gateway TLS)
+            - MQTT with TLS in Mosquitto
+          assignment:
+            type: Implementation
+            task: >-
+              Configure Mosquitto to require TLS. Generate a self-signed CA, server cert, and client cert using OpenSSL.
+              Connect an MQTT client with mutual TLS authentication. Publish a test message. Document every command used
+              and explain why mutual TLS (client cert + server cert) is better than one-way TLS for IoT.
+            xp: 120
+            due_days: 14
+        - number: 17
+          title: Zero Trust for IIoT and Industrial Systems
+          hours: 2
+          topics:
+            - 'Zero Trust Architecture: never trust, always verify'
+            - Micro-segmentation in factory networks
+            - 'OT/IT convergence risks: when SCADA meets the internet'
+            - India's Critical Information Infrastructure (CII) protection framework
+          keywords:
+            - Zero Trust
+            - Micro-Segmentation
+            - SCADA
+            - OT/IT Convergence
+            - CII
+            - Industrial IoT
+          case_study:
+            title: Mumbai Power Grid Attack (2020)
+            org: Maharashtra State Electricity Transmission Co.
+            description: >-
+              How a suspected state-level actor penetrated MSETCL's SCADA system months before a power failure during
+              the COVID lockdown — and what zero-trust architecture would have prevented.
+          tools:
+            - Wireshark (packet analysis)
+            - Nmap (network scanning — lab use only)
+          assignment:
+            type: Design
+            task: >-
+              Design a Zero Trust network architecture for AIIMS Delhi's ICU, which has 200 connected medical devices
+              (ventilators, infusion pumps, monitors). Draw the network diagram. Identify: which devices should be on a
+              separate VLAN, where TLS termination happens, how device identity is verified, and what triggers an
+              automatic quarantine. 2-page design doc + diagram.
+            xp: 150
+            due_days: 14
+    - number: 6
+      title: AI + IoT = AIoT
+      hours: 6
+      icon: 🧠
+      color: '#E65100'
+      sessions:
+        - number: 18
+          title: Machine Learning on the Edge
+          hours: 2
+          topics:
+            - 'TinyML: running neural networks on microcontrollers with <256KB RAM'
+            - 'Model quantisation: FP32 → INT8, accuracy vs memory tradeoffs'
+            - TensorFlow Lite Micro, Edge Impulse, Arduino Machine Learning
+            - Keyword spotting, gesture recognition, vibration anomaly detection
+          keywords:
+            - TinyML
+            - TFLite Micro
+            - Quantisation
+            - Edge Impulse
+            - Keyword Spotting
+            - INT8
+            - Model Pruning
+          case_study:
+            title: Google's Coral — Keyword Detection Without Cloud
+            org: Google
+            description: >-
+              How 'Hey Google' detection runs on a 0.5W chip entirely offline, with < 1ms latency — and why this matters
+              for privacy in IoT devices.
+          tools:
+            - Edge Impulse Studio (free)
+            - Wokwi.com
+            - Google Colab (model training)
+          assignment:
+            type: Build
+            task: >-
+              Use Edge Impulse Studio (free): collect 40 samples each of two vibration patterns using your phone's
+              accelerometer (e.g. 'tapping table' vs 'phone resting'). Train a neural network classifier. Target: > 85%
+              accuracy. Export as Arduino library. Deploy to Wokwi ESP32 or a physical Arduino. Report: model size (KB),
+              inference time (ms), accuracy.
+            xp: 150
+            due_days: 14
+        - number: 19
+          title: Computer Vision at the Edge
+          hours: 2
+          topics:
+            - 'Object detection: YOLO on Raspberry Pi, MobileNet on Coral'
+            - 'Anomaly detection in manufacturing: missing bolt, wrong label'
+            - 'Privacy-preserving edge vision: process locally, never upload faces'
+            - 'Thermal imaging + CV: fire detection, fever screening'
+          keywords:
+            - YOLO
+            - MobileNet
+            - OpenCV
+            - Edge Inference
+            - Thermal Imaging
+            - Object Detection
+            - TensorRT
+          case_study:
+            title: Bosch's AI Quality Control — Pune Plant
+            org: Bosch India + IIT Bombay
+            description: >-
+              How Bosch deployed edge vision cameras at their Pune manufacturing plant to detect micro-cracks in engine
+              parts at 10,000 units/hour — replacing 12 manual inspectors.
+          tools:
+            - Raspberry Pi Camera Module (or laptop webcam)
+            - OpenCV
+            - YOLOv8n (nano model)
+          assignment:
+            type: Implementation
+            task: >-
+              Using OpenCV and a pre-trained MobileNet-SSD model: write a Python script that detects objects in a live
+              webcam feed (or video file). Count the number of times a 'person' appears per minute. Log to a CSV file.
+              This simulates occupancy monitoring. If using Wokwi: simulate with a stored image array instead of live
+              video.
+            xp: 130
+            due_days: 14
+        - number: 20
+          title: Generative AI and LLMs in IoT Systems
+          hours: 2
+          topics:
+            - 'LLMs as IoT orchestrators: natural language to device commands'
+            - RAG (Retrieval Augmented Generation) with sensor history
+            - 'Anomaly explanation: ''Why did my sensor spike at 3AM?'''
+            - 'Limits and risks: LLM hallucination in safety-critical IoT'
+          keywords:
+            - LLM
+            - RAG
+            - Function Calling
+            - AI Agent
+            - Natural Language Interface
+            - Hallucination
+            - Tool Use
+          case_study:
+            title: Siemens MindSphere + GPT-4 for Predictive Maintenance
+            org: Siemens + OpenAI
+            description: >-
+              How Siemens used GPT-4 with function calling to let factory managers ask 'Which machines are likely to
+              fail this week?' and get actionable answers from 2 million sensor readings.
+          tools:
+            - Claude API (Anthropic)
+            - Node-RED
+            - InfluxDB
+          assignment:
+            type: Build
+            task: >-
+              Using the Anthropic or OpenAI API: build a Python chatbot that has access to a CSV of simulated sensor
+              readings (last 24h). The user can ask natural language questions like 'Was there any anomaly yesterday?'
+              or 'What was the peak temperature and when?'. The LLM should use tool calling to query the CSV and return
+              accurate answers. Demonstrate 3 queries.
+            xp: 160
+            due_days: 14
+    - number: 7
+      title: Project Studio — Build & Present
+      hours: 10
+      icon: 🚀
+      color: '#4A148C'
+      sessions:
+        - number: 21
+          title: Project Ideation & Scoping
+          hours: 2
+          topics:
+            - Problem-first vs technology-first thinking
+            - 'IoT project canvas: problem, stakeholders, sensors, connectivity, cloud, outcome'
+            - 'Feasibility assessment: budget, timeline, skill, hardware availability'
+            - 'India-relevant problem spaces: agriculture, healthcare, smart city, defence, education'
+          keywords:
+            - Project Canvas
+            - Problem Statement
+            - Stakeholder
+            - Feasibility
+            - MVP
+            - Scope Creep
+          case_study:
+            title: IIT Madras Rural Water Quality Monitor — From Idea to Deployment in 6 Weeks
+            org: IIT Madras + Rural Development Dept
+            description: >-
+              How a 3-person student team built a solar-powered, NB-IoT water quality monitor for rural Tamil Nadu hand
+              pumps — and got it deployed in 6 weeks on a ₹8,000 budget.
+          tools:
+            - IoT Project Canvas template
+            - Wokwi.com for prototyping
+          assignment:
+            type: Project
+            task: >-
+              Define your semester project. Submit: 1-paragraph problem statement, stakeholder map, sensor list with
+              justification, connectivity choice with justification, cloud platform, expected outcome. Peer feedback:
+              swap with one other student and give written feedback on feasibility.
+            xp: 100
+            due_days: 7
+        - number: 22
+          title: Prototyping Sprint 1 — Hardware + Connectivity
+          hours: 2
+          topics:
+            - 'Agile for hardware: 2-week sprints, physical demo at end of each'
+            - 'Debugging hardware: oscilloscope, logic analyser, serial monitor tricks'
+            - 'Power measurement: INA219 current sensor for battery life estimation'
+            - 'Version controlling hardware: KiCad + Git'
+          keywords:
+            - Sprint
+            - Prototype
+            - Debugging
+            - INA219
+            - Logic Analyser
+            - Hardware Versioning
+          assignment:
+            type: Project
+            task: >-
+              Sprint 1 deliverable: working hardware prototype with all sensors connected and reading data. Demo: show
+              serial monitor output with real sensor readings. If using simulation, show Wokwi project with all sensors
+              wired. Submit: GitHub repo link, Wokwi project link, and a 2-minute screen recording of your demo.
+            xp: 150
+            due_days: 14
+        - number: 23
+          title: Prototyping Sprint 2 — Cloud + Dashboard
+          hours: 2
+          topics:
+            - Connecting your prototype to the cloud
+            - Building a real-time dashboard
+            - Setting up alerts and notifications
+            - Data logging and history
+          keywords:
+            - MQTT
+            - Dashboard
+            - Alert
+            - Notification
+            - Data Logging
+            - Cloud Platform
+          assignment:
+            type: Project
+            task: >-
+              Sprint 2 deliverable: sensor data flowing to cloud platform, live dashboard showing real-time and
+              historical data. At least one alert configured (e.g. temperature > threshold → email/SMS). Submit:
+              dashboard screenshot, alert test screenshot, updated GitHub repo.
+            xp: 150
+            due_days: 14
+        - number: 24
+          title: Testing, Optimisation & Documentation
+          hours: 2
+          topics:
+            - 'IoT testing: unit tests, integration tests, field tests'
+            - 'Power optimisation: deep sleep, duty cycling, adaptive sampling'
+            - Writing technical documentation for IoT projects
+            - 'Open-sourcing your project: README, LICENSE, circuit diagram'
+          keywords:
+            - Deep Sleep
+            - Duty Cycle
+            - Power Optimisation
+            - Technical Documentation
+            - Open Source
+          assignment:
+            type: Project
+            task: >-
+              Measure your project's power consumption (use INA219 or estimate from datasheets). Calculate estimated
+              battery life. Implement at least one power optimisation (deep sleep, reduced polling rate, etc). Measure
+              improvement. Update your GitHub README with: project description, setup instructions, circuit diagram, and
+              power analysis.
+            xp: 120
+            due_days: 14
+        - number: 25
+          title: Final Presentations
+          hours: 2
+          topics:
+            - Communicating technical work to non-technical stakeholders
+            - 'Live demo best practices: what to do when it fails'
+            - Peer evaluation and constructive feedback
+            - 'Publishing your project: GitHub, Hackster.io, Instructables'
+          keywords:
+            - Presentation
+            - Demo
+            - Peer Review
+            - Publication
+            - Portfolio
+          assignment:
+            type: Project
+            task: >-
+              Final presentation: 10-minute live demo + 5-minute Q&A. Evaluation criteria: working demo (40%), problem
+              relevance (20%), technical depth (20%), presentation clarity (10%), documentation quality (10%). Publish
+              your project to Hackster.io or Instructables after presentation.
+            xp: 200
+            due_days: 21
+  missions:
+    - title: Operation BorderSense
+      story: >-
+        At 2237 hours, Sector 7 border surveillance goes dark. 40km of unmanned sensor grid offline. Possible drone
+        incursion window: 45 minutes.
+      situation: >-
+        You are the on-call IoT engineer at a defence tech startup. DRDO has deployed your company's LoRa-based sensor
+        grid along a sensitive border sector. Three gateway nodes have simultaneously failed — likely jamming or
+        hardware fault. The field unit cannot reach the site in time.
+      challenge: >-
+        Diagnose the failure remotely, reroute traffic through backup nodes, restore at least 80% sensor coverage before
+        the window closes. You have SSH access to the cloud platform and the one remaining gateway.
+      deliverables:
+        - 'Failure diagnosis: identify which nodes failed and probable cause'
+        - 'Rerouting plan: which sensors can reach the backup gateway, signal strength calculations'
+        - 'Recovery script: Node-RED or Python script to reconfigure routing'
+        - 'Incident report: 1-page DRDO-format incident report'
+      hints:
+        - LoRa Adaptive Data Rate (ADR) can extend range if you lower the data rate
+        - Check if the failures are correlated with a specific frequency band
+        - 'DRDO incident reports require: timeline, impact assessment, root cause, corrective action'
+      domain: Defence
+      difficulty: Hard
+      xp: 300
+      status: active
+      tags:
+        - LoRa
+        - Network Resilience
+        - Security
+        - IIoT
+    - title: 'Code Blue: Village Clinic'
+      story: >-
+        Three cardiac patients in a remote Rajasthan clinic. Nearest hospital: 4 hours by road. One Raspberry Pi. ₹2,000
+        budget. The doctor just left for the city.
+      situation: >-
+        A NITI Aayog pilot has given a rural health clinic one Raspberry Pi 4, a USB ECG sensor, and ₹2,000 for
+        connectivity. The clinic nurse needs to monitor three at-risk patients overnight and alert the city doctor if
+        any deteriorate.
+      challenge: >-
+        Design and prototype a remote patient monitoring system that works on 2G connectivity, costs under ₹2,000, runs
+        unattended overnight, and sends alerts to a WhatsApp number.
+      deliverables:
+        - System architecture diagram with all components and costs
+        - Python code for ECG reading + alert logic (threshold-based)
+        - WhatsApp alert integration (Twilio or Ultramsg API)
+        - 'Failure mode analysis: what happens if internet goes down?'
+      hints:
+        - Twilio has a free WhatsApp sandbox — no paid account needed for the prototype
+        - A Raspberry Pi can run for 8 hours on a 20,000mAh power bank
+        - Consider local data logging as a fallback if connectivity fails
+      domain: Health
+      difficulty: Medium
+      xp: 200
+      status: active
+      tags:
+        - Healthcare
+        - Raspberry Pi
+        - Low-Cost IoT
+        - Rural
+    - title: Bengaluru Flood Command
+      story: >-
+        72 hours of heavy rain. 50 flood sensors deployed. Zero cloud dependency allowed — the data centre is in the
+        flood zone.
+      situation: >-
+        BBMP has deployed 50 LoRa water-level sensors across storm drains. You're the engineer on-call when the city's
+        cloud platform goes unreachable (the data centre is flooding). You have a Raspberry Pi gateway, local storage,
+        and a satellite uplink that allows 100KB/hour.
+      challenge: >-
+        Build a local-first system that aggregates sensor data on the Raspberry Pi, generates flood warnings using local
+        logic (no internet), and sends a compressed 10-minute summary via the satellite link.
+      deliverables:
+        - 'Local data pipeline on Raspberry Pi: MQTT broker + InfluxDB + alert engine'
+        - Flood prediction algorithm using water-level rate-of-change (not just threshold)
+        - 'Compression scheme: fit 50 sensor readings per 10 minutes into < 1KB'
+        - SMS/satellite alert format with ward-level flood probability
+      hints:
+        - 'Delta encoding: store the difference from the previous reading, not the absolute value'
+        - Rate-of-change is more predictive than absolute level for flash floods
+        - InfluxDB and Mosquitto run fine on a Raspberry Pi 3
+      domain: Smart City
+      difficulty: Medium
+      xp: 250
+      status: active
+      tags:
+        - LoRa
+        - Edge Computing
+        - Disaster Response
+        - Smart City
+    - title: The Dying Mango Orchard
+      story: >-
+        A farmer in Ratnagiri has seen 40% yield loss for three seasons. He has ₹8,000 and one weekend. The harvest is
+        in 6 weeks.
+      situation: >-
+        Rajesh Patil grows Alphonso mangoes on 2 hectares. Three bad seasons have forced him to consider giving up. A
+        local NGO has ₹8,000 to spend on IoT. You have one weekend to deploy something meaningful.
+      challenge: >-
+        Design and prototype a precision irrigation system using the cheapest possible components that Rajesh can
+        maintain himself (no coding knowledge). The system must pay for itself in one season through water savings.
+      deliverables:
+        - Bill of materials under ₹8,000 (with Flipkart/Amazon India links)
+        - Circuit diagram and wiring guide with photos/diagrams Rajesh can follow
+        - Arduino code with self-diagnostic LED indicators (Rajesh can't read a serial monitor)
+        - 'ROI calculation: water saved × cost/litre vs system cost'
+      hints:
+        - Capacitive soil moisture sensors (₹80 each) are more durable than resistive ones in soil
+        - A 5V relay module (₹60) can control a 24V solenoid valve
+        - 'Solar charging: a 6V 1W panel + TP4056 + 18650 cell = < ₹400'
+      domain: Agriculture
+      difficulty: Easy
+      xp: 150
+      status: active
+      tags:
+        - Agriculture
+        - Low-Cost
+        - Solar
+        - Arduino
+        - Precision Irrigation
+    - title: AIIMS Zero-Trust Defence
+      story: >-
+        2,000 connected medical devices. A nation-state attacker has been inside the network for 60 days. You have 48
+        hours before the next scheduled attack window.
+      situation: >-
+        AIIMS Delhi has discovered an advanced persistent threat (APT) in their network after a ransomware attack
+        warning from CERT-In. 2,000 IoT medical devices — ventilators, infusion pumps, imaging systems — are potentially
+        compromised. You are the incident response lead.
+      challenge: >-
+        Design and begin implementing a Zero Trust segmentation plan that isolates the most critical devices within 48
+        hours without disrupting patient care. Then design the long-term architecture to prevent recurrence.
+      deliverables:
+        - Asset inventory and criticality matrix (200 devices categorised in 4 tiers)
+        - '48-hour containment plan: which VLANs, which devices first, how to test without downtime'
+        - Zero Trust architecture diagram for the permanent solution
+        - 'Vendor briefing: 1-page document for Philips/GE (device manufacturers) on required firmware updates'
+      hints:
+        - Start with air-gapping devices that have no legitimate internet need (most infusion pumps)
+        - Medical devices often can't be patched — compensating controls (network segmentation) are the answer
+        - CERT-In requires breach notification within 6 hours for healthcare CII
+      domain: Healthcare + Security
+      difficulty: Hard
+      xp: 350
+      status: locked
+      unlock_after_unit: 5
+      tags:
+        - Zero Trust
+        - Healthcare
+        - ICS Security
+        - Incident Response
+        - CII
