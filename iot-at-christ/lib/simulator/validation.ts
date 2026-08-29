@@ -99,7 +99,7 @@ export function boardPinsReachableFrom(
     .filter((p): p is PinDef => p !== undefined)
 }
 
-export function validateCircuit(circuit: Circuit): ValidationResult {
+function validateCore(circuit: Circuit): ValidationResult {
   const issues: ValidationIssue[] = []
   const board = getBoard(circuit.boardId)
   const pinById = new Map(board.pins.map((p) => [p.id, p]))
@@ -309,4 +309,136 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
   }
 
   return { ok: issues.every((i) => i.severity !== 'error'), issues }
+}
+
+/** A validation rule is a pure function. Rules never mutate the circuit or one another's output. */
+export type ValidationRule = (circuit: Circuit) => ValidationIssue[]
+
+interface ConnectedTerminal {
+  instanceId: string
+  componentName: string
+  terminal: ReturnType<typeof getComponent>['terminals'][number]
+  pins: PinDef[]
+}
+
+const connectedTerminals = (circuit: Circuit): ConnectedTerminal[] =>
+  circuit.components.flatMap((placed) => {
+    const component = getComponent(placed.componentId)
+    return component.terminals.map((terminal) => ({
+      instanceId: placed.instanceId,
+      componentName: component.name,
+      terminal,
+      pins: boardPinsReachableFrom(circuit, placed.instanceId, terminal.id),
+    }))
+  })
+
+const logicOvervoltageRule: ValidationRule = (circuit) =>
+  connectedTerminals(circuit).flatMap(({ instanceId, componentName, terminal, pins }) => {
+    if (terminal.outputVoltage === undefined) return []
+    return pins
+      .filter((pin) => !isPowerPin(pin) && !isGroundPin(pin) && terminal.outputVoltage! > (pin.maxInputVoltage ?? getBoard(circuit.boardId).logicVoltage))
+      .map((pin) => ({
+        severity: 'error' as const, code: 'logic-overvoltage' as const, instanceId, pinId: pin.id,
+        message: `${componentName} ${terminal.label} can drive ${terminal.outputVoltage}V into ${pin.label}, whose input is limited to ${pin.maxInputVoltage ?? getBoard(circuit.boardId).logicVoltage}V. The GPIO protection structures can conduct and the chip may be permanently damaged; use a resistor divider or a proper level shifter.`,
+      }))
+  })
+
+const inputOnlyOutputRule: ValidationRule = (circuit) =>
+  connectedTerminals(circuit).flatMap(({ instanceId, componentName, terminal, pins }) => {
+    if (terminal.role !== 'digital-in') return []
+    return pins.filter((pin) => pin.direction === 'input').map((pin) => ({
+      severity: 'error' as const, code: 'input-only-output' as const, instanceId, pinId: pin.id,
+      message: `${pin.label} is input-only but ${componentName} ${terminal.label} needs the board to drive an output. It cannot source a logic level, so the actuator will not operate; move it to an output-capable GPIO.`,
+    }))
+  })
+
+const directLoadDriveRule: ValidationRule = (circuit) =>
+  connectedTerminals(circuit).flatMap(({ instanceId, componentName, terminal, pins }) => {
+    if (!terminal.requiresDriver || pins.every((pin) => isPowerPin(pin) || isGroundPin(pin))) return []
+    return pins.filter((pin) => !isPowerPin(pin) && !isGroundPin(pin)).map((pin) => ({
+      severity: 'error' as const, code: 'direct-load-drive' as const, instanceId, pinId: pin.id,
+      message: `${componentName} draws about ${terminal.currentRequirementMa ?? 'far more than GPIO'}mA and is connected directly to ${pin.label}. GPIO cannot supply that load, causing voltage collapse, overheating, or pin damage; use a ${terminal.requiresDriver === 'h-bridge' ? 'transistor/MOSFET H-bridge' : terminal.requiresDriver + ' driver'} powered from a suitable external supply.`,
+    }))
+  })
+
+const inductiveProtectionRule: ValidationRule = (circuit) =>
+  connectedTerminals(circuit)
+    .filter(({ terminal, pins }) => terminal.requiresFlybackDiode && terminal.requiresDriver !== 'h-bridge' && pins.some((p) => !isPowerPin(p) && !isGroundPin(p)))
+    .map(({ instanceId, componentName }) => ({
+      severity: 'error', code: 'inductive-protection', instanceId,
+      message: `${componentName} is an inductive load: when switched off its collapsing magnetic field creates a reverse-voltage spike that can destroy the GPIO or driver. Switch it with a transistor/MOSFET and place a flyback diode across the coil (or use a protected driver module).`,
+    }))
+
+const railCurrentRule: ValidationRule = (circuit) =>
+  connectedTerminals(circuit)
+    .filter(({ terminal, pins }) => terminal.role === 'vcc' && (terminal.requiresExternalSupply || (terminal.currentRequirementMa ?? 0) > 100) && pins.some(isPowerPin))
+    .map(({ instanceId, componentName, terminal }) => ({
+      severity: 'warning', code: 'rail-overload', instanceId,
+      message: `${componentName} may draw ${terminal.currentRequirementMa ?? 'high'}mA from the board rail. Motors and other external loads can overload the regulator or cause brownouts and resets; use a correctly rated external supply rather than sourcing the load from the board.`,
+    }))
+
+const commonGroundRule: ValidationRule = (circuit) => {
+  const all = connectedTerminals(circuit)
+  const externalInstances = new Set(all.filter(({ terminal }) => terminal.requiresExternalSupply).map(({ instanceId }) => instanceId))
+  return [...externalInstances].sort().flatMap((instanceId) => {
+    const terminals = all.filter((item) => item.instanceId === instanceId)
+    if (terminals.some(({ terminal, pins }) => terminal.role === 'gnd' && pins.some(isGroundPin))) return []
+    const name = terminals[0]?.componentName ?? 'External load'
+    return [{ severity: 'error', code: 'missing-common-ground', instanceId, message: `${name} uses an external supply but has no common ground with the board. Without the shared reference its control voltage is undefined and operation may be erratic; connect external-supply negative to board GND (never tie unlike positive rails together).` }]
+  })
+}
+
+const pullUpRule: ValidationRule = (circuit) =>
+  connectedTerminals(circuit)
+    .filter(({ terminal, pins }) => terminal.requiresPullUp && pins.length > 0 && !pins.some(isPowerPin))
+    .map(({ instanceId, componentName, terminal }) => ({
+      severity: 'warning', code: 'missing-pull-up', instanceId,
+      message: `${componentName} ${terminal.label} is open-drain/open-switch and has no pull-up path, so it floats and produces random logic readings. Add an appropriate pull-up resistor to the board's logic rail (or explicitly enable a supported internal pull-up).`,
+    }))
+
+const pwmRule: ValidationRule = (circuit) =>
+  connectedTerminals(circuit).flatMap(({ instanceId, componentName, terminal, pins }) => {
+    if (!terminal.requiresPwm) return []
+    return pins.filter((pin) => !pin.capabilities.includes('pwm') && pin.pwm !== true && !isPowerPin(pin) && !isGroundPin(pin)).map((pin) => ({
+      severity: 'warning' as const, code: 'pwm-incompatible' as const, instanceId, pinId: pin.id,
+      message: `${componentName} ${terminal.label} needs a timed PWM waveform, but ${pin.label} has no PWM output. The load cannot be speed/position controlled correctly; move the signal to a PWM-capable pin or use an external PWM driver.`,
+    }))
+  })
+
+const duplicatePinRoleRule: ValidationRule = (circuit) => {
+  const uses = new Map<string, ConnectedTerminal[]>()
+  for (const item of connectedTerminals(circuit)) for (const pin of item.pins) {
+    if (!DATA_ROLES.has(item.terminal.role) || isPowerPin(pin) || isGroundPin(pin) || item.terminal.bus === 'i2c') continue
+    const list = uses.get(pin.id) ?? []
+    list.push(item); uses.set(pin.id, list)
+  }
+  return [...uses.entries()].sort(([a], [b]) => a.localeCompare(b)).flatMap(([pinId, items]) => {
+    const roles = new Set(items.map(({ instanceId, terminal }) => `${instanceId}:${terminal.id}`))
+    if (roles.size < 2) return []
+    return [{ severity: 'warning', code: 'duplicate-pin-role', pinId, message: `${getBoard(circuit.boardId).pins.find((p) => p.id === pinId)?.label ?? pinId} is assigned ${roles.size} independent signal roles. Their drivers may contend (causing wrong readings or hardware damage); give each signal its own GPIO, except devices intentionally sharing a bus.` }]
+  })
+}
+
+const i2cAddressRule: ValidationRule = (circuit) => {
+  const devices = connectedTerminals(circuit).filter(({ terminal, pins }) => terminal.i2cAddress !== undefined && terminal.bus === 'i2c' && pins.some((p) => p.capabilities.includes('i2c-sda')))
+  const groups = new Map<number, ConnectedTerminal[]>()
+  for (const device of devices) {
+    const list = groups.get(device.terminal.i2cAddress!) ?? []
+    if (!list.some((x) => x.instanceId === device.instanceId)) list.push(device)
+    groups.set(device.terminal.i2cAddress!, list)
+  }
+  return [...groups.entries()].sort(([a], [b]) => a - b).flatMap(([address, items]) => items.length < 2 ? [] : [{
+    severity: 'error', code: 'i2c-address-conflict', instanceId: items[0].instanceId,
+    message: `${items.length} I²C devices share address 0x${address.toString(16).padStart(2, '0')} on the same bus, so both answer and corrupt communication. Change a configurable address, use an I²C multiplexer, or place one device on another bus.`,
+  }])
+}
+
+export const VALIDATION_RULES: readonly ValidationRule[] = [
+  logicOvervoltageRule, inputOnlyOutputRule, directLoadDriveRule, inductiveProtectionRule,
+  railCurrentRule, commonGroundRule, pullUpRule, pwmRule, duplicatePinRoleRule, i2cAddressRule,
+]
+
+export function validateCircuit(circuit: Circuit): ValidationResult {
+  const issues = [...validateCore(circuit).issues, ...VALIDATION_RULES.flatMap((rule) => rule(circuit))]
+  return { ok: issues.every((issue) => issue.severity !== 'error'), issues }
 }

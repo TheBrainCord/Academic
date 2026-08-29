@@ -14,6 +14,60 @@ const place = (instanceId: string, componentId: Circuit['components'][number]['c
 const wire = (id: string, from: Circuit['wires'][number]['from'], to: Circuit['wires'][number]['to']) => ({ id, from, to })
 
 describe('validateCircuit', () => {
+  const hasCode = (circuit: Circuit, code: string) => validateCircuit(circuit).issues.some((issue) => issue.code === code)
+  const oneSignal = (boardId: Circuit['boardId'], componentId: Circuit['components'][number]['componentId'], terminalId: string, pinId: string): Circuit => ({
+    boardId, components: [place('part', componentId)],
+    wires: [wire('signal', { kind: 'component', instanceId: 'part', terminalId }, { kind: 'board', pinId })],
+  })
+
+  it('rejects a 5V signal entering a 3.3V-only GPIO and recommends level conversion', () => {
+    const result = validateCircuit(oneSignal('esp32-devkit', 'hc-sr04', 'echo', 'gpio19'))
+    expect(result.issues.find((issue) => issue.code === 'logic-overvoltage')?.message).toMatch(/divider|level shifter/)
+  })
+
+  it('rejects an ESP32 input-only pin used to drive an output', () => {
+    expect(hasCode(oneSignal('esp32-devkit', 'led', 'anode', 'gpio34'), 'input-only-output')).toBe(true)
+  })
+
+  it('rejects a high-current load driven directly by GPIO', () => {
+    expect(hasCode(oneSignal('arduino-uno', 'buzzer', 'positive', 'd3'), 'direct-load-drive')).toBe(true)
+  })
+
+  it('requires flyback protection for a directly switched inductive load', () => {
+    expect(hasCode(oneSignal('arduino-uno', 'buzzer', 'positive', 'd3'), 'inductive-protection')).toBe(true)
+  })
+
+  it('warns when a board rail is used for a large external load', () => {
+    expect(hasCode(oneSignal('arduino-uno', 'servo-motor', 'vcc', '5v'), 'rail-overload')).toBe(true)
+  })
+
+  it('requires a common board ground for an externally supplied load', () => {
+    expect(hasCode(oneSignal('arduino-uno', 'servo-motor', 'vcc', '5v'), 'missing-common-ground')).toBe(true)
+  })
+
+  it('warns when an open signal has no pull-up', () => {
+    expect(hasCode(oneSignal('arduino-uno', 'push-button', 'pin1', 'd2'), 'missing-pull-up')).toBe(true)
+  })
+
+  it('warns when a PWM terminal uses a non-PWM pin', () => {
+    expect(hasCode(oneSignal('arduino-uno', 'servo-motor', 'signal', 'd13'), 'pwm-incompatible')).toBe(true)
+  })
+
+  it('warns when independent roles duplicate a GPIO pin', () => {
+    const circuit: Circuit = { boardId: 'arduino-uno', components: [place('a', 'pir'), place('b', 'ir-sensor')], wires: [
+      wire('a', { kind: 'component', instanceId: 'a', terminalId: 'out' }, { kind: 'board', pinId: 'd2' }),
+      wire('b', { kind: 'component', instanceId: 'b', terminalId: 'out' }, { kind: 'board', pinId: 'd2' }),
+    ] }
+    expect(hasCode(circuit, 'duplicate-pin-role')).toBe(true)
+  })
+
+  it('rejects duplicate I2C addresses on one bus', () => {
+    const circuit: Circuit = { boardId: 'arduino-uno', components: [place('imu1', 'mpu6050'), place('imu2', 'mpu6050')], wires: [
+      wire('a', { kind: 'component', instanceId: 'imu1', terminalId: 'sda' }, { kind: 'board', pinId: 'a4' }),
+      wire('b', { kind: 'component', instanceId: 'imu2', terminalId: 'sda' }, { kind: 'board', pinId: 'a4' }),
+    ] }
+    expect(hasCode(circuit, 'i2c-address-conflict')).toBe(true)
+  })
   it('returns an info message for an empty bench', () => {
     const result = validateCircuit({ boardId: 'arduino-uno', components: [], wires: [] })
     expect(result.ok).toBe(true)

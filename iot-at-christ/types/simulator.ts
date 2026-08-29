@@ -32,6 +32,19 @@ export interface PinDef {
   /** Silkscreen label shown to the student, e.g. 'D13', 'GPIO4', '5V' */
   label: string
   capabilities: PinCapability[]
+  /** Electrical direction; unlike capabilities this prevents treating input-only GPIO as an output. */
+  direction?: 'input' | 'output' | 'bidirectional' | 'power' | 'ground'
+  /** Pins used during reset/boot need extra care even when they are otherwise ordinary GPIO. */
+  status?: 'normal' | 'reserved' | 'boot-sensitive'
+  /** Absolute signal voltage accepted by an input (not the board supply voltage). */
+  maxInputVoltage?: number
+  /** Conservative continuous GPIO current guidance, in mA. */
+  recommendedSourceCurrentMa?: number
+  recommendedSinkCurrentMa?: number
+  pwm?: boolean
+  /** Shared peripheral identity, e.g. `i2c-0`; devices on the same bus may share SDA/SCL. */
+  bus?: string
+  cautions?: string[]
   /** Which physical side of the board drawing the pin sits on */
   side: 'left' | 'right'
   /** 0-based position along its side, top to bottom */
@@ -93,6 +106,21 @@ export interface TerminalDef {
   id: string
   label: string
   role: TerminalRole
+  /** Worst-case voltage driven by this terminal. */
+  outputVoltage?: number
+  /** Current drawn from a GPIO or supply rail, in mA. */
+  currentRequirementMa?: number
+  /** Minimum load impedance the output may safely drive, in ohms. */
+  minimumLoadOhms?: number
+  requiresPullUp?: boolean
+  pullUpVoltage?: number
+  i2cAddress?: number
+  bus?: string
+  requiresPwm?: boolean
+  requiresDriver?: 'transistor' | 'mosfet' | 'h-bridge'
+  requiresFlybackDiode?: boolean
+  requiresExternalSupply?: boolean
+  caution?: string
 }
 
 export interface SimulatedReadingDef {
@@ -175,6 +203,16 @@ export type FailureCode =
   | 'no-adc-on-board'    // analog sensor on a board with no ADC at all (the Pi)
   | 'pin-conflict'       // two data signals share one board pin
   | 'not-wired'          // part on the bench with no wires yet
+  | 'logic-overvoltage'
+  | 'input-only-output'
+  | 'direct-load-drive'
+  | 'inductive-protection'
+  | 'rail-overload'
+  | 'missing-common-ground'
+  | 'missing-pull-up'
+  | 'pwm-incompatible'
+  | 'duplicate-pin-role'
+  | 'i2c-address-conflict'
 
 export interface ValidationIssue {
   severity: IssueSeverity
