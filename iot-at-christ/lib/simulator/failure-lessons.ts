@@ -224,6 +224,24 @@ export const FAILURE_LESSONS: Record<FailureCode, FailureLesson> = {
     effect: 'none',
     serialDrama: [],
   },
+  ...Object.fromEntries(([
+    'logic-overvoltage', 'input-only-output', 'direct-load-drive', 'inductive-protection',
+    'rail-overload', 'missing-common-ground', 'missing-pull-up', 'pwm-incompatible',
+    'duplicate-pin-role', 'i2c-address-conflict',
+  ] as FailureCode[]).map((code) => [code, {
+    code,
+    headline: 'Electrical compatibility warning',
+    whatYouSaw: 'The circuit did not behave safely or predictably.',
+    why: 'The connection violates an electrical limit or interface requirement described by the validation warning.',
+    fix: 'Follow the warning’s concrete wiring remedy before powering real hardware.',
+    onRealHardware: 'Ignoring electrical limits can cause corrupted readings, resets, overheating, or permanent damage.',
+    effect: 'glitch' as const,
+    serialDrama: ['[safety] incompatible electrical connection detected'],
+  }])) as Record<Exclude<FailureCode,
+    | 'short-circuit' | 'missing-resistor' | 'overvoltage' | 'undervoltage'
+    | 'no-power' | 'no-ground' | 'floating-signal' | 'signal-short'
+    | 'analog-on-digital' | 'no-adc-on-board' | 'pin-conflict' | 'not-wired'
+  >, FailureLesson>,
 }
 
 export function getLesson(code: FailureCode): FailureLesson {

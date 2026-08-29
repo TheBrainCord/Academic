@@ -34,15 +34,15 @@ const ARDUINO_UNO_PINS: PinDef[] = [
 const ESP32_DEVKIT_PINS: PinDef[] = [
   { id: '3v3', label: '3V3', capabilities: ['power-3v3'], side: 'left', index: 0 },
   { id: 'gnd-l', label: 'GND', capabilities: ['ground'], side: 'left', index: 1 },
-  { id: 'gpio34', label: 'GPIO34', capabilities: ['digital', 'analog-in'], side: 'left', index: 2 },
-  { id: 'gpio35', label: 'GPIO35', capabilities: ['digital', 'analog-in'], side: 'left', index: 3 },
+  { id: 'gpio34', label: 'GPIO34', capabilities: ['digital', 'analog-in'], direction: 'input', maxInputVoltage: 3.3, recommendedSourceCurrentMa: 0, recommendedSinkCurrentMa: 0, pwm: false, cautions: ['Input-only; no internal pull-up or pull-down.'], side: 'left', index: 2 },
+  { id: 'gpio35', label: 'GPIO35', capabilities: ['digital', 'analog-in'], direction: 'input', maxInputVoltage: 3.3, recommendedSourceCurrentMa: 0, recommendedSinkCurrentMa: 0, pwm: false, cautions: ['Input-only; no internal pull-up or pull-down.'], side: 'left', index: 3 },
   { id: 'gpio32', label: 'GPIO32', capabilities: ['digital', 'analog-in'], side: 'left', index: 4 },
   { id: 'gpio33', label: 'GPIO33', capabilities: ['digital', 'analog-in'], side: 'left', index: 5 },
   { id: 'gpio25', label: 'GPIO25', capabilities: ['digital', 'pwm', 'analog-in'], side: 'left', index: 6 },
   { id: 'gpio26', label: 'GPIO26', capabilities: ['digital', 'pwm', 'analog-in'], side: 'left', index: 7 },
   { id: 'gpio27', label: 'GPIO27', capabilities: ['digital', 'pwm', 'analog-in'], side: 'left', index: 8 },
   { id: 'gpio14', label: 'GPIO14', capabilities: ['digital', 'pwm'], side: 'left', index: 9 },
-  { id: 'gpio12', label: 'GPIO12', capabilities: ['digital', 'pwm'], side: 'left', index: 10 },
+  { id: 'gpio12', label: 'GPIO12', capabilities: ['digital', 'pwm'], direction: 'bidirectional', status: 'boot-sensitive', maxInputVoltage: 3.3, recommendedSourceCurrentMa: 12, recommendedSinkCurrentMa: 12, pwm: true, cautions: ['Strapping pin; an attached circuit can prevent boot.'], side: 'left', index: 10 },
   { id: 'gpio13', label: 'GPIO13', capabilities: ['digital', 'pwm'], side: 'left', index: 11 },
   { id: 'vin', label: 'VIN (5V)', capabilities: ['power-5v'], side: 'right', index: 0 },
   { id: 'gnd-r', label: 'GND', capabilities: ['ground'], side: 'right', index: 1 },
@@ -54,8 +54,8 @@ const ESP32_DEVKIT_PINS: PinDef[] = [
   { id: 'gpio17', label: 'GPIO17/TX', capabilities: ['digital', 'uart-tx'], side: 'right', index: 7 },
   { id: 'gpio16', label: 'GPIO16/RX', capabilities: ['digital', 'uart-rx'], side: 'right', index: 8 },
   { id: 'gpio4', label: 'GPIO4', capabilities: ['digital', 'pwm'], side: 'right', index: 9 },
-  { id: 'gpio2', label: 'GPIO2', capabilities: ['digital', 'pwm'], side: 'right', index: 10 },
-  { id: 'gpio15', label: 'GPIO15', capabilities: ['digital', 'pwm'], side: 'right', index: 11 },
+  { id: 'gpio2', label: 'GPIO2', capabilities: ['digital', 'pwm'], direction: 'bidirectional', status: 'boot-sensitive', maxInputVoltage: 3.3, recommendedSourceCurrentMa: 12, recommendedSinkCurrentMa: 12, pwm: true, bus: 'gpio', cautions: ['Strapping pin; avoid forcing its level during reset.'], side: 'right', index: 10 },
+  { id: 'gpio15', label: 'GPIO15', capabilities: ['digital', 'pwm'], direction: 'bidirectional', status: 'boot-sensitive', maxInputVoltage: 3.3, recommendedSourceCurrentMa: 12, recommendedSinkCurrentMa: 12, pwm: true, cautions: ['Strapping pin; avoid forcing its level during reset.'], side: 'right', index: 11 },
 ]
 
 // Left column ≈ odd physical pins, right column ≈ even pins, like the real header.
@@ -104,13 +104,32 @@ const NODEMCU_PINS: PinDef[] = [
   { id: '3v3-r', label: '3V3', capabilities: ['power-3v3'], side: 'right', index: 8 },
 ]
 
+/** Fill the common electrical contract consistently while preserving exceptional pin metadata above. */
+const characterizePins = (pins: PinDef[], logicVoltage: 3.3 | 5): PinDef[] => pins.map((pin) => {
+  const power = pin.capabilities.some((capability) => capability === 'power-3v3' || capability === 'power-5v')
+  const ground = pin.capabilities.includes('ground')
+  const gpio = !power && !ground
+  const i2c = pin.capabilities.some((capability) => capability === 'i2c-sda' || capability === 'i2c-scl')
+  return {
+    ...pin,
+    direction: pin.direction ?? (power ? 'power' : ground ? 'ground' : pin.capabilities.length === 1 && pin.capabilities.includes('analog-in') ? 'input' : 'bidirectional'),
+    status: pin.status ?? 'normal',
+    maxInputVoltage: pin.maxInputVoltage ?? (gpio ? logicVoltage : undefined),
+    recommendedSourceCurrentMa: pin.recommendedSourceCurrentMa ?? (gpio ? (logicVoltage === 5 ? 20 : 12) : undefined),
+    recommendedSinkCurrentMa: pin.recommendedSinkCurrentMa ?? (gpio ? (logicVoltage === 5 ? 20 : 12) : undefined),
+    pwm: pin.pwm ?? pin.capabilities.includes('pwm'),
+    bus: pin.bus ?? (i2c ? 'i2c-0' : undefined),
+    cautions: pin.cautions ?? (logicVoltage === 3.3 && gpio ? ['Not 5V-tolerant; level-shift higher-voltage signals.'] : []),
+  }
+})
+
 export const BOARDS: Record<BoardId, BoardDef> = {
   'arduino-uno': {
     id: 'arduino-uno',
     name: 'Arduino Uno',
     logicVoltage: 5,
     hasAnalogIn: true,
-    pins: ARDUINO_UNO_PINS,
+    pins: characterizePins(ARDUINO_UNO_PINS, 5),
     description: 'The classic 5V beginner board — forgiving, well documented, and perfect for first circuits.',
     teachingNotes: [
       'The Uno runs 5V logic: its pins output 5V and expect 5V signals.',
@@ -125,7 +144,7 @@ export const BOARDS: Record<BoardId, BoardDef> = {
     name: 'ESP32 DevKit',
     logicVoltage: 3.3,
     hasAnalogIn: true,
-    pins: ESP32_DEVKIT_PINS,
+    pins: characterizePins(ESP32_DEVKIT_PINS, 3.3),
     description: 'A 3.3V powerhouse with built-in Wi-Fi and Bluetooth — the go-to board for real IoT projects.',
     teachingNotes: [
       'GPIO pins are 3.3V — connecting 5V signals can damage the chip.',
@@ -140,7 +159,7 @@ export const BOARDS: Record<BoardId, BoardDef> = {
     name: 'Raspberry Pi 4',
     logicVoltage: 3.3,
     hasAnalogIn: false,
-    pins: RASPBERRY_PI_PINS,
+    pins: characterizePins(RASPBERRY_PI_PINS, 3.3),
     description: 'A full Linux computer with a 40-pin GPIO header — powerful, but with one famous catch: no analog inputs.',
     teachingNotes: [
       'No analog pins! Analog sensors need an external ADC like the MCP3008.',
@@ -155,7 +174,7 @@ export const BOARDS: Record<BoardId, BoardDef> = {
     name: 'NodeMCU (ESP8266)',
     logicVoltage: 3.3,
     hasAnalogIn: true,
-    pins: NODEMCU_PINS,
+    pins: characterizePins(NODEMCU_PINS, 3.3),
     description: 'A pocket-sized Wi-Fi board — the cheapest way to get a sensor talking to the internet.',
     teachingNotes: [
       'GPIO pins are 3.3V — a 5V sensor signal (like the HC-SR04 ECHO) can damage it without a divider.',
