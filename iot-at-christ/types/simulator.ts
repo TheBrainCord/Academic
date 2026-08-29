@@ -97,6 +97,21 @@ export interface TerminalDef {
   id: string
   label: string
   role: TerminalRole
+  /** Worst-case voltage driven by this terminal. */
+  outputVoltage?: number
+  /** Current drawn from a GPIO or supply rail, in mA. */
+  currentRequirementMa?: number
+  /** Minimum load impedance the output may safely drive, in ohms. */
+  minimumLoadOhms?: number
+  requiresPullUp?: boolean
+  pullUpVoltage?: number
+  i2cAddress?: number
+  bus?: string
+  requiresPwm?: boolean
+  requiresDriver?: 'transistor' | 'mosfet' | 'h-bridge'
+  requiresFlybackDiode?: boolean
+  requiresExternalSupply?: boolean
+  caution?: string
 }
 
 export interface SimulatedReadingDef {
@@ -181,6 +196,16 @@ export type FailureCode =
   | 'unsupported-pin-direction' // signal requires a direction the pin cannot provide
   | 'pin-caution'        // usable pin with a board-specific boot/reservation caveat
   | 'not-wired'          // part on the bench with no wires yet
+  | 'logic-overvoltage'
+  | 'input-only-output'
+  | 'direct-load-drive'
+  | 'inductive-protection'
+  | 'rail-overload'
+  | 'missing-common-ground'
+  | 'missing-pull-up'
+  | 'pwm-incompatible'
+  | 'duplicate-pin-role'
+  | 'i2c-address-conflict'
 
 export interface ValidationIssue {
   severity: IssueSeverity

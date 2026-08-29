@@ -35,7 +35,7 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     name: 'Push Button',
     category: 'input',
     terminals: [
-      { id: 'pin1', label: 'Signal', role: 'digital-out' },
+      { id: 'pin1', label: 'Signal', role: 'digital-out', requiresPullUp: true, pullUpVoltage: 3.3 },
       { id: 'pin2', label: 'GND', role: 'gnd' },
     ],
     minVoltage: 0,
@@ -49,7 +49,7 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     name: 'Buzzer',
     category: 'actuator',
     terminals: [
-      { id: 'positive', label: '+', role: 'digital-in' },
+      { id: 'positive', label: '+', role: 'digital-in', currentRequirementMa: 30, requiresDriver: 'transistor', requiresFlybackDiode: true },
       { id: 'negative', label: '-', role: 'gnd' },
     ],
     minVoltage: 3,
@@ -64,7 +64,7 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     category: 'sensor',
     terminals: [
       { id: 'vcc', label: 'VCC', role: 'vcc' },
-      { id: 'data', label: 'DATA', role: 'digital-out' },
+      { id: 'data', label: 'DATA', role: 'digital-out', outputVoltage: 5, requiresPullUp: true },
       { id: 'gnd', label: 'GND', role: 'gnd' },
     ],
     minVoltage: 3,
@@ -84,7 +84,7 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     terminals: [
       { id: 'vcc', label: 'VCC', role: 'vcc' },
       { id: 'trig', label: 'TRIG', role: 'digital-in' },
-      { id: 'echo', label: 'ECHO', role: 'digital-out' },
+      { id: 'echo', label: 'ECHO', role: 'digital-out', outputVoltage: 5 },
       { id: 'gnd', label: 'GND', role: 'gnd' },
     ],
     minVoltage: 4.5,
@@ -163,8 +163,8 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     category: 'sensor',
     terminals: [
       { id: 'vcc', label: 'VCC', role: 'vcc' },
-      { id: 'scl', label: 'SCL', role: 'digital-out' },
-      { id: 'sda', label: 'SDA', role: 'digital-out' },
+      { id: 'scl', label: 'SCL', role: 'digital-out', requiresPullUp: true, i2cAddress: 0x68, bus: 'i2c' },
+      { id: 'sda', label: 'SDA', role: 'digital-out', requiresPullUp: true, i2cAddress: 0x68, bus: 'i2c' },
       { id: 'gnd', label: 'GND', role: 'gnd' },
     ],
     minVoltage: 3,
@@ -199,8 +199,8 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     name: 'Servo Motor',
     category: 'actuator',
     terminals: [
-      { id: 'signal', label: 'Signal', role: 'digital-in' },
-      { id: 'vcc', label: 'VCC', role: 'vcc' },
+      { id: 'signal', label: 'Signal', role: 'digital-in', requiresPwm: true },
+      { id: 'vcc', label: 'VCC', role: 'vcc', currentRequirementMa: 650, requiresExternalSupply: true },
       { id: 'gnd', label: 'GND', role: 'gnd' },
     ],
     minVoltage: 4.8,
@@ -214,8 +214,8 @@ export const COMPONENTS: Record<ComponentId, ComponentDef> = {
     name: 'DC Motor + L298N',
     category: 'actuator',
     terminals: [
-      { id: 'ena', label: 'ENA (~)', role: 'digital-in' },
-      { id: 'vcc', label: 'Motor VCC', role: 'vcc' },
+      { id: 'ena', label: 'ENA (~)', role: 'digital-in', requiresPwm: true },
+      { id: 'vcc', label: 'Motor VCC', role: 'vcc', currentRequirementMa: 1000, requiresExternalSupply: true, requiresDriver: 'h-bridge', requiresFlybackDiode: true },
       { id: 'gnd', label: 'GND', role: 'gnd' },
     ],
     minVoltage: 6,

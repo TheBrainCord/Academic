@@ -104,13 +104,32 @@ const NODEMCU_PINS: PinDef[] = [
   { id: '3v3-r', label: '3V3', capabilities: ['power-3v3'], side: 'right', index: 8 },
 ]
 
+/** Fill the common electrical contract consistently while preserving exceptional pin metadata above. */
+const characterizePins = (pins: PinDef[], logicVoltage: 3.3 | 5): PinDef[] => pins.map((pin) => {
+  const power = pin.capabilities.some((capability) => capability === 'power-3v3' || capability === 'power-5v')
+  const ground = pin.capabilities.includes('ground')
+  const gpio = !power && !ground
+  const i2c = pin.capabilities.some((capability) => capability === 'i2c-sda' || capability === 'i2c-scl')
+  return {
+    ...pin,
+    direction: pin.direction ?? (power ? 'power' : ground ? 'ground' : pin.capabilities.length === 1 && pin.capabilities.includes('analog-in') ? 'input' : 'bidirectional'),
+    status: pin.status ?? 'normal',
+    maxInputVoltage: pin.maxInputVoltage ?? (gpio ? logicVoltage : undefined),
+    recommendedSourceCurrentMa: pin.recommendedSourceCurrentMa ?? (gpio ? (logicVoltage === 5 ? 20 : 12) : undefined),
+    recommendedSinkCurrentMa: pin.recommendedSinkCurrentMa ?? (gpio ? (logicVoltage === 5 ? 20 : 12) : undefined),
+    pwm: pin.pwm ?? pin.capabilities.includes('pwm'),
+    bus: pin.bus ?? (i2c ? 'i2c-0' : undefined),
+    cautions: pin.cautions ?? (logicVoltage === 3.3 && gpio ? ['Not 5V-tolerant; level-shift higher-voltage signals.'] : []),
+  }
+})
+
 export const BOARDS: Record<BoardId, BoardDef> = {
   'arduino-uno': {
     id: 'arduino-uno',
     name: 'Arduino Uno',
     logicVoltage: 5,
     hasAnalogIn: true,
-    pins: ARDUINO_UNO_PINS,
+    pins: characterizePins(ARDUINO_UNO_PINS, 5),
     description: 'The classic 5V beginner board — forgiving, well documented, and perfect for first circuits.',
     teachingNotes: [
       'The Uno runs 5V logic: its pins output 5V and expect 5V signals.',
@@ -125,7 +144,7 @@ export const BOARDS: Record<BoardId, BoardDef> = {
     name: 'ESP32 DevKit',
     logicVoltage: 3.3,
     hasAnalogIn: true,
-    pins: ESP32_DEVKIT_PINS,
+    pins: characterizePins(ESP32_DEVKIT_PINS, 3.3),
     description: 'A 3.3V powerhouse with built-in Wi-Fi and Bluetooth — the go-to board for real IoT projects.',
     teachingNotes: [
       'GPIO pins are 3.3V — connecting 5V signals can damage the chip.',
@@ -142,7 +161,7 @@ export const BOARDS: Record<BoardId, BoardDef> = {
     name: 'Raspberry Pi 4',
     logicVoltage: 3.3,
     hasAnalogIn: false,
-    pins: RASPBERRY_PI_PINS,
+    pins: characterizePins(RASPBERRY_PI_PINS, 3.3),
     description: 'A full Linux computer with a 40-pin GPIO header — powerful, but with one famous catch: no analog inputs.',
     teachingNotes: [
       'No analog pins! Analog sensors need an external ADC like the MCP3008.',
@@ -157,7 +176,7 @@ export const BOARDS: Record<BoardId, BoardDef> = {
     name: 'NodeMCU (ESP8266)',
     logicVoltage: 3.3,
     hasAnalogIn: true,
-    pins: NODEMCU_PINS,
+    pins: characterizePins(NODEMCU_PINS, 3.3),
     description: 'A pocket-sized Wi-Fi board — the cheapest way to get a sensor talking to the internet.',
     teachingNotes: [
       'GPIO pins are 3.3V — a 5V sensor signal (like the HC-SR04 ECHO) can damage it without a divider.',
