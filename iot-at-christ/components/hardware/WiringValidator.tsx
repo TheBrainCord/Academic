@@ -1,0 +1,6 @@
+import { AlertTriangle, CheckCircle2, Info } from 'lucide-react'
+
+export function WiringValidator({ step, fault }: { step: number; fault: boolean }) {
+  const valid = step >= 4 && !fault
+  return <section aria-labelledby="validator-heading" className={`rounded-xl border p-4 ${fault ? 'border-red-300 bg-red-50' : valid ? 'border-emerald-300 bg-emerald-50' : 'border-sky-200 bg-sky-50'}`}><div className="flex gap-3">{fault ? <AlertTriangle className="h-6 w-6 shrink-0 text-red-600"/> : valid ? <CheckCircle2 className="h-6 w-6 shrink-0 text-emerald-600"/> : <Info className="h-6 w-6 shrink-0 text-sky-600"/>}<div><h2 id="validator-heading" className="font-bold">{fault ? 'Unsafe: VCC and GND are shorted' : valid ? 'Circuit ready for evidence' : `Assembly ${step + 1} of 5`}</h2><p className="mt-1 text-xs leading-relaxed text-christ-navy/70">{fault ? 'Current has a near-zero-resistance path. A physical board may heat up or be damaged. Disconnect power, correct the rails, then reset.' : valid ? 'Power, reference, signal, and protected output paths are complete. Run the circuit and vary the sensor.' : 'This is intentionally incomplete. Follow the current step; the validator explains what is missing rather than treating learning-in-progress as failure.'}</p></div></div></section>
+}
