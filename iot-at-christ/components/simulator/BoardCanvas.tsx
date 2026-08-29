@@ -74,14 +74,17 @@ function pinTooltip(pin: PinDef): string {
   if (pin.capabilities.includes('power-5v')) parts.push('5V power rail')
   if (pin.capabilities.includes('power-3v3')) parts.push('3.3V power rail')
   if (pin.capabilities.includes('ground')) parts.push('Ground (GND)')
-  if (pin.capabilities.includes('digital')) parts.push('digital GPIO')
+  if (pin.capabilities.includes('gpio')) parts.push('bidirectional digital GPIO')
+  if (pin.capabilities.includes('digital-input')) parts.push('digital input only')
+  if (pin.capabilities.includes('digital-output')) parts.push('digital output only')
   if (pin.capabilities.includes('pwm')) parts.push('PWM-capable (~)')
   if (pin.capabilities.includes('analog-in')) parts.push('analog input (ADC)')
   if (pin.capabilities.includes('i2c-sda')) parts.push('I2C SDA')
   if (pin.capabilities.includes('i2c-scl')) parts.push('I2C SCL')
   if (pin.capabilities.includes('uart-tx')) parts.push('UART TX')
   if (pin.capabilities.includes('uart-rx')) parts.push('UART RX')
-  return `${pin.label} — ${parts.join(', ')}`
+  const warning = pin.warnings?.length ? ` — Caution: ${pin.warnings.join(' ')}` : ''
+  return `${pin.label} — ${parts.join(', ')}${warning}`
 }
 
 function pinPosition(board: BoardDef, pin: PinDef): { x: number; y: number } {
@@ -131,8 +134,8 @@ const ROLE_TO_CAPS: Record<TerminalRole, PinCapability[]> = {
   vcc: ['power-5v', 'power-3v3'],
   gnd: ['ground'],
   'analog-out': ['analog-in'],
-  'digital-out': ['digital', 'analog-in'],
-  'digital-in': ['digital', 'pwm'],
+  'digital-out': ['gpio', 'digital-input'],
+  'digital-in': ['gpio', 'digital-output', 'pwm'],
   passive: [], // a resistor leg may legally go anywhere
 }
 

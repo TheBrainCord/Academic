@@ -51,6 +51,14 @@ const reachesAnyPower = (circuit: Circuit, instanceId: string, terminalId: strin
   reaches(circuit, instanceId, terminalId, 'power-5v') ||
   reaches(circuit, instanceId, terminalId, 'power-3v3')
 
+const reachesDigitalInput = (circuit: Circuit, instanceId: string, terminalId: string): boolean =>
+  reaches(circuit, instanceId, terminalId, 'gpio') ||
+  reaches(circuit, instanceId, terminalId, 'digital-input')
+
+const reachesDigitalOutput = (circuit: Circuit, instanceId: string, terminalId: string): boolean =>
+  reaches(circuit, instanceId, terminalId, 'gpio') ||
+  reaches(circuit, instanceId, terminalId, 'digital-output')
+
 /** True when some instance of the component satisfies the predicate. */
 const someInstance = (
   circuit: Circuit,
@@ -69,11 +77,11 @@ const noErrors = (validation: ValidationResult): boolean => validation.ok
 
 // A wired LED: anode reaches a digital pin (through the resistor) and the
 // cathode reaches ground. Validation separately enforces the resistor rule.
-const ledWired = (circuit: Circuit, capability: PinCapability = 'digital'): boolean =>
+const ledWired = (circuit: Circuit, capability?: PinCapability): boolean =>
   someInstance(
     circuit,
     'led',
-    (id) => reaches(circuit, id, 'anode', capability) && reaches(circuit, id, 'cathode', 'ground'),
+    (id) => (capability ? reaches(circuit, id, 'anode', capability) : reachesDigitalOutput(circuit, id, 'anode')) && reaches(circuit, id, 'cathode', 'ground'),
   )
 
 // ---------------------------------------------------------------------------
@@ -140,7 +148,7 @@ export const CHALLENGES: ChallengeDef[] = [
         req(
           'data',
           'DHT11 DATA wired to a GPIO pin',
-          someInstance(circuit, 'dht11', (id) => reaches(circuit, id, 'data', 'digital')),
+          someInstance(circuit, 'dht11', (id) => reachesDigitalInput(circuit, id, 'data')),
         ),
         req('valid', 'No errors in Test Connections', noErrors(validation)),
       ]),
@@ -195,7 +203,7 @@ export const CHALLENGES: ChallengeDef[] = [
         circuit,
         'buzzer',
         (id) =>
-          reaches(circuit, id, 'positive', 'digital') && reaches(circuit, id, 'negative', 'ground'),
+          reachesDigitalOutput(circuit, id, 'positive') && reaches(circuit, id, 'negative', 'ground'),
       )
       return status([
         req('board', 'Use the Arduino Uno', circuit.boardId === 'arduino-uno'),
@@ -225,7 +233,7 @@ export const CHALLENGES: ChallengeDef[] = [
             (id) =>
               reaches(circuit, id, 'vcc', 'power-5v') &&
               reaches(circuit, id, 'gnd', 'ground') &&
-              reaches(circuit, id, 'out', 'digital'),
+              reachesDigitalInput(circuit, id, 'out'),
           ),
         ),
         req('led', 'LED wired to a GPIO through a resistor, cathode → GND', ledWired(circuit)),

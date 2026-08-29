@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "authoritativeSourceId": "official-syllabus",
+  "sources": [
+    {
+      "id": "official-syllabus",
+      "filename": "official-syllabus.pdf",
+      "role": "Official institution-issued course syllabus",
+      "status": "missing",
+      "provenance": {
+        "expectedIssuer": "CHRIST (Deemed to be University)",
+        "reference": null
+      },
+      "editionOrDate": null,
+      "checksum": null,
+      "lecturerVerification": null
+    },
+    {
+      "id": "lecturer-notes",
+      "filename": "lecturer-notes.pdf",
+      "role": "Lecturer-supplied supporting notes",
+      "status": "missing",
+      "provenance": {
+        "expectedIssuer": "Responsible course lecturer",
+        "reference": null
+      },
+      "editionOrDate": null,
+      "checksum": null,
+      "lecturerVerification": null
+    },
+    {
+      "id": "prescribed-reading-list",
+      "filename": "prescribed-reading-list.pdf",
+      "role": "Institution- or lecturer-issued supporting reading list",
+      "status": "missing",
+      "provenance": {
+        "expectedIssuer": "CHRIST (Deemed to be University) or responsible course lecturer",
+        "reference": null
+      },
+      "editionOrDate": null,
+      "checksum": null,
+      "lecturerVerification": null
+    }
+  ]
+}

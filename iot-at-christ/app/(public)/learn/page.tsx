@@ -1,23 +1,39 @@
 import Link from 'next/link'
 import { ArrowRight, Clock, Cpu } from 'lucide-react'
 import { UNIT2_MODULES } from '@/content/lectures/unit2'
+import { WEEKLY_PLANS } from '@/content/course'
+import { CourseStudioCard } from '@/components/course'
 
 // Unit 2 lecture gallery — pick a module to open its slide deck.
 export default function LearnPage() {
   return (
     <div className="space-y-6">
       <div>
+        <p className="text-xs font-mono text-christ-saffron uppercase tracking-widest">Guided weekend learning</p>
+        <h1 className="text-3xl font-display font-bold text-christ-navy mt-1">Course Studio</h1>
+        <p className="text-sm font-body text-christ-navy/60 mt-1 max-w-2xl">Build an IoT system one evidence-led weekend at a time. Each studio includes preparation, a touchscreen-ready teacher run sheet, a knowledge check and a practical exam.</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {WEEKLY_PLANS.map((plan) => <CourseStudioCard key={plan.id} plan={plan} />)}
+      </div>
+
+      <div className="border-t border-christ-navy/10 pt-8">
         <p className="text-xs font-mono text-christ-saffron uppercase tracking-widest">
           Unit 2 · Hardware Layer
         </p>
-        <h1 className="text-3xl font-display font-bold text-christ-navy mt-1">
+        <h2 className="text-3xl font-display font-bold text-christ-navy mt-1">
           Lecture Modules
-        </h1>
+        </h2>
         <p className="text-sm font-body text-christ-navy/60 mt-1 max-w-2xl">
           From silicon physics to a manufactured PCB — wiring, code and research ideas for each topic,
           linked straight into the Virtual Lab.
         </p>
       </div>
+
+      <Link href="/learn/hardware/sense-think-act" className="group block overflow-hidden rounded-2xl bg-christ-navy p-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+        <div className="flex flex-wrap items-center justify-between gap-4"><div className="max-w-2xl"><span className="rounded-full bg-christ-saffron px-3 py-1 font-mono text-[10px] uppercase tracking-wider">New · interactive hardware studio</span><h2 className="mt-3 text-2xl font-bold">Build the sense → think → act loop</h2><p className="mt-1 text-sm text-white/65">Present, progressively wire, validate, and test one circuit across Arduino Uno, ESP32, and Raspberry Pi.</p></div><span className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-white px-4 text-sm font-bold text-christ-navy">Open studio <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1"/></span></div>
+      </Link>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {UNIT2_MODULES.map((mod) => (

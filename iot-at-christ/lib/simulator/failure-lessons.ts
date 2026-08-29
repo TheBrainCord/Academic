@@ -214,6 +214,26 @@ export const FAILURE_LESSONS: Record<FailureCode, FailureLesson> = {
       '[bus] data corrupted',
     ],
   },
+  'unsupported-pin-direction': {
+    code: 'unsupported-pin-direction',
+    headline: '↪️ This pin only works the other way',
+    whatYouSaw: 'The connected actuator did not respond because the selected pin cannot drive it.',
+    why: 'Some GPIO pins are input-only. They can measure a sensor signal, but have no output driver transistor to source or sink an actuator current.',
+    fix: 'Move the actuator signal to a bidirectional GPIO or digital-output pin. Keep input-only pins for sensors.',
+    onRealHardware: 'This does not normally cause damage; the output simply never changes because the hardware driver does not exist.',
+    effect: 'dead',
+    serialDrama: ['[gpio] ERROR: selected pin is input-only'],
+  },
+  'pin-caution': {
+    code: 'pin-caution',
+    headline: '⚠️ Usable pin with a startup caveat',
+    whatYouSaw: 'The circuit remains valid, but the simulator highlighted a pin that has a special role while the board resets.',
+    why: 'Boot-strapping pins are sampled during reset to configure the chip. They become normal GPIO after startup, provided attached hardware did not force the wrong startup level.',
+    fix: 'Use the pin with suitable pull resistors, or move the signal to an ordinary GPIO if the attached module might hold it at the wrong level during reset.',
+    onRealHardware: 'A wrong strap level usually prevents booting rather than damaging the chip. Correcting the wiring restores normal operation.',
+    effect: 'none',
+    serialDrama: [],
+  },
   'not-wired': {
     code: 'not-wired',
     headline: 'Part not wired yet',
@@ -224,6 +244,24 @@ export const FAILURE_LESSONS: Record<FailureCode, FailureLesson> = {
     effect: 'none',
     serialDrama: [],
   },
+  ...Object.fromEntries(([
+    'logic-overvoltage', 'input-only-output', 'direct-load-drive', 'inductive-protection',
+    'rail-overload', 'missing-common-ground', 'missing-pull-up', 'pwm-incompatible',
+    'duplicate-pin-role', 'i2c-address-conflict',
+  ] as FailureCode[]).map((code) => [code, {
+    code,
+    headline: 'Electrical compatibility warning',
+    whatYouSaw: 'The circuit did not behave safely or predictably.',
+    why: 'The connection violates an electrical limit or interface requirement described by the validation warning.',
+    fix: 'Follow the warning’s concrete wiring remedy before powering real hardware.',
+    onRealHardware: 'Ignoring electrical limits can cause corrupted readings, resets, overheating, or permanent damage.',
+    effect: 'glitch' as const,
+    serialDrama: ['[safety] incompatible electrical connection detected'],
+  }])) as Record<Exclude<FailureCode,
+    | 'short-circuit' | 'missing-resistor' | 'overvoltage' | 'undervoltage'
+    | 'no-power' | 'no-ground' | 'floating-signal' | 'signal-short'
+    | 'analog-on-digital' | 'no-adc-on-board' | 'pin-conflict' | 'not-wired'
+  >, FailureLesson>,
 }
 
 export function getLesson(code: FailureCode): FailureLesson {

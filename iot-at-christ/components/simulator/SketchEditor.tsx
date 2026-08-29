@@ -22,8 +22,9 @@ function pinSummary(pin: PinDef): string {
   if (caps.includes('i2c-scl')) parts.push('I2C clock (SCL)')
   if (caps.includes('analog-in')) parts.push('Analog input')
   if (caps.includes('pwm')) parts.push('PWM output')
-  if (caps.includes('digital') && parts.length === 0) parts.push('Digital I/O')
-  else if (caps.includes('digital') && !parts.includes('Digital I/O')) parts.push('digital')
+  if (caps.includes('gpio')) parts.push('Digital I/O')
+  if (caps.includes('digital-input')) parts.push('Digital input only')
+  if (caps.includes('digital-output')) parts.push('Digital output only')
   return parts.length > 0 ? parts.join(' / ') : 'I/O pin'
 }
 

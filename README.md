@@ -24,6 +24,20 @@ Next.js 14 · TypeScript · Tailwind · Supabase · Resend · Google Classroom A
 Drop a `.yaml` file in `/content/subjects/` and run `npm run seed`.
 No code changes required.
 
+## Curriculum authority
+
+The official, institution-issued syllabus is the authoritative source for course
+scope, learning outcomes, assessment requirements, and prescribed topics. Course
+Studio content must be reconciled with that syllabus; if the application and the
+official syllabus differ, the official syllabus takes precedence.
+
+Interactive activities, simulations, current technologies, case studies, and
+other modern additions are **living-curriculum supplements**. They help teachers
+explain IoT concepts and help students explore how modules work together, but do
+not replace or silently amend the official syllabus. Source availability and
+verification are tracked in
+[`iot-at-christ/content/course/source-materials/`](iot-at-christ/content/course/source-materials/README.md).
+
 ## License
 
 MIT — free to use, fork, and deploy at any university.

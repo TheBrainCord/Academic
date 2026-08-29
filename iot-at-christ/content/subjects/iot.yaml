@@ -9,14 +9,14 @@ curriculumStatus:
   lastVerified: "2026-08-29"
 units:
   - number: 1
-    title: "IoT Universe — The Big Picture"
+    title: Introduction to the Internet of Things
     hours: 6
-    icon: "🌐"
-    color: "#1565C0"
+    icon: 🌐
+    color: '#1565C0'
     sessions:
       - number: 1
-        title: "What is IoT? Beyond the Buzzword"
-        hours: 2
+        title: Introduction to the Internet of Things
+        hours: 6
         topics:
           - "Definition & evolution: M2M → IoT → IIoT → AIoT"
           - "The 4-layer architecture: Perception → Network → Middleware → Application"
@@ -107,10 +107,10 @@ units:
             claimScope: "The legal-status discussion of India's Digital Personal Data Protection Act, 2023."
             lastVerified: "2026-08-29"
   - number: 2
-    title: "Hardware Layer — Sensors, Boards & Components"
-    hours: 8
-    icon: "🔧"
-    color: "#2E7D32"
+    title: IoT Architecture and Devices
+    hours: 7
+    icon: 🔧
+    color: '#2E7D32'
     sessions:
       - number: 4
         title: "Microcontrollers vs Microprocessors"
@@ -229,10 +229,10 @@ units:
           xp: 120
           due_days: 14
   - number: 3
-    title: "Connectivity & Protocols"
-    hours: 8
-    icon: "📡"
-    color: "#6A1B9A"
+    title: IoT Communication and Protocols
+    hours: 7
+    icon: 📡
+    color: '#6A1B9A'
     sessions:
       - number: 8
         title: "Short-Range Protocols — Wi-Fi, Bluetooth, Zigbee, Z-Wave"
@@ -366,10 +366,10 @@ units:
           xp: 110
           due_days: 14
   - number: 4
-    title: "Cloud, Data & IoT Platforms"
-    hours: 6
-    icon: "☁️"
-    color: "#00695C"
+    title: IoT Data and Services
+    hours: 5
+    icon: ☁️
+    color: '#00695C'
     sessions:
       - number: 12
         title: "Cloud Architecture for IoT"
@@ -456,10 +456,10 @@ units:
           xp: 130
           due_days: 14
   - number: 5
-    title: "IoT Security — Defence to Consumer"
+    title: IoT Security and Management
     hours: 6
-    icon: "🔐"
-    color: "#B71C1C"
+    icon: 🔐
+    color: '#B71C1C'
     sessions:
       - number: 15
         title: "The IoT Attack Surface"
