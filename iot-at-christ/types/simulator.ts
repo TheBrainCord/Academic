@@ -11,11 +11,13 @@ export type BoardId = 'arduino-uno' | 'esp32-devkit' | 'raspberry-pi-4' | 'nodem
 
 /**
  * What a single board pin is electrically capable of. A physical pin may
- * carry several capabilities (e.g. ESP32 GPIO pins are digital + pwm +
+ * carry several capabilities (e.g. ESP32 GPIO pins are gpio + pwm +
  * sometimes analog-in).
  */
 export type PinCapability =
-  | 'digital'      // digital read/write
+  | 'digital-input' // input-only digital pin
+  | 'digital-output' // output-only digital pin
+  | 'gpio'         // bidirectional digital input/output
   | 'analog-in'    // ADC input
   | 'pwm'          // PWM output
   | 'power-3v3'    // 3.3V supply rail
@@ -32,6 +34,8 @@ export interface PinDef {
   /** Silkscreen label shown to the student, e.g. 'D13', 'GPIO4', '5V' */
   label: string
   capabilities: PinCapability[]
+  /** Usage caveats that should educate rather than prohibit the connection. */
+  warnings?: string[]
   /** Which physical side of the board drawing the pin sits on */
   side: 'left' | 'right'
   /** 0-based position along its side, top to bottom */
@@ -174,6 +178,8 @@ export type FailureCode =
   | 'analog-on-digital'  // analog output on a pin with no ADC
   | 'no-adc-on-board'    // analog sensor on a board with no ADC at all (the Pi)
   | 'pin-conflict'       // two data signals share one board pin
+  | 'unsupported-pin-direction' // signal requires a direction the pin cannot provide
+  | 'pin-caution'        // usable pin with a board-specific boot/reservation caveat
   | 'not-wired'          // part on the bench with no wires yet
 
 export interface ValidationIssue {

@@ -17,6 +17,12 @@ const isPowerPin = (pin: PinDef): boolean =>
 
 const isGroundPin = (pin: PinDef): boolean => pin.capabilities.includes('ground')
 
+const canReadDigital = (pin: PinDef): boolean =>
+  pin.capabilities.includes('gpio') || pin.capabilities.includes('digital-input')
+
+const canDriveDigital = (pin: PinDef): boolean =>
+  pin.capabilities.includes('gpio') || pin.capabilities.includes('digital-output')
+
 const DATA_ROLES: ReadonlySet<TerminalRole> = new Set(['digital-out', 'analog-out', 'digital-in'])
 
 interface Nets {
@@ -121,6 +127,7 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
       .filter((p): p is PinDef => p !== undefined)
 
   const wiredKeys = new Set<string>()
+  const cautionedPins = new Set<string>()
   for (const wire of circuit.wires) {
     wiredKeys.add(endKey(wire.from))
     wiredKeys.add(endKey(wire.to))
@@ -223,6 +230,24 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
               instanceId: placed.instanceId,
               message: `${def.name}'s ${terminal.label} terminal is wired straight to a ${kind} pin — that's a short circuit in the making. Signal terminals belong on GPIO pins.`,
             })
+          } else {
+            for (const pin of netPins) {
+              // Terminal roles describe the component: a component output needs
+              // a board input, while an actuator input needs the board to drive.
+              const supported = terminal.role === 'digital-out'
+                ? canReadDigital(pin)
+                : canDriveDigital(pin)
+              if (!supported) {
+                const need = terminal.role === 'digital-out' ? 'read a digital input' : 'drive a digital output'
+                issues.push({
+                  severity: 'error',
+                  code: 'unsupported-pin-direction',
+                  instanceId: placed.instanceId,
+                  pinId: pin.id,
+                  message: `${pin.label} cannot ${need} for ${def.name}'s ${terminal.label} terminal. Choose a pin with the required direction.`,
+                })
+              }
+            }
           }
           break
         }
@@ -260,6 +285,20 @@ export function validateCircuit(circuit: Circuit): ValidationResult {
         }
         case 'passive':
           break
+      }
+
+      if (DATA_ROLES.has(terminal.role)) {
+        for (const pin of netPins) {
+          if (!pin.warnings || cautionedPins.has(pin.id)) continue
+          cautionedPins.add(pin.id)
+          issues.push({
+            severity: 'warning',
+            code: 'pin-caution',
+            instanceId: placed.instanceId,
+            pinId: pin.id,
+            message: `${pin.label}: ${pin.warnings.join(' ')}`,
+          })
+        }
       }
     }
 
