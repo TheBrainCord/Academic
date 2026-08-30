@@ -7,11 +7,14 @@ Follow the steps in order; step 4 is the block you paste into Vercel.
 ## 1. Apply the database schema
 
 Open <https://supabase.com/dashboard/project/buenkrsopqnhpysgsvog/sql/new>
-and run the two migration files **in this order** (paste the full file
+and run the migration files **in this order** (paste the full file
 contents, run, then the next):
 
 1. `iot-at-christ/supabase/migrations/001_initial_schema.sql`
 2. `iot-at-christ/supabase/migrations/002_supervision_model.sql`
+3. `iot-at-christ/supabase/migrations/003_simulator_telemetry.sql`
+4. `iot-at-christ/supabase/migrations/004_profile_role_guard.sql`
+5. `iot-at-christ/supabase/migrations/20260829123550_inventory_project_tracking.sql`
 
 Or with the CLI from `iot-at-christ/`:
 
