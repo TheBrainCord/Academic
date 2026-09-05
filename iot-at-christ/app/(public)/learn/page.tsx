@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, Clock, Cpu } from 'lucide-react'
 import { UNIT2_MODULES } from '@/content/lectures/unit2'
+import { UNIT4_DECKS } from '@/content/lectures/unit4'
 import { WEEKLY_PLANS } from '@/content/course'
 import { CourseStudioCard } from '@/components/course'
 
@@ -60,6 +61,47 @@ export default function LearnPage() {
               <span className="inline-flex items-center gap-1"><Cpu className="h-3 w-3" /> {mod.board}</span>
               <span className="ml-auto inline-flex items-center gap-1 text-christ-saffron">
                 Open <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="border-t border-christ-navy/10 pt-8">
+        <p className="text-xs font-mono text-christ-green uppercase tracking-widest">
+          Unit 4 · IoT Data and Services
+        </p>
+        <h2 className="mt-1 text-3xl font-display font-bold text-christ-navy">
+          60-Minute Teaching Decks
+        </h2>
+        <p className="mt-1 max-w-2xl text-sm font-body text-christ-navy/60">
+          Touchscreen-ready sessions with a live timer, revealable teacher cues, class votes,
+          ESP32 builds, code walkthroughs and evidence-based exit checks.
+        </p>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        {UNIT4_DECKS.map((deck) => (
+          <Link
+            key={deck.id}
+            href={`/learn/${deck.id}`}
+            className="group flex flex-col rounded-2xl border border-christ-green/20 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-christ-green/60 hover:shadow-md"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <span className="text-3xl" aria-hidden>{deck.icon}</span>
+              <span className="rounded-full border border-christ-green/25 bg-christ-green/5 px-2.5 py-1 font-mono text-[10px] text-christ-green">
+                SESSION {deck.session}
+              </span>
+            </div>
+            <h3 className="mt-3 font-display text-lg font-bold text-christ-navy transition-colors group-hover:text-christ-green">
+              {deck.title}
+            </h3>
+            <p className="mt-1.5 flex-1 text-xs leading-relaxed text-christ-navy/60">{deck.subtitle}</p>
+            <div className="mt-5 flex items-center gap-3 font-mono text-[11px] text-christ-navy/45">
+              <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {deck.minutes} min</span>
+              <span>{deck.slides.length} slides</span>
+              <span className="ml-auto inline-flex items-center gap-1 font-semibold text-christ-green">
+                Teach <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
               </span>
             </div>
           </Link>
