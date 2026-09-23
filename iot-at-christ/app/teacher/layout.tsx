@@ -9,6 +9,7 @@ const navItems = [
   { href: '/teacher/usage',       label: 'Simulator Usage' },
   { href: '/teacher/curriculum',  label: 'Curriculum' },
   { href: '/teacher/students',    label: 'Students' },
+  { href: '/teacher/inventory',   label: 'Inventory & Projects' },
   { href: '/teacher/assignments', label: 'Assignments' },
   { href: '/teacher/forum',       label: 'Forum' },
   { href: '/teacher/research',    label: 'Research' },

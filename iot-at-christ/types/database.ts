@@ -12,6 +12,15 @@ export type RoleSubtype     = 'primary' | 'advisor' | null
 export type PhaseStatus     = 'planned' | 'in-progress' | 'pending_review' | 'completed'
 export type SignoffDecision = 'approved' | 'revision_requested' | 'coordinator_override'
 export type SupervisorType  = 'primary' | 'advisor'
+export type HardwareCondition = 'usable' | 'needs_repair' | 'retired'
+export type HardwareLoanStatus =
+  | 'active'
+  | 'partially_returned'
+  | 'returned'
+  | 'overdue'
+  | 'lost'
+  | 'damaged'
+export type ProjectProgressStatus = 'planning' | 'in_progress' | 'blocked' | 'testing' | 'completed'
 export type NotificationType =
   | 'SUPERVISOR_ASSIGNED'
   | 'PHASE_SUBMITTED'
@@ -216,6 +225,78 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['notifications']['Insert']>
       }
 
+      hardware_inventory: {
+        Row: {
+          id:               string
+          asset_code:       string
+          name:             string
+          category:         string
+          model:            string | null
+          description:      string | null
+          storage_location: string | null
+          total_quantity:   number
+          minimum_quantity: number
+          unit_cost_inr:    number | null
+          condition:        HardwareCondition
+          created_by:       string | null
+          created_at:       string
+          updated_at:       string
+        }
+        Insert: Omit<Database['public']['Tables']['hardware_inventory']['Row'], 'id' | 'created_at' | 'updated_at'>
+          & { id?: string; created_at?: string; updated_at?: string }
+        Update: Partial<Database['public']['Tables']['hardware_inventory']['Insert']>
+      }
+
+      hardware_loans: {
+        Row: {
+          id:                string
+          inventory_item_id: string
+          borrower_id:       string
+          project_id:        string | null
+          issued_by:         string
+          quantity:          number
+          returned_quantity: number
+          purpose:           string | null
+          issued_at:         string
+          due_at:            string | null
+          returned_at:       string | null
+          return_notes:      string | null
+          status:            HardwareLoanStatus
+          created_at:        string
+          updated_at:        string
+        }
+        Insert: Omit<Database['public']['Tables']['hardware_loans']['Row'], 'id' | 'returned_quantity' | 'issued_at' | 'returned_at' | 'return_notes' | 'created_at' | 'updated_at'>
+          & {
+            id?: string
+            returned_quantity?: number
+            issued_at?: string
+            returned_at?: string | null
+            return_notes?: string | null
+            created_at?: string
+            updated_at?: string
+          }
+        Update: Partial<Database['public']['Tables']['hardware_loans']['Insert']>
+      }
+
+      project_progress_updates: {
+        Row: {
+          id:               string
+          project_id:       string
+          author_id:        string
+          progress_percent: number
+          status:           ProjectProgressStatus
+          summary:          string
+          accomplishments:  string | null
+          blockers:         string | null
+          next_steps:       string | null
+          created_at:       string
+          updated_at:       string
+        }
+        Insert: Omit<Database['public']['Tables']['project_progress_updates']['Row'], 'id' | 'created_at' | 'updated_at'>
+          & { id?: string; created_at?: string; updated_at?: string }
+        Update: Partial<Database['public']['Tables']['project_progress_updates']['Insert']>
+      }
+
       simulator_events: {
         Row: {
           id:           string
@@ -263,3 +344,6 @@ export type SupervisionComment  = Database['public']['Tables']['supervision_comm
 export type SupervisionMeeting  = Database['public']['Tables']['supervision_meetings']['Row']
 export type ResearchQuestion    = Database['public']['Tables']['research_questions']['Row']
 export type Notification        = Database['public']['Tables']['notifications']['Row']
+export type HardwareInventoryItem = Database['public']['Tables']['hardware_inventory']['Row']
+export type HardwareLoan          = Database['public']['Tables']['hardware_loans']['Row']
+export type ProjectProgressUpdate = Database['public']['Tables']['project_progress_updates']['Row']

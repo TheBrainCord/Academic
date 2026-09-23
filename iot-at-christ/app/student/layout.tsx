@@ -10,6 +10,7 @@ const navItems = [
   { href: '/student/lessons',     label: 'Lessons' },
   { href: '/student/simulator',   label: 'Virtual Lab' },
   { href: '/student/assignments', label: 'Assignments' },
+  { href: '/student/projects',    label: 'Project Tracker' },
   { href: '/student/forum',       label: 'Forum' },
   { href: '/student/research',    label: 'Research' },
   { href: '/student/research-ideas', label: 'Idea Bank' },
