@@ -3,6 +3,7 @@ import { LectureViewer } from '@/components/lectures/LectureViewer'
 import { UNIT2_MODULES, getModule } from '@/content/lectures/unit2'
 import { TeachingDeckViewer } from '@/components/lectures/TeachingDeckViewer'
 import { UNIT4_DECKS, getUnit4Deck } from '@/content/lectures/unit4'
+import { UNIT6_DECKS, getUnit6Deck } from '@/content/lectures/unit6'
 import { CourseStudio } from '@/components/course'
 import { WEEKLY_PLANS, getWeeklyPlan } from '@/content/course'
 
@@ -11,6 +12,7 @@ export function generateStaticParams() {
   return [
     ...UNIT2_MODULES.map((m) => m.id),
     ...UNIT4_DECKS.map((deck) => deck.id),
+    ...UNIT6_DECKS.map((deck) => deck.id),
     ...WEEKLY_PLANS.map((plan) => plan.id),
   ].map((moduleId) => ({ moduleId }))
 }
@@ -26,6 +28,9 @@ export default async function LectureModulePage({
 
   const unit4Deck = getUnit4Deck(moduleId)
   if (unit4Deck) return <TeachingDeckViewer deck={unit4Deck} />
+
+  const unit6Deck = getUnit6Deck(moduleId)
+  if (unit6Deck) return <TeachingDeckViewer deck={unit6Deck} />
 
   const lectureModule = getModule(moduleId)
   if (!lectureModule) notFound()

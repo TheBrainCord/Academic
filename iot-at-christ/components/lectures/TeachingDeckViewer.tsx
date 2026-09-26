@@ -18,6 +18,7 @@ import {
   Users,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CaseStudyWorkspace } from '@/components/lectures/CaseStudyWorkspace'
 import type {
   TeachingDeck,
   TeachingDeckCard,
@@ -478,6 +479,10 @@ export function TeachingDeckViewer({ deck }: { deck: TeachingDeck }) {
               ))}
             </div>
           </div>
+        )}
+
+        {slide.caseStudy && (
+          <CaseStudyWorkspace caseStudy={slide.caseStudy} deckId={deck.id} />
         )}
       </section>
 

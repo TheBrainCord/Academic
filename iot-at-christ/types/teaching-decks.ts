@@ -60,6 +60,21 @@ export interface TeachingDeckQuestion {
   options: TeachingDeckOption[]
 }
 
+export interface TeachingDeckCaseStudyField {
+  id: string
+  label: string
+  prompt: string
+  placeholder?: string
+}
+
+export interface TeachingDeckCaseStudy {
+  scenario: string
+  challenge: string
+  requirements: string[]
+  fields: TeachingDeckCaseStudyField[]
+  reflectionQuestions: string[]
+}
+
 export interface TeachingSlide {
   id: string
   kind: TeachingSlideKind
@@ -80,6 +95,7 @@ export interface TeachingSlide {
   code?: TeachingDeckCode
   questions?: TeachingDeckQuestion[]
   checklist?: string[]
+  caseStudy?: TeachingDeckCaseStudy
 }
 
 export interface TeachingDeck {

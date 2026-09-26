@@ -568,209 +568,107 @@ units:
             claimScope: "Current Indian Critical Information Infrastructure authority and protection-framework context."
             lastVerified: "2026-08-29"
   - number: 6
-    title: "AI + IoT = AIoT"
-    hours: 6
+    title: "Edge, Cloud, AI & Secure IoT — Self Study"
+    hours: 9
     icon: "🧠"
     color: "#E65100"
     sessions:
       - number: 18
-        title: "Machine Learning on the Edge"
-        hours: 2
+        title: "Edge Computing vs Cloud Computing + Complete IoT Cloud Architecture"
+        hours: 3
         topics:
-          - "TinyML: running neural networks on microcontrollers with <256KB RAM"
-          - "Model quantisation: FP32 → INT8, accuracy vs memory tradeoffs"
-          - "TensorFlow Lite Micro, Edge Impulse, Arduino Machine Learning"
-          - "Keyword spotting, gesture recognition, vibration anomaly detection"
+          - "Edge Computing vs Cloud Computing: latency, bandwidth, privacy, resilience and scale"
+          - "Hybrid IoT architecture: device, edge/gateway and cloud responsibilities"
+          - "Complete IoT cloud path: device → connectivity/protocol → ingestion → processing → storage → analytics → application"
+          - "Return command path, acknowledgement and device-reported final state"
         keywords:
-          - "TinyML"
-          - "TFLite Micro"
-          - "Quantisation"
-          - "Edge Impulse"
-          - "Keyword Spotting"
-          - "INT8"
-          - "Model Pruning"
+          - "Edge Computing"
+          - "Cloud Computing"
+          - "IoT Gateway"
+          - "MQTT Broker"
+          - "Time-Series Data"
+          - "Resilience"
         case_study:
-          title: "Google's Coral — Keyword Detection Without Cloud"
-          org: "Google"
-          description: "Edge keyword-detection exercise exploring offline inference and privacy; no power or latency benchmark is asserted."
+          title: "Safety Alarm vs Fleet Analytics"
+          org: "IoT at CHRIST"
+          description: "Architecture exercise comparing an immediate local safety decision with cloud-based historical and fleet-wide analysis."
         tools:
-          - "Edge Impulse Studio (free)"
-          - "Wokwi.com"
-          - "Google Colab (model training)"
+          - "IoT at CHRIST Unit 6 interactive deck"
+          - "Architecture worksheet"
         assignment:
-          type: "Build"
-          task: "Use Edge Impulse Studio (free): collect 40 samples each of two vibration patterns using your phone's accelerometer (e.g. 'tapping table' vs 'phone resting'). Train a neural network classifier. Target: > 85% accuracy. Export as Arduino library. Deploy to Wokwi ESP32 or a physical Arduino. Report: model size (KB), inference time (ms), accuracy."
-          xp: 150
-          due_days: 14
-      - number: 19
-        title: "Computer Vision at the Edge"
-        hours: 2
-        topics:
-          - "Object detection: YOLO on Raspberry Pi, MobileNet on Coral"
-          - "Anomaly detection in manufacturing: missing bolt, wrong label"
-          - "Privacy-preserving edge vision: process locally, never upload faces"
-          - "Thermal imaging + CV: fire detection, fever screening"
-        keywords:
-          - "YOLO"
-          - "MobileNet"
-          - "OpenCV"
-          - "Edge Inference"
-          - "Thermal Imaging"
-          - "Object Detection"
-          - "TensorRT"
-        case_study:
-          title: "Bosch's AI Quality Control — Pune Plant"
-          org: "Bosch India + IIT Bombay"
-          description: "Manufacturing-vision exercise for detecting surface defects at the edge; no production throughput or workforce outcome is asserted."
-        tools:
-          - "Raspberry Pi Camera Module (or laptop webcam)"
-          - "OpenCV"
-          - "YOLOv8n (nano model)"
-        assignment:
-          type: "Implementation"
-          task: "Using OpenCV and a pre-trained MobileNet-SSD model: write a Python script that detects objects in a live webcam feed (or video file). Count the number of times a 'person' appears per minute. Log to a CSV file. This simulates occupancy monitoring. If using Wokwi: simulate with a stored image array instead of live video."
-          xp: 130
-          due_days: 14
-      - number: 20
-        title: "Generative AI and LLMs in IoT Systems"
-        hours: 2
-        topics:
-          - "LLMs as IoT orchestrators: natural language to device commands"
-          - "RAG (Retrieval Augmented Generation) with sensor history"
-          - "Anomaly explanation: 'Why did my sensor spike at 3AM?'"
-          - "Limits and risks: LLM hallucination in safety-critical IoT"
-        keywords:
-          - "LLM"
-          - "RAG"
-          - "Function Calling"
-          - "AI Agent"
-          - "Natural Language Interface"
-          - "Hallucination"
-          - "Tool Use"
-        case_study:
-          title: "Industrial LLM Assistant — Predictive Maintenance Design"
-          org: "Siemens + OpenAI"
-          description: "Industrial assistant design exercise using tool calls over sensor history; no vendor deployment or data-volume claim is asserted."
-        tools:
-          - "Claude API (Anthropic)"
-          - "Node-RED"
-          - "InfluxDB"
-        assignment:
-          type: "Build"
-          task: "Using the Anthropic or OpenAI API: build a Python chatbot that has access to a CSV of simulated sensor readings (last 24h). The user can ask natural language questions like 'Was there any anomaly yesterday?' or 'What was the peak temperature and when?'. The LLM should use tool calling to query the CSV and return accurate answers. Demonstrate 3 queries."
-          xp: 160
-          due_days: 14
-  - number: 7
-    title: "Project Studio — Build & Present"
-    hours: 10
-    icon: "🚀"
-    color: "#4A148C"
-    sessions:
-      - number: 21
-        title: "Project Ideation & Scoping"
-        hours: 2
-        topics:
-          - "Problem-first vs technology-first thinking"
-          - "IoT project canvas: problem, stakeholders, sensors, connectivity, cloud, outcome"
-          - "Feasibility assessment: budget, timeline, skill, hardware availability"
-          - "India-relevant problem spaces: agriculture, healthcare, smart city, defence, education"
-        keywords:
-          - "Project Canvas"
-          - "Problem Statement"
-          - "Stakeholder"
-          - "Feasibility"
-          - "MVP"
-          - "Scope Creep"
-        case_study:
-          title: "Rural Water Quality Monitor — From Idea to Deployment"
-          org: "IIT Madras + Rural Development Dept"
-          description: "Student design scenario for a solar-powered rural water-quality monitor, with budget and schedule to be estimated from current component evidence."
-        tools:
-          - "IoT Project Canvas template"
-          - "Wokwi.com for prototyping"
-        assignment:
-          type: "Project"
-          task: "Define your semester project. Submit: 1-paragraph problem statement, stakeholder map, sensor list with justification, connectivity choice with justification, cloud platform, expected outcome. Peer feedback: swap with one other student and give written feedback on feasibility."
+          type: "Self Study"
+          task: "For one real-world IoT project, draw the end-to-end architecture from sensor to actuator. Mark every decision as DEVICE, EDGE or CLOUD and justify each placement using latency, bandwidth, privacy, resilience or scale."
           xp: 100
           due_days: 7
-      - number: 22
-        title: "Prototyping Sprint 1 — Hardware + Connectivity"
-        hours: 2
+      - number: 19
+        title: "Edge AI and TinyML"
+        hours: 3
         topics:
-          - "Agile for hardware: 2-week sprints, physical demo at end of each"
-          - "Debugging hardware: oscilloscope, logic analyser, serial monitor tricks"
-          - "Power measurement: INA219 current sensor for battery life estimation"
-          - "Version controlling hardware: KiCad + Git"
+          - "Edge AI: inference close to sensors instead of sending every raw input to the cloud"
+          - "TinyML: compact machine-learning inference on constrained microcontrollers"
+          - "Training vs inference and why deployment location matters"
+          - "Use cases: keyword spotting, gesture recognition, vibration anomaly detection and local vision analytics"
         keywords:
-          - "Sprint"
-          - "Prototype"
-          - "Debugging"
-          - "INA219"
-          - "Logic Analyser"
-          - "Hardware Versioning"
+          - "Edge AI"
+          - "TinyML"
+          - "Inference"
+          - "Model Optimisation"
+          - "Anomaly Detection"
+          - "Privacy"
+        case_study:
+          title: "Machine Vibration Protection"
+          org: "IoT at CHRIST"
+          description: "Students decide whether vibration anomaly inference should run on-device, at an edge gateway or in the cloud when the machine must remain protected during network loss."
+        tools:
+          - "IoT at CHRIST Unit 6 interactive deck"
+          - "Optional Edge Impulse / TinyML research"
         assignment:
-          type: "Project"
-          task: "Sprint 1 deliverable: working hardware prototype with all sensors connected and reading data. Demo: show serial monitor output with real sensor readings. If using simulation, show Wokwi project with all sensors wired. Submit: GitHub repo link, Wokwi project link, and a 2-minute screen recording of your demo."
+          type: "Self Study"
+          task: "Choose one sensing problem where AI may add value. Explain what data is collected, where model training occurs, where inference runs, why that placement is appropriate, and what happens if connectivity is unavailable."
+          xp: 100
+          due_days: 7
+      - number: 20
+        title: "Authentication, Encryption, TLS and DTLS + Final IoT Case Study"
+        hours: 3
+        topics:
+          - "Authentication: verifying device, user and server identity before trust is granted"
+          - "Encryption: protecting confidentiality of application data in transit"
+          - "TLS for protected application connections such as HTTPS and MQTT over TLS"
+          - "DTLS for datagram-oriented secure communication such as UDP-based CoAP deployments"
+          - "Authorisation, least privilege and safe command paths"
+          - "Final architecture case study combining sensing, edge/cloud, AI, security, resilience and actuation"
+        keywords:
+          - "Authentication"
+          - "Encryption"
+          - "TLS"
+          - "DTLS"
+          - "Device Identity"
+          - "Authorisation"
+          - "IoT Security"
+        case_study:
+          title: "Smart Railway Station Safety & Assistance System"
+          org: "IoT at CHRIST"
+          description: "Students independently design an end-to-end railway-station IoT system that continues essential safety functions during Internet failure, uses edge/cloud processing deliberately, applies AI only where justified, and protects device communication."
+        tools:
+          - "IoT at CHRIST Unit 6 case-study workspace"
+          - "Student research sources"
+        assignment:
+          type: "Case Study"
+          task: "Complete the Smart Railway Station Safety & Assistance System architecture in the Unit 6 workspace. Include sensors, controllers/gateway, communication, protocols, edge decisions, Edge AI/TinyML, complete cloud architecture, authentication, encrypted transport, failure handling and scale. Justify WHAT, HOW and WHY for each major choice."
           xp: 150
-          due_days: 14
-      - number: 23
-        title: "Prototyping Sprint 2 — Cloud + Dashboard"
-        hours: 2
-        topics:
-          - "Connecting your prototype to the cloud"
-          - "Building a real-time dashboard"
-          - "Setting up alerts and notifications"
-          - "Data logging and history"
-        keywords:
-          - "MQTT"
-          - "Dashboard"
-          - "Alert"
-          - "Notification"
-          - "Data Logging"
-          - "Cloud Platform"
-        assignment:
-          type: "Project"
-          task: "Sprint 2 deliverable: sensor data flowing to cloud platform, live dashboard showing real-time and historical data. At least one alert configured (e.g. temperature > threshold → email/SMS). Submit: dashboard screenshot, alert test screenshot, updated GitHub repo."
-          xp: 150
-          due_days: 14
-      - number: 24
-        title: "Testing, Optimisation & Documentation"
-        hours: 2
-        topics:
-          - "IoT testing: unit tests, integration tests, field tests"
-          - "Power optimisation: deep sleep, duty cycling, adaptive sampling"
-          - "Writing technical documentation for IoT projects"
-          - "Open-sourcing your project: README, LICENSE, circuit diagram"
-        keywords:
-          - "Deep Sleep"
-          - "Duty Cycle"
-          - "Power Optimisation"
-          - "Technical Documentation"
-          - "Open Source"
-        assignment:
-          type: "Project"
-          task: "Measure your project's power consumption (use INA219 or estimate from datasheets). Calculate estimated battery life. Implement at least one power optimisation (deep sleep, reduced polling rate, etc). Measure improvement. Update your GitHub README with: project description, setup instructions, circuit diagram, and power analysis."
-          xp: 120
-          due_days: 14
-      - number: 25
-        title: "Final Presentations"
-        hours: 2
-        topics:
-          - "Communicating technical work to non-technical stakeholders"
-          - "Live demo best practices: what to do when it fails"
-          - "Peer evaluation and constructive feedback"
-          - "Publishing your project: GitHub, Hackster.io, Instructables"
-        keywords:
-          - "Presentation"
-          - "Demo"
-          - "Peer Review"
-          - "Publication"
-          - "Portfolio"
-        assignment:
-          type: "Project"
-          task: "Final presentation: 10-minute live demo + 5-minute Q&A. Evaluation criteria: working demo (40%), problem relevance (20%), technical depth (20%), presentation clarity (10%), documentation quality (10%). Publish your project to Hackster.io or Instructables after presentation."
-          xp: 200
-          due_days: 21
+          due_days: 7
+        references:
+          - title: "The Transport Layer Security (TLS) Protocol Version 1.3"
+            authoritativeUrl: "https://www.rfc-editor.org/rfc/rfc8446"
+            publisher: "IETF / RFC Editor"
+            claimScope: "Transport Layer Security protocol concepts used to explain protected reliable application connections."
+            lastVerified: "2026-09-26"
+          - title: "The Datagram Transport Layer Security (DTLS) Protocol Version 1.3"
+            authoritativeUrl: "https://www.rfc-editor.org/rfc/rfc9147"
+            publisher: "IETF / RFC Editor"
+            claimScope: "Datagram Transport Layer Security concepts used to explain protected datagram communication."
+            lastVerified: "2026-09-26"
+
 missions:
   - title: "Operation BorderSense"
     story: "At 2237 hours, Sector 7 border surveillance goes dark. 40km of unmanned sensor grid offline. Possible drone incursion window: 45 minutes."
