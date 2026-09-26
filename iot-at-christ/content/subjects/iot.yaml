@@ -569,13 +569,13 @@ units:
             lastVerified: "2026-08-29"
   - number: 6
     title: "Edge, Cloud, AI & Secure IoT — Self Study"
-    hours: 6
+    hours: 9
     icon: "🧠"
     color: "#E65100"
     sessions:
       - number: 18
         title: "Edge Computing vs Cloud Computing + Complete IoT Cloud Architecture"
-        hours: 2
+        hours: 3
         topics:
           - "Edge Computing vs Cloud Computing: latency, bandwidth, privacy, resilience and scale"
           - "Hybrid IoT architecture: device, edge/gateway and cloud responsibilities"
@@ -602,7 +602,7 @@ units:
           due_days: 7
       - number: 19
         title: "Edge AI and TinyML"
-        hours: 2
+        hours: 3
         topics:
           - "Edge AI: inference close to sensors instead of sending every raw input to the cloud"
           - "TinyML: compact machine-learning inference on constrained microcontrollers"
@@ -629,7 +629,7 @@ units:
           due_days: 7
       - number: 20
         title: "Authentication, Encryption, TLS and DTLS + Final IoT Case Study"
-        hours: 2
+        hours: 3
         topics:
           - "Authentication: verifying device, user and server identity before trust is granted"
           - "Encryption: protecting confidentiality of application data in transit"
