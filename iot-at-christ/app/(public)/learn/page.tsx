@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Clock, Cpu } from 'lucide-react'
 import { UNIT2_MODULES } from '@/content/lectures/unit2'
 import { UNIT4_DECKS } from '@/content/lectures/unit4'
+import { UNIT6_DECKS } from '@/content/lectures/unit6'
 import { WEEKLY_PLANS } from '@/content/course'
 import { CourseStudioCard } from '@/components/course'
 
@@ -107,6 +108,49 @@ export default function LearnPage() {
           </Link>
         ))}
       </div>
+
+      <div className="border-t border-christ-navy/10 pt-8">
+        <p className="text-xs font-mono text-christ-saffron uppercase tracking-widest">
+          Unit 6 · Self Study · Final Class
+        </p>
+        <h2 className="mt-1 text-3xl font-display font-bold text-christ-navy">
+          Edge, Cloud, AI & IoT Security
+        </h2>
+        <p className="mt-1 max-w-2xl text-sm font-body text-christ-navy/60">
+          One touchscreen-ready learning journey: recap Units 1–5, study edge vs cloud,
+          trace complete cloud architecture, understand Edge AI/TinyML and secure IoT,
+          then solve a real-world architecture case study independently.
+        </p>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        {UNIT6_DECKS.map((deck) => (
+          <Link
+            key={deck.id}
+            href={`/learn/${deck.id}`}
+            className="group flex flex-col rounded-2xl border border-christ-saffron/25 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-christ-saffron/70 hover:shadow-md"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <span className="text-3xl" aria-hidden>{deck.icon}</span>
+              <span className="rounded-full border border-christ-saffron/25 bg-christ-saffron/5 px-2.5 py-1 font-mono text-[10px] text-christ-saffron">
+                SELF STUDY
+              </span>
+            </div>
+            <h3 className="mt-3 font-display text-xl font-bold text-christ-navy transition-colors group-hover:text-christ-saffron">
+              {deck.title}
+            </h3>
+            <p className="mt-1.5 flex-1 text-xs leading-relaxed text-christ-navy/60">{deck.subtitle}</p>
+            <div className="mt-5 flex items-center gap-3 font-mono text-[11px] text-christ-navy/45">
+              <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {deck.minutes} min</span>
+              <span>{deck.slides.length} slides</span>
+              <span className="ml-auto inline-flex items-center gap-1 font-semibold text-christ-saffron">
+                Start Unit 6 <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
     </div>
   )
 }
